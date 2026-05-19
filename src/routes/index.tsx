@@ -241,29 +241,29 @@ function ContactSection({ packages }: { packages: Package[] }) {
   };
 
   return (
-    <section id="contact" className="bg-ink text-background py-24">
+    <section id="contact" className="bg-beige text-foreground py-24">
       <div className="max-w-6xl mx-auto px-6 grid lg:grid-cols-5 gap-12">
         <div className="lg:col-span-2">
           <p className="text-xs uppercase tracking-[0.3em] text-gold mb-3">Get in touch</p>
           <h2 className="font-serif text-4xl md:text-5xl mb-6">
             Let's create something <span className="italic text-gradient-gold">magical</span>
           </h2>
-          <p className="text-background/70 mb-10 leading-relaxed">
+          <p className="text-muted-foreground mb-10 leading-relaxed">
             Tell us about your event and we'll craft the perfect photobooth experience.
             Quotes returned within 24 hours.
           </p>
           <ul className="space-y-5">
             <li className="flex items-start gap-4">
               <span className="h-10 w-10 inline-flex items-center justify-center rounded-full gradient-gold text-ink flex-shrink-0"><Phone className="h-4 w-4" /></span>
-              <div><p className="text-xs uppercase tracking-widest text-gold">Phone</p><a href="tel:0419678189" className="text-background hover:text-gold">0419 678 189</a></div>
+              <div><p className="text-xs uppercase tracking-widest text-gold">Phone</p><a href="tel:0419678189" className="text-foreground hover:text-gold">0419 678 189</a></div>
             </li>
             <li className="flex items-start gap-4">
               <span className="h-10 w-10 inline-flex items-center justify-center rounded-full gradient-gold text-ink flex-shrink-0"><Mail className="h-4 w-4" /></span>
-              <div><p className="text-xs uppercase tracking-widest text-gold">Email</p><a href="mailto:elitemagicbooth@gmail.com" className="text-background hover:text-gold">elitemagicbooth@gmail.com</a></div>
+              <div><p className="text-xs uppercase tracking-widest text-gold">Email</p><a href="mailto:elitemagicbooth@gmail.com" className="text-foreground hover:text-gold">elitemagicbooth@gmail.com</a></div>
             </li>
             <li className="flex items-start gap-4">
               <span className="h-10 w-10 inline-flex items-center justify-center rounded-full gradient-gold text-ink flex-shrink-0"><MapPin className="h-4 w-4" /></span>
-              <div><p className="text-xs uppercase tracking-widest text-gold">Location</p><p className="text-background">Melbourne, Victoria</p></div>
+              <div><p className="text-xs uppercase tracking-widest text-gold">Location</p><p className="text-foreground">Melbourne, Victoria</p></div>
             </li>
           </ul>
         </div>
