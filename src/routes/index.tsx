@@ -1,8 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
-import { Check, Phone, Mail, MapPin, Camera, Sparkles, Heart, Users } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { Check, Phone, Mail, MapPin, Camera, Sparkles, Heart, Users, ArrowRight, Star } from "lucide-react";
 import { toast } from "sonner";
 import heroImg from "@/assets/hero.jpg";
+import logo from "@/assets/logo.png";
 import { DEFAULT_PACKAGES, type Package } from "@/lib/packages";
 import { SiteHeader, SiteFooter } from "@/components/SiteChrome";
 import { Toaster } from "@/components/ui/sonner";
@@ -53,43 +54,8 @@ function Home() {
       <SiteHeader />
 
       {/* Hero */}
-      <section className="relative min-h-screen flex items-center pt-24 overflow-hidden bg-beige">
-        <div className="absolute inset-0">
-          <img src={heroImg} alt="Elite MagicBooth photobooth setup" className="w-full h-full object-cover opacity-40" />
-          <div className="absolute inset-0 bg-gradient-to-r from-background/95 via-background/80 to-background/40" />
-          <div className="absolute inset-0 bg-gradient-to-b from-background/40 via-transparent to-background" />
-        </div>
-        <div className="relative max-w-7xl mx-auto px-6 py-20 grid md:grid-cols-2 gap-12 items-center w-full">
-          <div className="text-foreground animate-fade-up">
-            <div className="inline-flex items-center gap-2 rounded-full border border-gold/50 bg-card/80 backdrop-blur px-4 py-1.5 text-xs uppercase tracking-widest text-gold mb-6 shadow-sm">
-              <Sparkles className="h-3.5 w-3.5" /> Melbourne's Premium Photobooth
-            </div>
-            <h1 className="font-serif text-5xl md:text-7xl leading-[1.05] mb-6">
-              Premium Photobooth Hire for{" "}
-              <span className="text-gradient-gold italic">Unforgettable</span> Events
-            </h1>
-            <p className="text-lg text-muted-foreground max-w-xl mb-8 leading-relaxed">
-              Elite MagicBooth delivers stylish photobooth experiences with unlimited prints,
-              custom templates, designer props, elegant backdrops, and instant digital sharing —
-              tailored to your event.
-            </p>
-            <div className="flex flex-wrap gap-4">
-              <a
-                href="#packages"
-                className="inline-flex items-center gap-2 rounded-full gradient-gold px-7 py-3.5 font-semibold text-ink shadow-luxe hover:scale-105 transition-transform"
-              >
-                View Packages
-              </a>
-              <a
-                href="#contact"
-                className="inline-flex items-center gap-2 rounded-full border border-gold/50 bg-card/80 backdrop-blur px-7 py-3.5 font-semibold text-foreground hover:bg-gold hover:text-ink transition"
-              >
-                Contact Us
-              </a>
-            </div>
-          </div>
-        </div>
-      </section>
+      <Hero />
+
 
       {/* Highlights */}
       <section className="max-w-7xl mx-auto px-6 py-20 grid grid-cols-2 md:grid-cols-4 gap-6">
@@ -227,6 +193,182 @@ function Home() {
     </div>
   );
 }
+
+function Hero() {
+  const imgRef = useRef<HTMLImageElement>(null);
+
+  // Subtle parallax on scroll
+  useEffect(() => {
+    const onScroll = () => {
+      if (!imgRef.current) return;
+      const y = Math.min(window.scrollY, 600);
+      imgRef.current.style.transform = `translate3d(0, ${y * 0.25}px, 0) scale(${1 + y * 0.0004})`;
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  // Pre-generated bokeh particles (deterministic so SSR matches client)
+  const particles = Array.from({ length: 22 }, (_, i) => {
+    const seed = (i * 9301 + 49297) % 233280;
+    const left = (seed / 233280) * 100;
+    const size = 6 + ((i * 13) % 18);
+    const delay = (i * 0.7) % 14;
+    const duration = 14 + ((i * 5) % 12);
+    const tx = ((i % 2 === 0 ? 1 : -1) * (20 + (i * 7) % 60));
+    return { left, size, delay, duration, tx, key: i };
+  });
+
+  return (
+    <section className="relative min-h-screen flex items-center pt-24 overflow-hidden bg-beige isolate">
+      {/* Background image with subtle zoom + parallax */}
+      <div className="absolute inset-0 overflow-hidden">
+        <img
+          ref={imgRef}
+          src={heroImg}
+          alt="Elegant photobooth at a luxury wedding reception"
+          className="w-full h-[115%] object-cover animate-hero-zoom will-change-transform"
+        />
+        {/* Warm cinematic gradient overlays — keep image visible, text legible */}
+        <div className="absolute inset-0 bg-gradient-to-r from-background/85 via-background/55 to-background/10" />
+        <div className="absolute inset-0 bg-gradient-to-b from-background/30 via-transparent to-background" />
+        <div
+          className="absolute inset-0 opacity-60 mix-blend-soft-light"
+          style={{
+            background:
+              "radial-gradient(60% 60% at 20% 30%, oklch(0.92 0.08 85 / 0.5), transparent 60%), radial-gradient(50% 50% at 85% 75%, oklch(0.78 0.11 80 / 0.35), transparent 65%)",
+          }}
+        />
+      </div>
+
+      {/* Floating bokeh particles */}
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        {particles.map((p) => (
+          <span
+            key={p.key}
+            className="absolute bottom-[-40px] rounded-full bg-gradient-to-br from-[oklch(0.92_0.08_85)] to-[oklch(0.78_0.11_80)] blur-[2px]"
+            style={{
+              left: `${p.left}%`,
+              width: `${p.size}px`,
+              height: `${p.size}px`,
+              opacity: 0.5,
+              ["--tx" as string]: `${p.tx}px`,
+              animation: `particleFloat ${p.duration}s linear ${p.delay}s infinite`,
+            }}
+          />
+        ))}
+      </div>
+
+      <div className="relative max-w-7xl mx-auto px-6 py-20 grid lg:grid-cols-[1.1fr_1fr] gap-12 items-center w-full z-10">
+        {/* Left: text */}
+        <div className="text-foreground">
+          <div
+            className="inline-flex items-center gap-2 rounded-full glass-card px-4 py-1.5 text-xs uppercase tracking-[0.25em] text-gold mb-6 animate-fade-up"
+            style={{ animationDelay: "0.05s" }}
+          >
+            <Sparkles className="h-3.5 w-3.5" /> Melbourne · Luxury Photobooth
+          </div>
+
+          <h1
+            className="font-serif text-[2.75rem] sm:text-6xl lg:text-7xl xl:text-[5.25rem] leading-[1.02] mb-6 animate-fade-up"
+            style={{ animationDelay: "0.15s" }}
+          >
+            Capture Every <br className="hidden sm:block" />
+            Celebration in <span className="shimmer-text italic">Style</span>
+          </h1>
+
+          <p
+            className="text-base sm:text-lg text-muted-foreground max-w-xl mb-8 leading-relaxed animate-fade-up"
+            style={{ animationDelay: "0.3s" }}
+          >
+            Premium photobooth experiences for weddings, birthdays, corporate events
+            &amp; special occasions — unlimited prints, designer props, and instant
+            digital sharing, beautifully tailored to your event.
+          </p>
+
+          <div
+            className="flex flex-wrap gap-4 animate-fade-up"
+            style={{ animationDelay: "0.45s" }}
+          >
+            <a
+              href="#packages"
+              className="group relative inline-flex items-center gap-2 rounded-full gradient-gold px-7 py-4 font-semibold text-ink shadow-luxe overflow-hidden transition-transform hover:scale-105 animate-pulse-glow"
+            >
+              <span className="relative z-10">View Packages</span>
+              <ArrowRight className="relative z-10 h-4 w-4 transition-transform group-hover:translate-x-1" />
+              <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/40 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
+            </a>
+            <a
+              href="#contact"
+              className="group inline-flex items-center gap-2 rounded-full glass-card px-7 py-4 font-semibold text-foreground hover:text-ink hover:bg-gold transition"
+            >
+              Book Your Event
+              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+            </a>
+          </div>
+
+          {/* Trust row */}
+          <div
+            className="mt-10 flex flex-wrap items-center gap-6 text-sm text-muted-foreground animate-fade-up"
+            style={{ animationDelay: "0.6s" }}
+          >
+            <div className="flex items-center gap-1.5">
+              {[0, 1, 2, 3, 4].map((i) => (
+                <Star key={i} className="h-4 w-4 fill-gold text-gold" />
+              ))}
+              <span className="ml-1 font-medium text-foreground">5.0</span>
+            </div>
+            <span className="h-4 w-px bg-border" />
+            <span><strong className="text-foreground">500+</strong> events styled</span>
+            <span className="h-4 w-px bg-border hidden sm:inline-block" />
+            <span className="hidden sm:inline">Unlimited prints · QR sharing</span>
+          </div>
+        </div>
+
+        {/* Right: floating glass image card */}
+        <div className="relative hidden lg:block animate-fade-up" style={{ animationDelay: "0.35s" }}>
+          <div className="relative aspect-[4/5] rounded-[2rem] overflow-hidden shadow-luxe ring-1 ring-gold/30">
+            <img
+              src={heroImg}
+              alt="Guests enjoying Elite MagicBooth"
+              className="w-full h-full object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-ink/40 via-transparent to-transparent" />
+          </div>
+
+          {/* Floating logo badge */}
+          <div className="absolute -top-6 -left-6 glass-card rounded-2xl p-3 shadow-luxe animate-float">
+            <img src={logo} alt="Elite MagicBooth" className="h-14 w-14 rounded-full" />
+          </div>
+
+          {/* Floating stat card */}
+          <div
+            className="absolute -bottom-6 -right-6 glass-card rounded-2xl px-5 py-4 shadow-luxe animate-float"
+            style={{ animationDelay: "1.5s" }}
+          >
+            <p className="text-xs uppercase tracking-widest text-gold mb-1">Loved by</p>
+            <p className="font-serif text-2xl text-foreground">500+ Events</p>
+            <p className="text-xs text-muted-foreground">across Melbourne</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Curved wave transition */}
+      <svg
+        className="absolute bottom-0 left-0 w-full text-background z-10"
+        viewBox="0 0 1440 120"
+        preserveAspectRatio="none"
+        aria-hidden="true"
+      >
+        <path
+          fill="currentColor"
+          d="M0,64 C240,112 480,112 720,80 C960,48 1200,16 1440,48 L1440,120 L0,120 Z"
+        />
+      </svg>
+    </section>
+  );
+}
+
 
 function ContactSection({ packages }: { packages: Package[] }) {
   const [submitting, setSubmitting] = useState(false);
