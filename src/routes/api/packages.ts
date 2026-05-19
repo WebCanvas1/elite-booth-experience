@@ -20,7 +20,8 @@ type KVLike = {
 async function getKV(): Promise<KVLike | null> {
   try {
     // Dynamic import so non-CF environments don't crash at module load.
-    const mod = (await import("cloudflare:workers").catch(() => null)) as
+    // @ts-expect-error - cloudflare:workers is provided at runtime by @cloudflare/vite-plugin
+    const mod = (await import(/* @vite-ignore */ "cloudflare:workers").catch(() => null)) as
       | { env?: Record<string, unknown> }
       | null;
     const binding = mod?.env?.PHOTOBOOTH_KV as KVLike | undefined;
