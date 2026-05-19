@@ -4,4 +4,18 @@
   "compatibility_date": "2025-09-24",
   "compatibility_flags": ["nodejs_compat"],
   "main": "src/server.ts",
+  // ============================================================
+  // Cloudflare KV binding for Elite MagicBooth package storage.
+  // Replace "REPLACE_WITH_YOUR_KV_NAMESPACE_ID" with the actual
+  // namespace id after running:
+  //   wrangler kv namespace create PHOTOBOOTH_KV
+  // The binding name PHOTOBOOTH_KV is referenced from
+  // src/routes/api/packages.ts via `import { env } from "cloudflare:workers"`.
+  // ============================================================
+  "kv_namespaces": [
+    {
+      "binding": "PHOTOBOOTH_KV",
+      "id": "REPLACE_WITH_YOUR_KV_NAMESPACE_ID"
+    }
+  ]
 }
