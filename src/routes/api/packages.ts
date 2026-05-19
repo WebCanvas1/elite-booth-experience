@@ -86,7 +86,7 @@ export const Route = createFileRoute("/api/packages")({
           id: String(p.id || crypto.randomUUID()),
           name: String(p.name || "").slice(0, 100),
           price: Number(p.price) || 0,
-          image: String(p.image || "").slice(0, 1000),
+          image: String(p.image || "").slice(0, 2_000_000), // allow base64 data URLs (~1.5MB)
           features: Array.isArray(p.features)
             ? p.features.map((f) => String(f).slice(0, 300)).slice(0, 50)
             : [],
