@@ -27,17 +27,17 @@ export function SiteHeader() {
 
 export function SiteFooter() {
   return (
-    <footer className="bg-ink text-background/90 mt-24">
+    <footer className="bg-beige text-foreground mt-24 border-t border-border">
       <div className="max-w-7xl mx-auto px-6 py-16 grid md:grid-cols-3 gap-12">
         <div>
           <h3 className="font-serif text-3xl text-gradient-gold mb-3">Elite MagicBooth</h3>
-          <p className="text-sm text-background/60 leading-relaxed">
+          <p className="text-sm text-muted-foreground leading-relaxed">
             Premium photobooth experiences for unforgettable events across Melbourne.
           </p>
         </div>
         <div>
           <h4 className="text-sm uppercase tracking-widest text-gold mb-4">Contact</h4>
-          <ul className="space-y-2 text-sm text-background/70">
+          <ul className="space-y-2 text-sm text-muted-foreground">
             <li>Melbourne, Victoria</li>
             <li><a href="tel:0419678189" className="hover:text-gold">0419 678 189</a></li>
             <li><a href="mailto:elitemagicbooth@gmail.com" className="hover:text-gold">elitemagicbooth@gmail.com</a></li>
@@ -45,17 +45,17 @@ export function SiteFooter() {
         </div>
         <div>
           <h4 className="text-sm uppercase tracking-widest text-gold mb-4">Explore</h4>
-          <ul className="space-y-2 text-sm text-background/70">
+          <ul className="space-y-2 text-sm text-muted-foreground">
             <li><a href="/#packages" className="hover:text-gold">Packages</a></li>
             <li><a href="/#gallery" className="hover:text-gold">Gallery</a></li>
             <li><a href="/#contact" className="hover:text-gold">Get a Quote</a></li>
           </ul>
         </div>
       </div>
-      <div className="border-t border-background/10">
-        <div className="max-w-7xl mx-auto px-6 py-5 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-background/50">
+      <div className="border-t border-border">
+        <div className="max-w-7xl mx-auto px-6 py-5 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-muted-foreground">
           <p>© {new Date().getFullYear()} Elite MagicBooth. All rights reserved.</p>
-          <Link to="/admin" className="hover:text-gold opacity-60 hover:opacity-100 transition">
+          <Link to="/admin" className="hover:text-gold opacity-70 hover:opacity-100 transition">
             Admin Login
           </Link>
         </div>

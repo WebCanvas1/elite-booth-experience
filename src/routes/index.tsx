@@ -53,21 +53,22 @@ function Home() {
       <SiteHeader />
 
       {/* Hero */}
-      <section className="relative min-h-screen flex items-center pt-24 overflow-hidden">
+      <section className="relative min-h-screen flex items-center pt-24 overflow-hidden bg-beige">
         <div className="absolute inset-0">
-          <img src={heroImg} alt="Elite MagicBooth photobooth setup" className="w-full h-full object-cover" />
-          <div className="absolute inset-0 bg-gradient-to-r from-ink/85 via-ink/60 to-ink/30" />
+          <img src={heroImg} alt="Elite MagicBooth photobooth setup" className="w-full h-full object-cover opacity-40" />
+          <div className="absolute inset-0 bg-gradient-to-r from-background/95 via-background/80 to-background/40" />
+          <div className="absolute inset-0 bg-gradient-to-b from-background/40 via-transparent to-background" />
         </div>
         <div className="relative max-w-7xl mx-auto px-6 py-20 grid md:grid-cols-2 gap-12 items-center w-full">
-          <div className="text-background animate-fade-up">
-            <div className="inline-flex items-center gap-2 rounded-full border border-gold/40 bg-background/10 backdrop-blur px-4 py-1.5 text-xs uppercase tracking-widest text-gold mb-6">
+          <div className="text-foreground animate-fade-up">
+            <div className="inline-flex items-center gap-2 rounded-full border border-gold/50 bg-card/80 backdrop-blur px-4 py-1.5 text-xs uppercase tracking-widest text-gold mb-6 shadow-sm">
               <Sparkles className="h-3.5 w-3.5" /> Melbourne's Premium Photobooth
             </div>
             <h1 className="font-serif text-5xl md:text-7xl leading-[1.05] mb-6">
               Premium Photobooth Hire for{" "}
               <span className="text-gradient-gold italic">Unforgettable</span> Events
             </h1>
-            <p className="text-lg text-background/80 max-w-xl mb-8 leading-relaxed">
+            <p className="text-lg text-muted-foreground max-w-xl mb-8 leading-relaxed">
               Elite MagicBooth delivers stylish photobooth experiences with unlimited prints,
               custom templates, designer props, elegant backdrops, and instant digital sharing —
               tailored to your event.
@@ -81,7 +82,7 @@ function Home() {
               </a>
               <a
                 href="#contact"
-                className="inline-flex items-center gap-2 rounded-full border border-background/40 bg-background/10 backdrop-blur px-7 py-3.5 font-semibold text-background hover:bg-background hover:text-ink transition"
+                className="inline-flex items-center gap-2 rounded-full border border-gold/50 bg-card/80 backdrop-blur px-7 py-3.5 font-semibold text-foreground hover:bg-gold hover:text-ink transition"
               >
                 Contact Us
               </a>
@@ -240,29 +241,29 @@ function ContactSection({ packages }: { packages: Package[] }) {
   };
 
   return (
-    <section id="contact" className="bg-ink text-background py-24">
+    <section id="contact" className="bg-beige text-foreground py-24">
       <div className="max-w-6xl mx-auto px-6 grid lg:grid-cols-5 gap-12">
         <div className="lg:col-span-2">
           <p className="text-xs uppercase tracking-[0.3em] text-gold mb-3">Get in touch</p>
           <h2 className="font-serif text-4xl md:text-5xl mb-6">
             Let's create something <span className="italic text-gradient-gold">magical</span>
           </h2>
-          <p className="text-background/70 mb-10 leading-relaxed">
+          <p className="text-muted-foreground mb-10 leading-relaxed">
             Tell us about your event and we'll craft the perfect photobooth experience.
             Quotes returned within 24 hours.
           </p>
           <ul className="space-y-5">
             <li className="flex items-start gap-4">
               <span className="h-10 w-10 inline-flex items-center justify-center rounded-full gradient-gold text-ink flex-shrink-0"><Phone className="h-4 w-4" /></span>
-              <div><p className="text-xs uppercase tracking-widest text-gold">Phone</p><a href="tel:0419678189" className="text-background hover:text-gold">0419 678 189</a></div>
+              <div><p className="text-xs uppercase tracking-widest text-gold">Phone</p><a href="tel:0419678189" className="text-foreground hover:text-gold">0419 678 189</a></div>
             </li>
             <li className="flex items-start gap-4">
               <span className="h-10 w-10 inline-flex items-center justify-center rounded-full gradient-gold text-ink flex-shrink-0"><Mail className="h-4 w-4" /></span>
-              <div><p className="text-xs uppercase tracking-widest text-gold">Email</p><a href="mailto:elitemagicbooth@gmail.com" className="text-background hover:text-gold">elitemagicbooth@gmail.com</a></div>
+              <div><p className="text-xs uppercase tracking-widest text-gold">Email</p><a href="mailto:elitemagicbooth@gmail.com" className="text-foreground hover:text-gold">elitemagicbooth@gmail.com</a></div>
             </li>
             <li className="flex items-start gap-4">
               <span className="h-10 w-10 inline-flex items-center justify-center rounded-full gradient-gold text-ink flex-shrink-0"><MapPin className="h-4 w-4" /></span>
-              <div><p className="text-xs uppercase tracking-widest text-gold">Location</p><p className="text-background">Melbourne, Victoria</p></div>
+              <div><p className="text-xs uppercase tracking-widest text-gold">Location</p><p className="text-foreground">Melbourne, Victoria</p></div>
             </li>
           </ul>
         </div>
