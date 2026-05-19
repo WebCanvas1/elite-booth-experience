@@ -1,8 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
-import { Check, Phone, Mail, MapPin, Camera, Sparkles, Heart, Users } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { Check, Phone, Mail, MapPin, Camera, Sparkles, Heart, Users, ArrowRight, Star } from "lucide-react";
 import { toast } from "sonner";
 import heroImg from "@/assets/hero.jpg";
+import logo from "@/assets/logo.png";
 import { DEFAULT_PACKAGES, type Package } from "@/lib/packages";
 import { SiteHeader, SiteFooter } from "@/components/SiteChrome";
 import { Toaster } from "@/components/ui/sonner";
