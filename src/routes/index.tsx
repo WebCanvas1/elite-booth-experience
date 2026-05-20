@@ -174,12 +174,12 @@ function Home() {
                     <li key={f} className="flex gap-2"><Check className="h-4 w-4 text-gold flex-shrink-0 mt-0.5" /><span>{f}</span></li>
                   ))}
                 </ul>
-                <a
-                  href="#contact"
+                <Link
+                  to="/enquire"
                   className="mt-auto inline-flex items-center justify-center rounded-full gradient-gold px-5 py-3 text-sm font-semibold text-ink hover:scale-105 transition-transform"
                 >
                   Enquire Now
-                </a>
+                </Link>
               </div>
             </div>
           ))}
