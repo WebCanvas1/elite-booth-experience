@@ -9,10 +9,16 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as EnquireRouteImport } from './routes/enquire'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ApiPackagesRouteImport } from './routes/api/packages'
 
+const EnquireRoute = EnquireRouteImport.update({
+  id: '/enquire',
+  path: '/enquire',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminRoute = AdminRouteImport.update({
   id: '/admin',
   path: '/admin',
@@ -32,35 +38,46 @@ const ApiPackagesRoute = ApiPackagesRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
+  '/enquire': typeof EnquireRoute
   '/api/packages': typeof ApiPackagesRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
+  '/enquire': typeof EnquireRoute
   '/api/packages': typeof ApiPackagesRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
+  '/enquire': typeof EnquireRoute
   '/api/packages': typeof ApiPackagesRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/admin' | '/api/packages'
+  fullPaths: '/' | '/admin' | '/enquire' | '/api/packages'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/admin' | '/api/packages'
-  id: '__root__' | '/' | '/admin' | '/api/packages'
+  to: '/' | '/admin' | '/enquire' | '/api/packages'
+  id: '__root__' | '/' | '/admin' | '/enquire' | '/api/packages'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRoute
+  EnquireRoute: typeof EnquireRoute
   ApiPackagesRoute: typeof ApiPackagesRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/enquire': {
+      id: '/enquire'
+      path: '/enquire'
+      fullPath: '/enquire'
+      preLoaderRoute: typeof EnquireRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin': {
       id: '/admin'
       path: '/admin'
@@ -88,6 +105,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRoute,
+  EnquireRoute: EnquireRoute,
   ApiPackagesRoute: ApiPackagesRoute,
 }
 export const routeTree = rootRouteImport

@@ -5,21 +5,25 @@ export function SiteHeader() {
   return (
     <header className="fixed top-0 left-0 right-0 z-50 backdrop-blur-md bg-background/70 border-b border-border/50">
       <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-        <Link to="/" className="flex items-center gap-2">
-          <img src={logo} alt="Elite MagicBooth" className="h-10 w-auto" />
+        <Link to="/" className="flex items-center gap-3 group">
+          <img src={logo} alt="Elite MagicBooth" className="h-10 w-10 md:h-12 md:w-12 rounded-full ring-1 ring-gold/40 group-hover:ring-gold transition" />
+          <span className="font-serif text-lg md:text-2xl leading-none tracking-wide">
+            <span className="text-foreground">Elite</span>{" "}
+            <span className="text-gradient-gold italic">MagicBooth</span>
+          </span>
         </Link>
         <nav className="hidden md:flex items-center gap-8 text-sm font-medium">
           <a href="/#gallery" className="hover:text-gold transition-colors">Gallery</a>
           <a href="/#about" className="hover:text-gold transition-colors">About</a>
           <a href="/#packages" className="hover:text-gold transition-colors">Packages</a>
-          <a href="/#contact" className="hover:text-gold transition-colors">Contact</a>
+          <Link to="/enquire" className="hover:text-gold transition-colors">Contact</Link>
         </nav>
-        <a
-          href="/#contact"
+        <Link
+          to="/enquire"
           className="inline-flex items-center gap-2 rounded-full gradient-gold px-5 py-2.5 text-sm font-semibold text-ink shadow-luxe hover:scale-105 transition-transform"
         >
           Book Now
-        </a>
+        </Link>
       </div>
     </header>
   );
@@ -48,7 +52,7 @@ export function SiteFooter() {
           <ul className="space-y-2 text-sm text-muted-foreground">
             <li><a href="/#packages" className="hover:text-gold">Packages</a></li>
             <li><a href="/#gallery" className="hover:text-gold">Gallery</a></li>
-            <li><a href="/#contact" className="hover:text-gold">Get a Quote</a></li>
+            <li><Link to="/enquire" className="hover:text-gold">Get a Quote</Link></li>
           </ul>
         </div>
       </div>
