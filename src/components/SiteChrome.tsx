@@ -52,7 +52,7 @@ export function SiteFooter() {
           <ul className="space-y-2 text-sm text-muted-foreground">
             <li><a href="/#packages" className="hover:text-gold">Packages</a></li>
             <li><a href="/#gallery" className="hover:text-gold">Gallery</a></li>
-            <li><a href="/#contact" className="hover:text-gold">Get a Quote</a></li>
+            <li><Link to="/enquire" className="hover:text-gold">Get a Quote</Link></li>
           </ul>
         </div>
       </div>
