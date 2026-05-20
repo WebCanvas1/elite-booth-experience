@@ -220,8 +220,8 @@ function Hero() {
   });
 
   return (
-    <section className="relative min-h-screen flex items-center pt-24 overflow-hidden bg-beige isolate">
-      {/* Background image with subtle zoom + parallax */}
+    <section className="relative min-h-screen flex items-center pt-24 overflow-hidden bg-ink isolate">
+      {/* Background image with slow zoom + parallax */}
       <div className="absolute inset-0 overflow-hidden">
         <img
           ref={imgRef}
@@ -229,14 +229,14 @@ function Hero() {
           alt="Elegant photobooth at a luxury wedding reception"
           className="w-full h-[115%] object-cover animate-hero-zoom will-change-transform"
         />
-        {/* Warm cinematic gradient overlays — keep image visible, text legible */}
-        <div className="absolute inset-0 bg-gradient-to-r from-background/85 via-background/55 to-background/10" />
-        <div className="absolute inset-0 bg-gradient-to-b from-background/30 via-transparent to-background" />
+        {/* Strong cinematic dark overlays for text legibility */}
+        <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/60 to-black/30" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-black/70" />
         <div
-          className="absolute inset-0 opacity-60 mix-blend-soft-light"
+          className="absolute inset-0 opacity-50 mix-blend-soft-light"
           style={{
             background:
-              "radial-gradient(60% 60% at 20% 30%, oklch(0.92 0.08 85 / 0.5), transparent 60%), radial-gradient(50% 50% at 85% 75%, oklch(0.78 0.11 80 / 0.35), transparent 65%)",
+              "radial-gradient(60% 60% at 20% 30%, oklch(0.92 0.08 85 / 0.45), transparent 60%), radial-gradient(50% 50% at 85% 75%, oklch(0.78 0.11 80 / 0.35), transparent 65%)",
           }}
         />
       </div>
@@ -259,30 +259,30 @@ function Hero() {
         ))}
       </div>
 
-      <div className="relative max-w-7xl mx-auto px-6 py-20 grid lg:grid-cols-[1.1fr_1fr] gap-12 items-center w-full z-10">
+      <div className="relative max-w-7xl mx-auto px-6 py-20 grid lg:grid-cols-[1.15fr_1fr] gap-12 items-center w-full z-10">
         {/* Left: text */}
-        <div className="text-foreground">
+        <div className="text-white" style={{ textShadow: "0 2px 24px rgba(0,0,0,0.55)" }}>
           <div
-            className="inline-flex items-center gap-2 rounded-full glass-card px-4 py-1.5 text-xs uppercase tracking-[0.25em] text-gold mb-6 animate-fade-up"
+            className="inline-flex items-center gap-2 rounded-full bg-white/10 backdrop-blur-md ring-1 ring-white/20 px-4 py-1.5 text-xs uppercase tracking-[0.25em] text-gold mb-6 animate-fade-up"
             style={{ animationDelay: "0.05s" }}
           >
             <Sparkles className="h-3.5 w-3.5" /> Melbourne · Luxury Photobooth
           </div>
 
           <h1
-            className="font-serif text-[2.75rem] sm:text-6xl lg:text-7xl xl:text-[5.25rem] leading-[1.02] mb-6 animate-fade-up"
-            style={{ animationDelay: "0.15s" }}
+            className="font-serif font-semibold text-white text-[2.5rem] sm:text-5xl lg:text-6xl xl:text-[4.5rem] leading-[1.05] mb-6 animate-fade-up"
+            style={{ animationDelay: "0.15s", textShadow: "0 4px 30px rgba(0,0,0,0.7)" }}
           >
-            Capture Every <br className="hidden sm:block" />
-            Celebration in <span className="shimmer-text italic">Style</span>
+            Turning Every Event Into{" "}
+            <span className="shimmer-text italic">Unforgettable Memories</span>
           </h1>
 
           <p
-            className="text-base sm:text-lg text-muted-foreground max-w-xl mb-8 leading-relaxed animate-fade-up"
-            style={{ animationDelay: "0.3s" }}
+            className="text-base sm:text-lg text-white/90 max-w-xl mb-8 leading-relaxed animate-fade-up"
+            style={{ animationDelay: "0.3s", textShadow: "0 2px 12px rgba(0,0,0,0.6)" }}
           >
-            Premium photobooth experiences for weddings, birthdays, corporate events
-            &amp; special occasions — unlimited prints, designer props, and instant
+            Luxury photobooth experiences for weddings, birthdays, corporate events
+            &amp; celebrations — unlimited prints, designer props, and instant
             digital sharing, beautifully tailored to your event.
           </p>
 
@@ -298,29 +298,29 @@ function Hero() {
               <ArrowRight className="relative z-10 h-4 w-4 transition-transform group-hover:translate-x-1" />
               <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/40 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
             </a>
-            <a
-              href="#contact"
-              className="group inline-flex items-center gap-2 rounded-full glass-card px-7 py-4 font-semibold text-foreground hover:text-ink hover:bg-gold transition"
+            <Link
+              to="/enquire"
+              className="group inline-flex items-center gap-2 rounded-full bg-white/10 backdrop-blur-md ring-1 ring-white/30 px-7 py-4 font-semibold text-white hover:text-ink hover:bg-gold transition"
             >
-              Book Your Event
+              Book Now
               <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-            </a>
+            </Link>
           </div>
 
           {/* Trust row */}
           <div
-            className="mt-10 flex flex-wrap items-center gap-6 text-sm text-muted-foreground animate-fade-up"
+            className="mt-10 flex flex-wrap items-center gap-6 text-sm text-white/80 animate-fade-up"
             style={{ animationDelay: "0.6s" }}
           >
             <div className="flex items-center gap-1.5">
               {[0, 1, 2, 3, 4].map((i) => (
                 <Star key={i} className="h-4 w-4 fill-gold text-gold" />
               ))}
-              <span className="ml-1 font-medium text-foreground">5.0</span>
+              <span className="ml-1 font-medium text-white">5.0</span>
             </div>
-            <span className="h-4 w-px bg-border" />
-            <span><strong className="text-foreground">500+</strong> events styled</span>
-            <span className="h-4 w-px bg-border hidden sm:inline-block" />
+            <span className="h-4 w-px bg-white/30" />
+            <span><strong className="text-white">500+</strong> events styled</span>
+            <span className="h-4 w-px bg-white/30 hidden sm:inline-block" />
             <span className="hidden sm:inline">Unlimited prints · QR sharing</span>
           </div>
         </div>
