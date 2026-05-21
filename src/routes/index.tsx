@@ -74,11 +74,12 @@ function Home() {
                   ))}
                 </ul>
                 <Link
-                  to="/enquire"
-                  className="mt-auto inline-flex items-center justify-center rounded-full gradient-gold px-5 py-3 text-sm font-semibold text-ink hover:scale-105 transition-transform"
-                >
-                  Enquire Now
-                </Link>
+  to="/enquire"
+  search={{ package: pkg.name }}
+  className="mt-auto inline-flex items-center justify-center rounded-full gradient-gold px-5 py-3 text-sm font-semibold text-ink hover:scale-105 transition-transform"
+>
+  Enquire Now
+</Link>
               </div>
             </div>
           ))}
@@ -280,9 +281,11 @@ function Hero() {
               <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/40 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
             </a>
             <Link
-              to="/enquire"
-              className="group inline-flex items-center gap-2 rounded-full bg-white/10 backdrop-blur-md ring-1 ring-white/30 px-7 py-4 font-semibold text-white hover:text-ink hover:bg-gold transition"
-            >
+  to="/enquire"
+  search={{ package: "Elite" }}
+  className="group inline-flex items-center gap-2 rounded-full bg-white/10 backdrop-blur-md ring-1 ring-white/30 px-7 py-4 font-semibold text-white hover:text-ink hover:bg-gold transition"
+>
+  Book Now
               Book Now
               <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
             </Link>
