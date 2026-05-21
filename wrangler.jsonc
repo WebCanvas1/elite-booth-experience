@@ -14,8 +14,8 @@
   // ============================================================
   "kv_namespaces": [
     {
-      "binding": "PHOTOBOOTH_KV",
-      "id": "REPLACE_WITH_YOUR_KV_NAMESPACE_ID"
-    }
+  "binding": "PHOTOBOOTH_KV",
+  "namespace_id": "dc4faa0f15344fc28cf73b07ebcb0ad5"
+}
   ]
 }
