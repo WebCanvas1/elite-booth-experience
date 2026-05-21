@@ -351,7 +351,7 @@ function Hero() {
 }
 
 
-function ContactSection({ packages }: { packages: Package[] }) {
+function ContactSection({ packages, contact }: { packages: Package[]; contact: ContactContent }) {
   const [submitting, setSubmitting] = useState(false);
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -363,36 +363,57 @@ function ContactSection({ packages }: { packages: Package[] }) {
     }, 600);
   };
 
+  const telHref = `tel:${contact.phone.replace(/\s+/g, "")}`;
+
   return (
-    <section id="contact" className="bg-beige text-foreground py-24">
-      <div className="max-w-6xl mx-auto px-6 grid lg:grid-cols-5 gap-12">
+    <section id="contact" className="bg-beige text-foreground py-16 md:py-24">
+      <div className="max-w-6xl mx-auto px-5 sm:px-6 grid lg:grid-cols-5 gap-10 md:gap-12">
         <div className="lg:col-span-2">
           <p className="text-xs uppercase tracking-[0.3em] text-gold mb-3">Get in touch</p>
-          <h2 className="font-serif text-4xl md:text-5xl mb-6">
-            Let's create something <span className="italic text-gradient-gold">magical</span>
+          <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl mb-6 leading-tight">
+            {contact.heading}
           </h2>
-          <p className="text-muted-foreground mb-10 leading-relaxed">
-            Tell us about your event and we'll craft the perfect photobooth experience.
-            Quotes returned within 24 hours.
+          <p className="text-muted-foreground mb-8 md:mb-10 leading-relaxed">
+            {contact.subtext}
           </p>
           <ul className="space-y-5">
-            <li className="flex items-start gap-4">
-              <span className="h-10 w-10 inline-flex items-center justify-center rounded-full gradient-gold text-ink flex-shrink-0"><Phone className="h-4 w-4" /></span>
-              <div><p className="text-xs uppercase tracking-widest text-gold">Phone</p><a href="tel:0419678189" className="text-foreground hover:text-gold">0419 678 189</a></div>
-            </li>
-            <li className="flex items-start gap-4">
-              <span className="h-10 w-10 inline-flex items-center justify-center rounded-full gradient-gold text-ink flex-shrink-0"><Mail className="h-4 w-4" /></span>
-              <div><p className="text-xs uppercase tracking-widest text-gold">Email</p><a href="mailto:elitemagicbooth@gmail.com" className="text-foreground hover:text-gold">elitemagicbooth@gmail.com</a></div>
-            </li>
-            <li className="flex items-start gap-4">
-              <span className="h-10 w-10 inline-flex items-center justify-center rounded-full gradient-gold text-ink flex-shrink-0"><MapPin className="h-4 w-4" /></span>
-              <div><p className="text-xs uppercase tracking-widest text-gold">Location</p><p className="text-foreground">Melbourne, Victoria</p></div>
-            </li>
+            {contact.phone && (
+              <li className="flex items-start gap-4">
+                <span className="h-10 w-10 inline-flex items-center justify-center rounded-full gradient-gold text-ink flex-shrink-0"><Phone className="h-4 w-4" /></span>
+                <div className="min-w-0"><p className="text-xs uppercase tracking-widest text-gold">Phone</p><a href={telHref} className="text-foreground hover:text-gold break-all">{contact.phone}</a></div>
+              </li>
+            )}
+            {contact.email && (
+              <li className="flex items-start gap-4">
+                <span className="h-10 w-10 inline-flex items-center justify-center rounded-full gradient-gold text-ink flex-shrink-0"><Mail className="h-4 w-4" /></span>
+                <div className="min-w-0"><p className="text-xs uppercase tracking-widest text-gold">Email</p><a href={`mailto:${contact.email}`} className="text-foreground hover:text-gold break-all">{contact.email}</a></div>
+              </li>
+            )}
+            {contact.location && (
+              <li className="flex items-start gap-4">
+                <span className="h-10 w-10 inline-flex items-center justify-center rounded-full gradient-gold text-ink flex-shrink-0"><MapPin className="h-4 w-4" /></span>
+                <div><p className="text-xs uppercase tracking-widest text-gold">Location</p><p className="text-foreground">{contact.location}</p></div>
+              </li>
+            )}
           </ul>
+          {(contact.instagram || contact.facebook) && (
+            <div className="flex gap-3 mt-6">
+              {contact.instagram && (
+                <a href={contact.instagram} target="_blank" rel="noreferrer" aria-label="Instagram" className="h-11 w-11 inline-flex items-center justify-center rounded-full border border-border bg-card hover:text-gold hover:border-gold transition">
+                  <Instagram className="h-4 w-4" />
+                </a>
+              )}
+              {contact.facebook && (
+                <a href={contact.facebook} target="_blank" rel="noreferrer" aria-label="Facebook" className="h-11 w-11 inline-flex items-center justify-center rounded-full border border-border bg-card hover:text-gold hover:border-gold transition">
+                  <Facebook className="h-4 w-4" />
+                </a>
+              )}
+            </div>
+          )}
         </div>
 
-        <form onSubmit={onSubmit} className="lg:col-span-3 bg-card text-foreground rounded-3xl p-8 md:p-10 shadow-luxe space-y-5">
-          <div className="grid md:grid-cols-2 gap-4">
+        <form onSubmit={onSubmit} className="lg:col-span-3 bg-card text-foreground rounded-3xl p-6 sm:p-8 md:p-10 shadow-luxe space-y-5">
+          <div className="grid sm:grid-cols-2 gap-4">
             <Field label="Name" name="name" required />
             <Field label="Email" name="email" type="email" required />
             <Field label="Phone" name="phone" type="tel" />
@@ -402,7 +423,7 @@ function ContactSection({ packages }: { packages: Package[] }) {
           </div>
           <div>
             <label className="block text-xs uppercase tracking-widest text-muted-foreground mb-2">Message</label>
-            <textarea name="message" rows={4} className="w-full rounded-2xl border border-input bg-background px-4 py-3 text-sm focus:border-gold focus:ring-2 focus:ring-gold/20 outline-none transition" placeholder="Tell us about your event..." />
+            <textarea name="message" rows={4} className="w-full rounded-2xl border border-input bg-background px-4 py-3 text-base sm:text-sm focus:border-gold focus:ring-2 focus:ring-gold/20 outline-none transition" placeholder="Tell us about your event..." />
           </div>
           <button disabled={submitting} type="submit" className="w-full inline-flex items-center justify-center rounded-full gradient-gold px-6 py-4 font-semibold text-ink shadow-luxe hover:scale-[1.02] transition-transform disabled:opacity-60">
             {submitting ? "Sending..." : "Get a Quote"}
@@ -412,6 +433,7 @@ function ContactSection({ packages }: { packages: Package[] }) {
     </section>
   );
 }
+
 
 function Field({ label, name, type = "text", required }: { label: string; name: string; type?: string; required?: boolean }) {
   return (
