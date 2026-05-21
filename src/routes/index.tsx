@@ -443,7 +443,7 @@ function Field({ label, name, type = "text", required }: { label: string; name: 
         name={name}
         type={type}
         required={required}
-        className="w-full rounded-2xl border border-input bg-background px-4 py-3 text-sm focus:border-gold focus:ring-2 focus:ring-gold/20 outline-none transition"
+        className="w-full rounded-2xl border border-input bg-background px-4 py-3 text-base sm:text-sm focus:border-gold focus:ring-2 focus:ring-gold/20 outline-none transition"
       />
     </div>
   );
@@ -455,7 +455,7 @@ function SelectField({ label, name, options }: { label: string; name: string; op
       <label className="block text-xs uppercase tracking-widest text-muted-foreground mb-2">{label}</label>
       <select
         name={name}
-        className="w-full rounded-2xl border border-input bg-background px-4 py-3 text-sm focus:border-gold focus:ring-2 focus:ring-gold/20 outline-none transition"
+        className="w-full rounded-2xl border border-input bg-background px-4 py-3 text-base sm:text-sm focus:border-gold focus:ring-2 focus:ring-gold/20 outline-none transition"
       >
         <option value="">Select...</option>
         {options.map((o) => <option key={o} value={o}>{o}</option>)}
@@ -463,3 +463,4 @@ function SelectField({ label, name, options }: { label: string; name: string; op
     </div>
   );
 }
+
