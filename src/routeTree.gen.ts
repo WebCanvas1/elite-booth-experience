@@ -13,6 +13,7 @@ import { Route as EnquireRouteImport } from './routes/enquire'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ApiPackagesRouteImport } from './routes/api/packages'
+import { Route as ApiContentRouteImport } from './routes/api/content'
 
 const EnquireRoute = EnquireRouteImport.update({
   id: '/enquire',
@@ -34,17 +35,24 @@ const ApiPackagesRoute = ApiPackagesRouteImport.update({
   path: '/api/packages',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiContentRoute = ApiContentRouteImport.update({
+  id: '/api/content',
+  path: '/api/content',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/enquire': typeof EnquireRoute
+  '/api/content': typeof ApiContentRoute
   '/api/packages': typeof ApiPackagesRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/enquire': typeof EnquireRoute
+  '/api/content': typeof ApiContentRoute
   '/api/packages': typeof ApiPackagesRoute
 }
 export interface FileRoutesById {
@@ -52,20 +60,28 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/enquire': typeof EnquireRoute
+  '/api/content': typeof ApiContentRoute
   '/api/packages': typeof ApiPackagesRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/admin' | '/enquire' | '/api/packages'
+  fullPaths: '/' | '/admin' | '/enquire' | '/api/content' | '/api/packages'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/admin' | '/enquire' | '/api/packages'
-  id: '__root__' | '/' | '/admin' | '/enquire' | '/api/packages'
+  to: '/' | '/admin' | '/enquire' | '/api/content' | '/api/packages'
+  id:
+    | '__root__'
+    | '/'
+    | '/admin'
+    | '/enquire'
+    | '/api/content'
+    | '/api/packages'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRoute
   EnquireRoute: typeof EnquireRoute
+  ApiContentRoute: typeof ApiContentRoute
   ApiPackagesRoute: typeof ApiPackagesRoute
 }
 
@@ -99,6 +115,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPackagesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/content': {
+      id: '/api/content'
+      path: '/api/content'
+      fullPath: '/api/content'
+      preLoaderRoute: typeof ApiContentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -106,6 +129,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRoute,
   EnquireRoute: EnquireRoute,
+  ApiContentRoute: ApiContentRoute,
   ApiPackagesRoute: ApiPackagesRoute,
 }
 export const routeTree = rootRouteImport
