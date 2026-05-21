@@ -1,12 +1,14 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
-import { Check, Phone, Mail, MapPin, Camera, Sparkles, Heart, Users, ArrowRight, Star } from "lucide-react";
+import { Check, Phone, Mail, MapPin, Camera, Sparkles, Heart, Users, ArrowRight, Star, Instagram, Facebook } from "lucide-react";
 import { toast } from "sonner";
 import heroImg from "@/assets/hero.jpg";
 import logo from "@/assets/logo.png";
-import { DEFAULT_PACKAGES, type Package } from "@/lib/packages";
+import { type Package } from "@/lib/packages";
 import { SiteHeader, SiteFooter } from "@/components/SiteChrome";
 import { Toaster } from "@/components/ui/sonner";
+import { useSiteContent } from "@/hooks/use-site-content";
+import type { ContactContent } from "@/lib/site-content";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -25,28 +27,10 @@ export const Route = createFileRoute("/")({
   component: Home,
 });
 
-const GALLERY = [
-  "https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=900&q=80",
-  "https://images.unsplash.com/photo-1530103862676-de8c9debad1d?auto=format&fit=crop&w=900&q=80",
-  "https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?auto=format&fit=crop&w=900&q=80",
-  "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=900&q=80",
-  "https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=900&q=80",
-  "https://images.unsplash.com/photo-1505236858219-8359eb29e329?auto=format&fit=crop&w=900&q=80",
-  "https://images.unsplash.com/photo-1469371670807-013ccf25f16a?auto=format&fit=crop&w=900&q=80",
-  "https://images.unsplash.com/photo-1478146896981-b80fe463b330?auto=format&fit=crop&w=900&q=80",
-];
-
 function Home() {
-  const [packages, setPackages] = useState<Package[]>(DEFAULT_PACKAGES);
+  const content = useSiteContent();
+  const { packages, gallery, about, contact } = content;
 
-  useEffect(() => {
-    fetch("/api/packages")
-      .then((r) => r.json())
-      .then((d: { packages?: Package[] }) => {
-        if (d.packages?.length) setPackages(d.packages);
-      })
-      .catch(() => {});
-  }, []);
 
   return (
     <div className="min-h-screen bg-background">
@@ -57,7 +41,7 @@ function Home() {
       <Hero />
 
       {/* Packages */}
-      <section id="packages" className="max-w-7xl mx-auto px-6 py-24">
+      <section id="packages" className="max-w-7xl mx-auto px-5 sm:px-6 py-16 md:py-24">
         <div className="text-center max-w-2xl mx-auto mb-14">
           <p className="text-xs uppercase tracking-[0.3em] text-gold mb-3">Tailored packages</p>
           <h2 className="font-serif text-4xl md:text-5xl mb-4">Choose Your Experience</h2>
@@ -102,58 +86,53 @@ function Home() {
       </section>
 
       {/* About */}
-      <section id="about" className="bg-beige py-24">
-        <div className="max-w-6xl mx-auto px-6 grid md:grid-cols-2 gap-16 items-center">
+      <section id="about" className="bg-beige py-16 md:py-24">
+        <div className="max-w-6xl mx-auto px-5 sm:px-6 grid md:grid-cols-2 gap-10 md:gap-16 items-center">
           <div className="relative">
             <img
-              src="https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=1000&q=80"
-              alt="About Elite MagicBooth"
+              src={about.image}
+              alt={about.heading}
               loading="lazy"
               className="rounded-3xl shadow-luxe w-full aspect-[4/5] object-cover"
             />
             <div className="absolute -bottom-6 -right-6 hidden md:block bg-card rounded-2xl p-6 shadow-luxe border border-border max-w-[220px]">
               <p className="text-3xl font-serif text-gradient-gold">500+</p>
-              <p className="text-sm text-muted-foreground">events styled across Melbourne</p>
+              <p className="text-sm text-muted-foreground">events styled across {contact.location || "Melbourne"}</p>
             </div>
           </div>
           <div>
-            <p className="text-xs uppercase tracking-[0.3em] text-gold mb-3">About Us</p>
-            <h2 className="font-serif text-4xl md:text-5xl mb-6">
-              Making your celebration <span className="italic text-gradient-gold">unforgettable</span>
+            <p className="text-xs uppercase tracking-[0.3em] text-gold mb-3">{about.eyebrow}</p>
+            <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl mb-6 leading-tight">
+              {about.heading}
             </h2>
-            <p className="text-muted-foreground leading-relaxed mb-4">
-              At Elite MagicBooth, we believe every event deserves more than just photos — it deserves
-              memories that last. From intimate baby showers to grand weddings and polished corporate
-              functions, our team brings warmth, style, and a touch of magic to every booking.
+            <p className="text-muted-foreground leading-relaxed mb-6 whitespace-pre-line">
+              {about.body}
             </p>
-            <p className="text-muted-foreground leading-relaxed mb-6">
-              Our friendly attendants, curated themed props, high-quality prints, fully custom
-              templates, instant SMS &amp; QR sharing, and beautiful digital galleries make sure your
-              guests leave smiling — and your memories live on long after the night ends.
-            </p>
-            <ul className="grid grid-cols-2 gap-3 text-sm">
-              {["Friendly attendants", "Themed props", "Quality prints", "Custom templates", "SMS / QR sharing", "Digital galleries"].map((t) => (
-                <li key={t} className="flex items-center gap-2"><Check className="h-4 w-4 text-gold" />{t}</li>
-              ))}
-            </ul>
+            {about.highlights.length > 0 && (
+              <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+                {about.highlights.map((t) => (
+                  <li key={t} className="flex items-center gap-2"><Check className="h-4 w-4 text-gold flex-shrink-0" />{t}</li>
+                ))}
+              </ul>
+            )}
           </div>
         </div>
       </section>
 
       {/* Gallery */}
-      <section id="gallery" className="max-w-7xl mx-auto px-6 py-24">
-        <div className="text-center max-w-2xl mx-auto mb-14">
+      <section id="gallery" className="max-w-7xl mx-auto px-5 sm:px-6 py-16 md:py-24">
+        <div className="text-center max-w-2xl mx-auto mb-10 md:mb-14">
           <p className="text-xs uppercase tracking-[0.3em] text-gold mb-3">Moments captured</p>
-          <h2 className="font-serif text-4xl md:text-5xl mb-4">A Gallery of Joy</h2>
+          <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl mb-4">A Gallery of Joy</h2>
           <p className="text-muted-foreground">
             From wedding celebrations to corporate galas — a glimpse of the moments we love creating.
           </p>
         </div>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {GALLERY.map((src, i) => (
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
+          {gallery.map((src, i) => (
             <div
-              key={src}
-              className={`overflow-hidden rounded-3xl shadow-luxe ${
+              key={`${src}-${i}`}
+              className={`overflow-hidden rounded-2xl sm:rounded-3xl shadow-luxe ${
                 i % 5 === 0 ? "row-span-2 aspect-[3/5]" : "aspect-square"
               }`}
             >
@@ -169,24 +148,26 @@ function Home() {
       </section>
 
       {/* Highlights */}
-      <section className="max-w-7xl mx-auto px-6 py-20 grid grid-cols-2 md:grid-cols-4 gap-6">
+      <section className="max-w-7xl mx-auto px-5 sm:px-6 py-16 md:py-20 grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
         {[
           { icon: Camera, label: "Unlimited Prints" },
           { icon: Sparkles, label: "Custom Templates" },
           { icon: Heart, label: "Designer Props" },
           { icon: Users, label: "Friendly Attendants" },
         ].map(({ icon: Icon, label }) => (
-          <div key={label} className="text-center p-6 rounded-3xl bg-card border border-border/60 shadow-luxe/30">
-            <div className="inline-flex h-14 w-14 items-center justify-center rounded-full gradient-gold mb-4">
-              <Icon className="h-6 w-6 text-ink" />
+          <div key={label} className="text-center p-5 sm:p-6 rounded-3xl bg-card border border-border/60 shadow-luxe/30">
+            <div className="inline-flex h-12 w-12 sm:h-14 sm:w-14 items-center justify-center rounded-full gradient-gold mb-3 sm:mb-4">
+              <Icon className="h-5 w-5 sm:h-6 sm:w-6 text-ink" />
             </div>
-            <p className="font-serif text-lg">{label}</p>
+            <p className="font-serif text-base sm:text-lg">{label}</p>
           </div>
         ))}
       </section>
 
       {/* Contact */}
-      <ContactSection packages={packages} />
+      <ContactSection packages={packages} contact={contact} />
+
+
 
 
       <SiteFooter />
@@ -370,7 +351,7 @@ function Hero() {
 }
 
 
-function ContactSection({ packages }: { packages: Package[] }) {
+function ContactSection({ packages, contact }: { packages: Package[]; contact: ContactContent }) {
   const [submitting, setSubmitting] = useState(false);
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -382,36 +363,57 @@ function ContactSection({ packages }: { packages: Package[] }) {
     }, 600);
   };
 
+  const telHref = `tel:${contact.phone.replace(/\s+/g, "")}`;
+
   return (
-    <section id="contact" className="bg-beige text-foreground py-24">
-      <div className="max-w-6xl mx-auto px-6 grid lg:grid-cols-5 gap-12">
+    <section id="contact" className="bg-beige text-foreground py-16 md:py-24">
+      <div className="max-w-6xl mx-auto px-5 sm:px-6 grid lg:grid-cols-5 gap-10 md:gap-12">
         <div className="lg:col-span-2">
           <p className="text-xs uppercase tracking-[0.3em] text-gold mb-3">Get in touch</p>
-          <h2 className="font-serif text-4xl md:text-5xl mb-6">
-            Let's create something <span className="italic text-gradient-gold">magical</span>
+          <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl mb-6 leading-tight">
+            {contact.heading}
           </h2>
-          <p className="text-muted-foreground mb-10 leading-relaxed">
-            Tell us about your event and we'll craft the perfect photobooth experience.
-            Quotes returned within 24 hours.
+          <p className="text-muted-foreground mb-8 md:mb-10 leading-relaxed">
+            {contact.subtext}
           </p>
           <ul className="space-y-5">
-            <li className="flex items-start gap-4">
-              <span className="h-10 w-10 inline-flex items-center justify-center rounded-full gradient-gold text-ink flex-shrink-0"><Phone className="h-4 w-4" /></span>
-              <div><p className="text-xs uppercase tracking-widest text-gold">Phone</p><a href="tel:0419678189" className="text-foreground hover:text-gold">0419 678 189</a></div>
-            </li>
-            <li className="flex items-start gap-4">
-              <span className="h-10 w-10 inline-flex items-center justify-center rounded-full gradient-gold text-ink flex-shrink-0"><Mail className="h-4 w-4" /></span>
-              <div><p className="text-xs uppercase tracking-widest text-gold">Email</p><a href="mailto:elitemagicbooth@gmail.com" className="text-foreground hover:text-gold">elitemagicbooth@gmail.com</a></div>
-            </li>
-            <li className="flex items-start gap-4">
-              <span className="h-10 w-10 inline-flex items-center justify-center rounded-full gradient-gold text-ink flex-shrink-0"><MapPin className="h-4 w-4" /></span>
-              <div><p className="text-xs uppercase tracking-widest text-gold">Location</p><p className="text-foreground">Melbourne, Victoria</p></div>
-            </li>
+            {contact.phone && (
+              <li className="flex items-start gap-4">
+                <span className="h-10 w-10 inline-flex items-center justify-center rounded-full gradient-gold text-ink flex-shrink-0"><Phone className="h-4 w-4" /></span>
+                <div className="min-w-0"><p className="text-xs uppercase tracking-widest text-gold">Phone</p><a href={telHref} className="text-foreground hover:text-gold break-all">{contact.phone}</a></div>
+              </li>
+            )}
+            {contact.email && (
+              <li className="flex items-start gap-4">
+                <span className="h-10 w-10 inline-flex items-center justify-center rounded-full gradient-gold text-ink flex-shrink-0"><Mail className="h-4 w-4" /></span>
+                <div className="min-w-0"><p className="text-xs uppercase tracking-widest text-gold">Email</p><a href={`mailto:${contact.email}`} className="text-foreground hover:text-gold break-all">{contact.email}</a></div>
+              </li>
+            )}
+            {contact.location && (
+              <li className="flex items-start gap-4">
+                <span className="h-10 w-10 inline-flex items-center justify-center rounded-full gradient-gold text-ink flex-shrink-0"><MapPin className="h-4 w-4" /></span>
+                <div><p className="text-xs uppercase tracking-widest text-gold">Location</p><p className="text-foreground">{contact.location}</p></div>
+              </li>
+            )}
           </ul>
+          {(contact.instagram || contact.facebook) && (
+            <div className="flex gap-3 mt-6">
+              {contact.instagram && (
+                <a href={contact.instagram} target="_blank" rel="noreferrer" aria-label="Instagram" className="h-11 w-11 inline-flex items-center justify-center rounded-full border border-border bg-card hover:text-gold hover:border-gold transition">
+                  <Instagram className="h-4 w-4" />
+                </a>
+              )}
+              {contact.facebook && (
+                <a href={contact.facebook} target="_blank" rel="noreferrer" aria-label="Facebook" className="h-11 w-11 inline-flex items-center justify-center rounded-full border border-border bg-card hover:text-gold hover:border-gold transition">
+                  <Facebook className="h-4 w-4" />
+                </a>
+              )}
+            </div>
+          )}
         </div>
 
-        <form onSubmit={onSubmit} className="lg:col-span-3 bg-card text-foreground rounded-3xl p-8 md:p-10 shadow-luxe space-y-5">
-          <div className="grid md:grid-cols-2 gap-4">
+        <form onSubmit={onSubmit} className="lg:col-span-3 bg-card text-foreground rounded-3xl p-6 sm:p-8 md:p-10 shadow-luxe space-y-5">
+          <div className="grid sm:grid-cols-2 gap-4">
             <Field label="Name" name="name" required />
             <Field label="Email" name="email" type="email" required />
             <Field label="Phone" name="phone" type="tel" />
@@ -421,7 +423,7 @@ function ContactSection({ packages }: { packages: Package[] }) {
           </div>
           <div>
             <label className="block text-xs uppercase tracking-widest text-muted-foreground mb-2">Message</label>
-            <textarea name="message" rows={4} className="w-full rounded-2xl border border-input bg-background px-4 py-3 text-sm focus:border-gold focus:ring-2 focus:ring-gold/20 outline-none transition" placeholder="Tell us about your event..." />
+            <textarea name="message" rows={4} className="w-full rounded-2xl border border-input bg-background px-4 py-3 text-base sm:text-sm focus:border-gold focus:ring-2 focus:ring-gold/20 outline-none transition" placeholder="Tell us about your event..." />
           </div>
           <button disabled={submitting} type="submit" className="w-full inline-flex items-center justify-center rounded-full gradient-gold px-6 py-4 font-semibold text-ink shadow-luxe hover:scale-[1.02] transition-transform disabled:opacity-60">
             {submitting ? "Sending..." : "Get a Quote"}
@@ -432,6 +434,7 @@ function ContactSection({ packages }: { packages: Package[] }) {
   );
 }
 
+
 function Field({ label, name, type = "text", required }: { label: string; name: string; type?: string; required?: boolean }) {
   return (
     <div>
@@ -440,7 +443,7 @@ function Field({ label, name, type = "text", required }: { label: string; name: 
         name={name}
         type={type}
         required={required}
-        className="w-full rounded-2xl border border-input bg-background px-4 py-3 text-sm focus:border-gold focus:ring-2 focus:ring-gold/20 outline-none transition"
+        className="w-full rounded-2xl border border-input bg-background px-4 py-3 text-base sm:text-sm focus:border-gold focus:ring-2 focus:ring-gold/20 outline-none transition"
       />
     </div>
   );
@@ -452,7 +455,7 @@ function SelectField({ label, name, options }: { label: string; name: string; op
       <label className="block text-xs uppercase tracking-widest text-muted-foreground mb-2">{label}</label>
       <select
         name={name}
-        className="w-full rounded-2xl border border-input bg-background px-4 py-3 text-sm focus:border-gold focus:ring-2 focus:ring-gold/20 outline-none transition"
+        className="w-full rounded-2xl border border-input bg-background px-4 py-3 text-base sm:text-sm focus:border-gold focus:ring-2 focus:ring-gold/20 outline-none transition"
       >
         <option value="">Select...</option>
         {options.map((o) => <option key={o} value={o}>{o}</option>)}
@@ -460,3 +463,4 @@ function SelectField({ label, name, options }: { label: string; name: string; op
     </div>
   );
 }
+
