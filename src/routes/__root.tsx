@@ -13,19 +13,32 @@ import appCss from "../styles.css?url";
 
 function ScrollToTopOnRefresh() {
   React.useEffect(() => {
-    if (typeof window !== "undefined") {
-      if ("scrollRestoration" in window.history) {
-        window.history.scrollRestoration = "manual";
-      }
+    if (typeof window === "undefined") return;
 
-      setTimeout(() => {
-        window.scrollTo({
-          top: 0,
-          left: 0,
-          behavior: "instant",
-        });
-      }, 0);
+    // Disable browser automatic scroll restoration
+    if ("scrollRestoration" in window.history) {
+      window.history.scrollRestoration = "manual";
     }
+
+    const forceScrollTop = () => {
+      window.scrollTo(0, 0);
+
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+    };
+
+    // Scroll immediately
+    forceScrollTop();
+
+    // Scroll again after render/hydration
+    setTimeout(forceScrollTop, 50);
+
+    // Scroll before refresh/unload
+    window.addEventListener("beforeunload", forceScrollTop);
+
+    return () => {
+      window.removeEventListener("beforeunload", forceScrollTop);
+    };
   }, []);
 
   return null;
@@ -125,7 +138,7 @@ function RootShell({ children }: { children: React.ReactNode }) {
       <head>
         <HeadContent />
       </head>
-      <body>
+      <body className="overflow-x-hidden">
         {children}
         <Scripts />
       </body>
