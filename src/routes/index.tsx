@@ -1,12 +1,14 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
-import { Check, Phone, Mail, MapPin, Camera, Sparkles, Heart, Users, ArrowRight, Star } from "lucide-react";
+import { Check, Phone, Mail, MapPin, Camera, Sparkles, Heart, Users, ArrowRight, Star, Instagram, Facebook } from "lucide-react";
 import { toast } from "sonner";
 import heroImg from "@/assets/hero.jpg";
 import logo from "@/assets/logo.png";
-import { DEFAULT_PACKAGES, type Package } from "@/lib/packages";
+import { type Package } from "@/lib/packages";
 import { SiteHeader, SiteFooter } from "@/components/SiteChrome";
 import { Toaster } from "@/components/ui/sonner";
+import { useSiteContent } from "@/hooks/use-site-content";
+import type { AboutContent, ContactContent } from "@/lib/site-content";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -25,28 +27,10 @@ export const Route = createFileRoute("/")({
   component: Home,
 });
 
-const GALLERY = [
-  "https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=900&q=80",
-  "https://images.unsplash.com/photo-1530103862676-de8c9debad1d?auto=format&fit=crop&w=900&q=80",
-  "https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?auto=format&fit=crop&w=900&q=80",
-  "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=900&q=80",
-  "https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=900&q=80",
-  "https://images.unsplash.com/photo-1505236858219-8359eb29e329?auto=format&fit=crop&w=900&q=80",
-  "https://images.unsplash.com/photo-1469371670807-013ccf25f16a?auto=format&fit=crop&w=900&q=80",
-  "https://images.unsplash.com/photo-1478146896981-b80fe463b330?auto=format&fit=crop&w=900&q=80",
-];
-
 function Home() {
-  const [packages, setPackages] = useState<Package[]>(DEFAULT_PACKAGES);
+  const content = useSiteContent();
+  const { packages, gallery, about, contact } = content;
 
-  useEffect(() => {
-    fetch("/api/packages")
-      .then((r) => r.json())
-      .then((d: { packages?: Package[] }) => {
-        if (d.packages?.length) setPackages(d.packages);
-      })
-      .catch(() => {});
-  }, []);
 
   return (
     <div className="min-h-screen bg-background">
