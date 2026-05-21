@@ -41,7 +41,7 @@ function Home() {
       <Hero />
 
       {/* Packages */}
-      <section id="packages" className="max-w-7xl mx-auto px-6 py-24">
+      <section id="packages" className="max-w-7xl mx-auto px-5 sm:px-6 py-16 md:py-24">
         <div className="text-center max-w-2xl mx-auto mb-14">
           <p className="text-xs uppercase tracking-[0.3em] text-gold mb-3">Tailored packages</p>
           <h2 className="font-serif text-4xl md:text-5xl mb-4">Choose Your Experience</h2>
