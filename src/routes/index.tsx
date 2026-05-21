@@ -86,58 +86,53 @@ function Home() {
       </section>
 
       {/* About */}
-      <section id="about" className="bg-beige py-24">
-        <div className="max-w-6xl mx-auto px-6 grid md:grid-cols-2 gap-16 items-center">
+      <section id="about" className="bg-beige py-16 md:py-24">
+        <div className="max-w-6xl mx-auto px-5 sm:px-6 grid md:grid-cols-2 gap-10 md:gap-16 items-center">
           <div className="relative">
             <img
-              src="https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=1000&q=80"
-              alt="About Elite MagicBooth"
+              src={about.image}
+              alt={about.heading}
               loading="lazy"
               className="rounded-3xl shadow-luxe w-full aspect-[4/5] object-cover"
             />
             <div className="absolute -bottom-6 -right-6 hidden md:block bg-card rounded-2xl p-6 shadow-luxe border border-border max-w-[220px]">
               <p className="text-3xl font-serif text-gradient-gold">500+</p>
-              <p className="text-sm text-muted-foreground">events styled across Melbourne</p>
+              <p className="text-sm text-muted-foreground">events styled across {contact.location || "Melbourne"}</p>
             </div>
           </div>
           <div>
-            <p className="text-xs uppercase tracking-[0.3em] text-gold mb-3">About Us</p>
-            <h2 className="font-serif text-4xl md:text-5xl mb-6">
-              Making your celebration <span className="italic text-gradient-gold">unforgettable</span>
+            <p className="text-xs uppercase tracking-[0.3em] text-gold mb-3">{about.eyebrow}</p>
+            <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl mb-6 leading-tight">
+              {about.heading}
             </h2>
-            <p className="text-muted-foreground leading-relaxed mb-4">
-              At Elite MagicBooth, we believe every event deserves more than just photos — it deserves
-              memories that last. From intimate baby showers to grand weddings and polished corporate
-              functions, our team brings warmth, style, and a touch of magic to every booking.
+            <p className="text-muted-foreground leading-relaxed mb-6 whitespace-pre-line">
+              {about.body}
             </p>
-            <p className="text-muted-foreground leading-relaxed mb-6">
-              Our friendly attendants, curated themed props, high-quality prints, fully custom
-              templates, instant SMS &amp; QR sharing, and beautiful digital galleries make sure your
-              guests leave smiling — and your memories live on long after the night ends.
-            </p>
-            <ul className="grid grid-cols-2 gap-3 text-sm">
-              {["Friendly attendants", "Themed props", "Quality prints", "Custom templates", "SMS / QR sharing", "Digital galleries"].map((t) => (
-                <li key={t} className="flex items-center gap-2"><Check className="h-4 w-4 text-gold" />{t}</li>
-              ))}
-            </ul>
+            {about.highlights.length > 0 && (
+              <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+                {about.highlights.map((t) => (
+                  <li key={t} className="flex items-center gap-2"><Check className="h-4 w-4 text-gold flex-shrink-0" />{t}</li>
+                ))}
+              </ul>
+            )}
           </div>
         </div>
       </section>
 
       {/* Gallery */}
-      <section id="gallery" className="max-w-7xl mx-auto px-6 py-24">
-        <div className="text-center max-w-2xl mx-auto mb-14">
+      <section id="gallery" className="max-w-7xl mx-auto px-5 sm:px-6 py-16 md:py-24">
+        <div className="text-center max-w-2xl mx-auto mb-10 md:mb-14">
           <p className="text-xs uppercase tracking-[0.3em] text-gold mb-3">Moments captured</p>
-          <h2 className="font-serif text-4xl md:text-5xl mb-4">A Gallery of Joy</h2>
+          <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl mb-4">A Gallery of Joy</h2>
           <p className="text-muted-foreground">
             From wedding celebrations to corporate galas — a glimpse of the moments we love creating.
           </p>
         </div>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {GALLERY.map((src, i) => (
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
+          {gallery.map((src, i) => (
             <div
-              key={src}
-              className={`overflow-hidden rounded-3xl shadow-luxe ${
+              key={`${src}-${i}`}
+              className={`overflow-hidden rounded-2xl sm:rounded-3xl shadow-luxe ${
                 i % 5 === 0 ? "row-span-2 aspect-[3/5]" : "aspect-square"
               }`}
             >
@@ -153,24 +148,26 @@ function Home() {
       </section>
 
       {/* Highlights */}
-      <section className="max-w-7xl mx-auto px-6 py-20 grid grid-cols-2 md:grid-cols-4 gap-6">
+      <section className="max-w-7xl mx-auto px-5 sm:px-6 py-16 md:py-20 grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
         {[
           { icon: Camera, label: "Unlimited Prints" },
           { icon: Sparkles, label: "Custom Templates" },
           { icon: Heart, label: "Designer Props" },
           { icon: Users, label: "Friendly Attendants" },
         ].map(({ icon: Icon, label }) => (
-          <div key={label} className="text-center p-6 rounded-3xl bg-card border border-border/60 shadow-luxe/30">
-            <div className="inline-flex h-14 w-14 items-center justify-center rounded-full gradient-gold mb-4">
-              <Icon className="h-6 w-6 text-ink" />
+          <div key={label} className="text-center p-5 sm:p-6 rounded-3xl bg-card border border-border/60 shadow-luxe/30">
+            <div className="inline-flex h-12 w-12 sm:h-14 sm:w-14 items-center justify-center rounded-full gradient-gold mb-3 sm:mb-4">
+              <Icon className="h-5 w-5 sm:h-6 sm:w-6 text-ink" />
             </div>
-            <p className="font-serif text-lg">{label}</p>
+            <p className="font-serif text-base sm:text-lg">{label}</p>
           </div>
         ))}
       </section>
 
       {/* Contact */}
-      <ContactSection packages={packages} />
+      <ContactSection packages={packages} contact={contact} />
+
+
 
 
       <SiteFooter />
