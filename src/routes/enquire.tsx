@@ -7,6 +7,9 @@ import { Toaster } from "@/components/ui/sonner";
 import { DEFAULT_PACKAGES, type Package } from "@/lib/packages";
 
 export const Route = createFileRoute("/enquire")({
+  validateSearch: (search: Record<string, unknown>) => ({
+    package: typeof search.package === "string" ? search.package : "",
+  }),
   head: () => ({
     meta: [
       { title: "Book Your Photobooth Experience — Elite MagicBooth" },
@@ -25,6 +28,9 @@ export const Route = createFileRoute("/enquire")({
 const EVENT_TYPES = ["Wedding", "Birthday", "Corporate", "Baby Shower", "Engagement", "Party", "Other"];
 
 function EnquirePage() {
+  const search = Route.useSearch();
+  const selectedPackage = search.package || "";
+
   const [packages, setPackages] = useState<Package[]>(DEFAULT_PACKAGES);
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -57,7 +63,6 @@ function EnquirePage() {
       <Toaster position="top-center" />
       <SiteHeader />
 
-      {/* Compact Hero banner */}
       <section className="relative pt-20 pb-8 overflow-hidden bg-beige">
         <div
           className="absolute inset-0 opacity-60"
@@ -88,14 +93,9 @@ function EnquirePage() {
         </div>
       </section>
 
-      {/* Compact Form + Contact info */}
       <section className="max-w-6xl mx-auto px-6 py-8 grid lg:grid-cols-5 gap-6">
-
-        {/* Contact info card */}
-<aside className="lg:col-span-2 space-y-4 order-2 lg:order-1">
-
+        <aside className="lg:col-span-2 space-y-4 order-2 lg:order-1">
           <div className="rounded-3xl bg-card border border-border shadow-luxe p-6">
-
             <h2 className="font-serif text-2xl mb-2">Elite MagicBooth</h2>
 
             <p className="text-sm text-muted-foreground mb-5">
@@ -103,7 +103,6 @@ function EnquirePage() {
             </p>
 
             <ul className="space-y-4">
-
               <li className="flex items-start gap-4">
                 <span className="h-10 w-10 inline-flex items-center justify-center rounded-full gradient-gold text-ink flex-shrink-0">
                   <Phone className="h-4 w-4" />
@@ -111,7 +110,6 @@ function EnquirePage() {
 
                 <div>
                   <p className="text-xs uppercase tracking-widest text-gold">Phone</p>
-
                   <a href="tel:0419678189" className="text-foreground hover:text-gold">
                     0419 678 189
                   </a>
@@ -125,7 +123,6 @@ function EnquirePage() {
 
                 <div>
                   <p className="text-xs uppercase tracking-widest text-gold">Email</p>
-
                   <a
                     href="mailto:elitemagicbooth@gmail.com"
                     className="text-foreground hover:text-gold break-all"
@@ -148,7 +145,6 @@ function EnquirePage() {
             </ul>
 
             <div className="mt-6 pt-5 border-t border-border flex items-center gap-3">
-
               <a
                 aria-label="Instagram"
                 href="#"
@@ -175,12 +171,10 @@ function EnquirePage() {
           </Link>
         </aside>
 
-        {/* Compact Glassmorphism form */}
         <form
-  onSubmit={onSubmit}
-  className="lg:col-span-3 order-1 lg:order-2 relative rounded-3xl bg-card/80 backdrop-blur-xl border border-border shadow-luxe p-5 md:p-6 space-y-3 animate-fade-up"
->
-
+          onSubmit={onSubmit}
+          className="lg:col-span-3 order-1 lg:order-2 relative rounded-3xl bg-card/80 backdrop-blur-xl border border-border shadow-luxe p-5 md:p-6 space-y-3 animate-fade-up"
+        >
           {submitted && (
             <div className="rounded-2xl bg-gold/15 border border-gold/40 px-4 py-3 text-sm flex items-center gap-2">
               <Check className="h-4 w-4 text-gold" />
@@ -189,17 +183,11 @@ function EnquirePage() {
           )}
 
           <div className="grid md:grid-cols-2 gap-3">
-
             <Field label="Full Name" name="name" required maxLength={100} />
-
             <Field label="Email Address" name="email" type="email" required maxLength={255} />
-
             <Field label="Phone Number" name="phone" type="tel" maxLength={30} />
-
             <SelectField label="Event Type" name="eventType" options={EVENT_TYPES} required />
-
             <Field label="Event Date" name="date" type="date" required />
-
             <Field label="Event Location" name="location" required maxLength={200} />
 
             <div className="md:col-span-2">
@@ -207,6 +195,7 @@ function EnquirePage() {
                 label="Package Interested In"
                 name="package"
                 options={packages.map((p) => p.name)}
+                defaultValue={selectedPackage}
               />
             </div>
           </div>
@@ -275,11 +264,13 @@ function SelectField({
   name,
   options,
   required,
+  defaultValue,
 }: {
   label: string;
   name: string;
   options: string[];
   required?: boolean;
+  defaultValue?: string;
 }) {
   return (
     <div>
@@ -290,6 +281,7 @@ function SelectField({
       <select
         name={name}
         required={required}
+        defaultValue={defaultValue || ""}
         className="w-full rounded-2xl border border-input bg-background px-4 py-3 text-sm focus:border-gold focus:ring-2 focus:ring-gold/20 outline-none transition"
       >
         <option value="">Select...</option>
