@@ -8,7 +8,7 @@ import { type Package } from "@/lib/packages";
 import { SiteHeader, SiteFooter } from "@/components/SiteChrome";
 import { Toaster } from "@/components/ui/sonner";
 import { useSiteContent } from "@/hooks/use-site-content";
-import type { AboutContent, ContactContent } from "@/lib/site-content";
+import type { ContactContent } from "@/lib/site-content";
 
 export const Route = createFileRoute("/")({
   head: () => ({
