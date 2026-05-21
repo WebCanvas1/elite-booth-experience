@@ -284,9 +284,7 @@ function Hero() {
   to="/enquire"
   search={{ package: "Elite" }}
   className="group inline-flex items-center gap-2 rounded-full bg-white/10 backdrop-blur-md ring-1 ring-white/30 px-7 py-4 font-semibold text-white hover:text-ink hover:bg-gold transition"
->
-  Book Now
-              Book Now
+>      Book Now
               <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
             </Link>
           </div>
