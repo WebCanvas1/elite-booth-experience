@@ -92,7 +92,7 @@ function EnquirePage() {
       <section className="max-w-6xl mx-auto px-6 py-8 grid lg:grid-cols-5 gap-6">
 
         {/* Contact info card */}
-        <aside className="lg:col-span-2 space-y-4">
+<aside className="lg:col-span-2 space-y-4 order-2 lg:order-1">
 
           <div className="rounded-3xl bg-card border border-border shadow-luxe p-6">
 
@@ -177,9 +177,9 @@ function EnquirePage() {
 
         {/* Compact Glassmorphism form */}
         <form
-          onSubmit={onSubmit}
-          className="lg:col-span-3 relative rounded-3xl bg-card/80 backdrop-blur-xl border border-border shadow-luxe p-5 md:p-6 space-y-3 animate-fade-up"
-        >
+  onSubmit={onSubmit}
+  className="lg:col-span-3 order-1 lg:order-2 relative rounded-3xl bg-card/80 backdrop-blur-xl border border-border shadow-luxe p-5 md:p-6 space-y-3 animate-fade-up"
+>
 
           {submitted && (
             <div className="rounded-2xl bg-gold/15 border border-gold/40 px-4 py-3 text-sm flex items-center gap-2">
