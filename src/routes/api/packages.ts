@@ -1,15 +1,15 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { DEFAULT_PACKAGES, ADMIN_PASSWORD, ADMIN_USERNAME, type Package } from "@/lib/packages";
+import { ADMIN_PASSWORD, ADMIN_USERNAME, DEFAULT_PACKAGES, type Package } from "@/lib/packages";
 
 // ============================================================
-// Cloudflare KV access.
-// Binding "PHOTOBOOTH_KV" is configured in wrangler.jsonc.
-// In production (Cloudflare Workers), `env.PHOTOBOOTH_KV` is the KVNamespace.
-// In local dev without a configured KV, we gracefully fall back to memory.
+// LEGACY endpoint kept for backward compatibility.
+// New code should use /api/content which returns the full site content
+// (packages, gallery, about, contact) stored in Cloudflare KV under
+// the binding PHOTOBOOTH_KV (see wrangler.jsonc).
 // ============================================================
-const KV_KEY = "packages:v1";
+const KV_KEY = "site:v1";
+const LEGACY_KEY = "packages:v1";
 
-// In-memory fallback for local dev when no KV binding is available.
 let memoryStore: Package[] | null = null;
 
 type KVLike = {
@@ -19,13 +19,11 @@ type KVLike = {
 
 async function getKV(): Promise<KVLike | null> {
   try {
-    // Dynamic import so non-CF environments don't crash at module load.
-    // @ts-expect-error - cloudflare:workers is provided at runtime by @cloudflare/vite-plugin
+    // @ts-expect-error - cloudflare:workers is provided at runtime
     const mod = (await import(/* @vite-ignore */ "cloudflare:workers").catch(() => null)) as
       | { env?: Record<string, unknown> }
       | null;
-    const binding = mod?.env?.PHOTOBOOTH_KV as KVLike | undefined;
-    return binding ?? null;
+    return (mod?.env?.PHOTOBOOTH_KV as KVLike | undefined) ?? null;
   } catch {
     return null;
   }
@@ -37,10 +35,13 @@ async function readPackages(): Promise<Package[]> {
     const raw = await kv.get(KV_KEY);
     if (raw) {
       try {
-        return JSON.parse(raw) as Package[];
-      } catch {
-        // fall through to defaults
-      }
+        const parsed = JSON.parse(raw) as { packages?: Package[] };
+        if (Array.isArray(parsed.packages) && parsed.packages.length) return parsed.packages;
+      } catch { /* ignore */ }
+    }
+    const legacy = await kv.get(LEGACY_KEY);
+    if (legacy) {
+      try { return JSON.parse(legacy) as Package[]; } catch { /* ignore */ }
     }
     return DEFAULT_PACKAGES;
   }
@@ -50,7 +51,14 @@ async function readPackages(): Promise<Package[]> {
 async function writePackages(pkgs: Package[]): Promise<void> {
   const kv = await getKV();
   if (kv) {
-    await kv.put(KV_KEY, JSON.stringify(pkgs));
+    // Merge into the unified site content blob.
+    const raw = await kv.get(KV_KEY);
+    let content: Record<string, unknown> = {};
+    if (raw) {
+      try { content = JSON.parse(raw); } catch { content = {}; }
+    }
+    content.packages = pkgs;
+    await kv.put(KV_KEY, JSON.stringify(content));
   } else {
     memoryStore = pkgs;
   }
@@ -81,12 +89,11 @@ export const Route = createFileRoute("/api/packages")({
             headers: { "content-type": "application/json" },
           });
         }
-        // Basic shape validation
         const clean: Package[] = body.packages.map((p) => ({
           id: String(p.id || crypto.randomUUID()),
           name: String(p.name || "").slice(0, 100),
           price: Number(p.price) || 0,
-          image: String(p.image || "").slice(0, 2_000_000), // allow base64 data URLs (~1.5MB)
+          image: String(p.image || "").slice(0, 2_500_000),
           features: Array.isArray(p.features)
             ? p.features.map((f) => String(f).slice(0, 300)).slice(0, 50)
             : [],
