@@ -5,13 +5,23 @@
   "compatibility_flags": ["nodejs_compat"],
   "main": "src/server.ts",
   // ============================================================
-  // Cloudflare KV binding for Elite MagicBooth package storage.
-  // Replace "REPLACE_WITH_YOUR_KV_NAMESPACE_ID" with the actual
-  // namespace id after running:
-  //   wrangler kv namespace create PHOTOBOOTH_KV
-  // The binding name PHOTOBOOTH_KV is referenced from
-  // src/routes/api/packages.ts via `import { env } from "cloudflare:workers"`.
+  // Cloudflare KV binding for Elite MagicBooth.
+  // Stores: site content (packages, gallery, about, contact),
+  //         admin password hashes (admin:pw:<email>),
+  //         password-reset tokens (admin:reset:<token>, TTL 30 min).
+  // The binding name PHOTOBOOTH_KV is referenced from:
+  //   - src/routes/api/content.ts
+  //   - src/routes/api/packages.ts
+  //   - src/lib/admin-auth.server.ts
+  //
+  // Email delivery for password resets uses Resend.
+  // Configure these Worker secrets via `wrangler secret put`:
+  //   RESEND_API_KEY        (required to actually send emails)
+  //   RESET_FROM_EMAIL      (optional, e.g. "Elite MagicBooth <noreply@yourdomain.com>")
+  //   RESET_PUBLIC_ORIGIN   (optional, e.g. "https://elitemagicbooth.com")
+  // If RESEND_API_KEY is unset, reset links are logged to Worker logs (dev only).
   // ============================================================
+
   "kv_namespaces": [
     {
   "binding": "PHOTOBOOTH_KV",
