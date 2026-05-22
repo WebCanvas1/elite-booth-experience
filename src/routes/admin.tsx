@@ -398,12 +398,10 @@ function PackageEditor({
             <AdminField label="Name" value={pkg.name} onChange={(v) => onChange({ name: v })} />
             <AdminField label="Price ($)" type="number" value={String(pkg.price)} onChange={(v) => onChange({ price: Number(v) || 0 })} />
           </div>
-          <AdminField
-            label="Image URL (overridden by upload)"
-            value={pkg.image.startsWith("data:") ? "" : pkg.image}
-            placeholder={pkg.image.startsWith("data:") ? "Using uploaded image" : "https://..."}
-            onChange={(v) => onChange({ image: v })}
-          />
+          <p className="text-xs text-muted-foreground">
+            Package image is uploaded from your device. Click <span className="text-gold font-semibold">Upload Image</span> to replace it.
+          </p>
+
           <div>
             <div className="flex items-center justify-between mb-2">
               <label className="block text-xs uppercase tracking-widest text-muted-foreground">Features</label>
@@ -429,7 +427,7 @@ function PackageEditor({
 function GalleryTab({ gallery, onChange }: { gallery: string[]; onChange: (g: string[]) => void }) {
   const fileRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
-  const [url, setUrl] = useState("");
+
 
   const onPickFiles = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
@@ -452,12 +450,8 @@ function GalleryTab({ gallery, onChange }: { gallery: string[]; onChange: (g: st
     }
   };
 
-  const addUrl = () => {
-    const v = url.trim();
-    if (!v) return;
-    onChange([...gallery, v]);
-    setUrl("");
-  };
+
+
 
   const remove = (idx: number) => onChange(gallery.filter((_, i) => i !== idx));
   const move = (idx: number, dir: -1 | 1) => {
@@ -487,17 +481,8 @@ function GalleryTab({ gallery, onChange }: { gallery: string[]; onChange: (g: st
         }
       />
 
-      <div className="bg-card border border-border rounded-2xl p-4 mb-6 flex flex-col sm:flex-row gap-3">
-        <input
-          value={url}
-          onChange={(e) => setUrl(e.target.value)}
-          placeholder="Or paste an image URL (https://...)"
-          className="flex-1 rounded-xl border border-input bg-background px-4 py-2.5 text-base sm:text-sm focus:border-gold focus:ring-2 focus:ring-gold/20 outline-none"
-        />
-        <button onClick={addUrl} className="inline-flex items-center justify-center gap-2 rounded-full border border-gold text-gold px-4 py-2.5 text-sm font-semibold hover:bg-gold hover:text-ink transition">
-          <Plus className="h-4 w-4" /> Add URL
-        </button>
-      </div>
+
+
 
       {gallery.length === 0 ? (
         <div className="text-center py-16 text-muted-foreground bg-card rounded-3xl border border-border border-dashed">
