@@ -9,12 +9,21 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as EnquireRouteImport } from './routes/enquire'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ApiPackagesRouteImport } from './routes/api/packages'
 import { Route as ApiContentRouteImport } from './routes/api/content'
+import { Route as ApiAdminResetRouteImport } from './routes/api/admin/reset'
+import { Route as ApiAdminLoginRouteImport } from './routes/api/admin/login'
+import { Route as ApiAdminForgotRouteImport } from './routes/api/admin/forgot'
 
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const EnquireRoute = EnquireRouteImport.update({
   id: '/enquire',
   path: '/enquire',
@@ -40,53 +49,113 @@ const ApiContentRoute = ApiContentRouteImport.update({
   path: '/api/content',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiAdminResetRoute = ApiAdminResetRouteImport.update({
+  id: '/api/admin/reset',
+  path: '/api/admin/reset',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAdminLoginRoute = ApiAdminLoginRouteImport.update({
+  id: '/api/admin/login',
+  path: '/api/admin/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAdminForgotRoute = ApiAdminForgotRouteImport.update({
+  id: '/api/admin/forgot',
+  path: '/api/admin/forgot',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/enquire': typeof EnquireRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/api/content': typeof ApiContentRoute
   '/api/packages': typeof ApiPackagesRoute
+  '/api/admin/forgot': typeof ApiAdminForgotRoute
+  '/api/admin/login': typeof ApiAdminLoginRoute
+  '/api/admin/reset': typeof ApiAdminResetRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/enquire': typeof EnquireRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/api/content': typeof ApiContentRoute
   '/api/packages': typeof ApiPackagesRoute
+  '/api/admin/forgot': typeof ApiAdminForgotRoute
+  '/api/admin/login': typeof ApiAdminLoginRoute
+  '/api/admin/reset': typeof ApiAdminResetRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/enquire': typeof EnquireRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/api/content': typeof ApiContentRoute
   '/api/packages': typeof ApiPackagesRoute
+  '/api/admin/forgot': typeof ApiAdminForgotRoute
+  '/api/admin/login': typeof ApiAdminLoginRoute
+  '/api/admin/reset': typeof ApiAdminResetRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/admin' | '/enquire' | '/api/content' | '/api/packages'
+  fullPaths:
+    | '/'
+    | '/admin'
+    | '/enquire'
+    | '/reset-password'
+    | '/api/content'
+    | '/api/packages'
+    | '/api/admin/forgot'
+    | '/api/admin/login'
+    | '/api/admin/reset'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/admin' | '/enquire' | '/api/content' | '/api/packages'
+  to:
+    | '/'
+    | '/admin'
+    | '/enquire'
+    | '/reset-password'
+    | '/api/content'
+    | '/api/packages'
+    | '/api/admin/forgot'
+    | '/api/admin/login'
+    | '/api/admin/reset'
   id:
     | '__root__'
     | '/'
     | '/admin'
     | '/enquire'
+    | '/reset-password'
     | '/api/content'
     | '/api/packages'
+    | '/api/admin/forgot'
+    | '/api/admin/login'
+    | '/api/admin/reset'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRoute
   EnquireRoute: typeof EnquireRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
   ApiContentRoute: typeof ApiContentRoute
   ApiPackagesRoute: typeof ApiPackagesRoute
+  ApiAdminForgotRoute: typeof ApiAdminForgotRoute
+  ApiAdminLoginRoute: typeof ApiAdminLoginRoute
+  ApiAdminResetRoute: typeof ApiAdminResetRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/enquire': {
       id: '/enquire'
       path: '/enquire'
@@ -122,6 +191,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiContentRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/admin/reset': {
+      id: '/api/admin/reset'
+      path: '/api/admin/reset'
+      fullPath: '/api/admin/reset'
+      preLoaderRoute: typeof ApiAdminResetRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/admin/login': {
+      id: '/api/admin/login'
+      path: '/api/admin/login'
+      fullPath: '/api/admin/login'
+      preLoaderRoute: typeof ApiAdminLoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/admin/forgot': {
+      id: '/api/admin/forgot'
+      path: '/api/admin/forgot'
+      fullPath: '/api/admin/forgot'
+      preLoaderRoute: typeof ApiAdminForgotRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -129,8 +219,12 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRoute,
   EnquireRoute: EnquireRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
   ApiContentRoute: ApiContentRoute,
   ApiPackagesRoute: ApiPackagesRoute,
+  ApiAdminForgotRoute: ApiAdminForgotRoute,
+  ApiAdminLoginRoute: ApiAdminLoginRoute,
+  ApiAdminResetRoute: ApiAdminResetRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
