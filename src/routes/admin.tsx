@@ -14,18 +14,25 @@ export const Route = createFileRoute("/admin")({
 
 const AUTH_KEY = "emb_admin_auth";
 
+type AdminCreds = { email: string; password: string };
+
 function AdminPage() {
-  const [creds, setCreds] = useState<{ u: string; p: string } | null>(null);
+  const [creds, setCreds] = useState<AdminCreds | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
     try {
       const raw = sessionStorage.getItem(AUTH_KEY);
-      if (raw) setCreds(JSON.parse(raw));
+      if (raw) {
+        const parsed = JSON.parse(raw) as Partial<AdminCreds>;
+        if (parsed.email && parsed.password) {
+          setCreds({ email: parsed.email, password: parsed.password });
+        }
+      }
     } catch { /* ignore */ }
   }, []);
 
-  const handleLogin = (c: { u: string; p: string }) => {
+  const handleLogin = (c: AdminCreds) => {
     sessionStorage.setItem(AUTH_KEY, JSON.stringify(c));
     setCreds(c);
   };
@@ -45,45 +52,117 @@ function AdminPage() {
   );
 }
 
-function LoginCard({ onLogin }: { onLogin: (c: { u: string; p: string }) => void }) {
-  const [u, setU] = useState("");
-  const [p, setP] = useState("");
+function LoginCard({ onLogin }: { onLogin: (c: AdminCreds) => void }) {
+  const [mode, setMode] = useState<"login" | "forgot">("login");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [submitting, setSubmitting] = useState(false);
   const [err, setErr] = useState("");
+  const [notice, setNotice] = useState("");
 
-  const submit = async (e: React.FormEvent) => {
+  const submitLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    setErr("");
-    const { ADMIN_USERNAME, ADMIN_PASSWORD } = await import("@/lib/packages");
-    if (u === ADMIN_USERNAME && p === ADMIN_PASSWORD) {
-      onLogin({ u, p });
-    } else {
-      setErr("Invalid credentials");
+    setErr(""); setNotice(""); setSubmitting(true);
+    try {
+      const res = await fetch("/api/admin/login", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ email: email.trim().toLowerCase(), password }),
+      });
+      const data = (await res.json().catch(() => ({}))) as { ok?: boolean; error?: string };
+      if (!res.ok || !data.ok) {
+        setErr("Invalid email or password.");
+      } else {
+        onLogin({ email: email.trim().toLowerCase(), password });
+      }
+    } catch {
+      setErr("Network error. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const submitForgot = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setErr(""); setNotice(""); setSubmitting(true);
+    try {
+      await fetch("/api/admin/forgot", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ email: email.trim().toLowerCase() }),
+      });
+      // Generic message — never leak whether email is authorised.
+      setNotice("If this email is authorised, a reset link has been sent.");
+    } catch {
+      setNotice("If this email is authorised, a reset link has been sent.");
+    } finally {
+      setSubmitting(false);
     }
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center px-5 py-10">
-      <form onSubmit={submit} className="w-full max-w-md bg-card rounded-3xl shadow-luxe p-7 sm:p-8 border border-border">
+      <form
+        onSubmit={mode === "login" ? submitLogin : submitForgot}
+        className="w-full max-w-md bg-card rounded-3xl shadow-luxe p-7 sm:p-8 border border-border"
+      >
         <Link to="/" className="flex justify-center mb-6"><img src={logo} alt="Elite MagicBooth" className="h-14" /></Link>
-        <h1 className="font-serif text-2xl sm:text-3xl text-center mb-2">Admin Login</h1>
-        <p className="text-sm text-center text-muted-foreground mb-6">Manage your website content</p>
+        <h1 className="font-serif text-2xl sm:text-3xl text-center mb-2 text-foreground">
+          {mode === "login" ? "Admin Login" : "Reset Password"}
+        </h1>
+        <p className="text-sm text-center text-muted-foreground mb-6">
+          {mode === "login" ? "Manage your website content" : "Enter your admin email to receive a reset link"}
+        </p>
         <div className="space-y-4">
           <div>
-            <label className="block text-xs uppercase tracking-widest text-muted-foreground mb-2">Username</label>
-            <input value={u} onChange={(e) => setU(e.target.value)} className="w-full rounded-2xl border border-input bg-background px-4 py-3 text-base focus:border-gold focus:ring-2 focus:ring-gold/20 outline-none" required />
+            <label className="block text-xs uppercase tracking-widest text-muted-foreground mb-2">Email</label>
+            <input
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              type="email"
+              autoComplete="email"
+              required
+              className="w-full rounded-2xl border border-input bg-background px-4 py-3 text-base focus:border-gold focus:ring-2 focus:ring-gold/20 outline-none"
+            />
           </div>
-          <div>
-            <label className="block text-xs uppercase tracking-widest text-muted-foreground mb-2">Password</label>
-            <input value={p} onChange={(e) => setP(e.target.value)} type="password" className="w-full rounded-2xl border border-input bg-background px-4 py-3 text-base focus:border-gold focus:ring-2 focus:ring-gold/20 outline-none" required />
-          </div>
+          {mode === "login" && (
+            <div>
+              <label className="block text-xs uppercase tracking-widest text-muted-foreground mb-2">Password</label>
+              <input
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                type="password"
+                autoComplete="current-password"
+                required
+                className="w-full rounded-2xl border border-input bg-background px-4 py-3 text-base focus:border-gold focus:ring-2 focus:ring-gold/20 outline-none"
+              />
+            </div>
+          )}
           {err && <p className="text-sm text-destructive">{err}</p>}
-          <button type="submit" className="w-full rounded-full gradient-gold py-3 font-semibold text-ink shadow-luxe hover:scale-[1.02] transition">Sign In</button>
-          <Link to="/" className="block text-center text-xs text-muted-foreground hover:text-gold mt-2">← Back to site</Link>
+          {notice && <p className="text-sm text-foreground bg-gold/15 border border-gold/40 rounded-2xl px-4 py-3">{notice}</p>}
+          <button
+            type="submit"
+            disabled={submitting}
+            className="w-full rounded-full gradient-gold py-3 font-semibold text-ink shadow-luxe hover:scale-[1.02] transition disabled:opacity-60"
+          >
+            {submitting ? "Please wait..." : mode === "login" ? "Sign In" : "Send Reset Link"}
+          </button>
+          <div className="flex justify-between text-xs">
+            <button
+              type="button"
+              onClick={() => { setMode(mode === "login" ? "forgot" : "login"); setErr(""); setNotice(""); }}
+              className="text-gold hover:underline"
+            >
+              {mode === "login" ? "Forgot Password?" : "← Back to login"}
+            </button>
+            <Link to="/" className="text-muted-foreground hover:text-gold">← Back to site</Link>
+          </div>
         </div>
       </form>
     </div>
   );
 }
+
 
 // Convert a File to a compressed base64 data URL stored in Cloudflare KV.
 async function fileToCompressedDataUrl(file: File, maxDim = 1400, quality = 0.8): Promise<string> {
