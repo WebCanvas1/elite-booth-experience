@@ -12,8 +12,6 @@ export const Route = createFileRoute("/admin")({
   component: AdminPage,
 });
 
-const AUTH_KEY = "emb_admin_auth";
-
 type AdminCreds = { email: string; password: string };
 
 function AdminPage() {
@@ -21,24 +19,26 @@ function AdminPage() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    try {
-      const raw = sessionStorage.getItem(AUTH_KEY);
-      if (raw) {
-        const parsed = JSON.parse(raw) as Partial<AdminCreds>;
-        if (parsed.email && parsed.password) {
-          setCreds({ email: parsed.email, password: parsed.password });
-        }
-      }
-    } catch { /* ignore */ }
+    const clearAdminSession = () => {
+      setCreds(null);
+    };
+
+    // Clear auth if user refreshes, closes tab, or navigates away
+    window.addEventListener("pagehide", clearAdminSession);
+    window.addEventListener("beforeunload", clearAdminSession);
+
+    return () => {
+      clearAdminSession();
+      window.removeEventListener("pagehide", clearAdminSession);
+      window.removeEventListener("beforeunload", clearAdminSession);
+    };
   }, []);
 
   const handleLogin = (c: AdminCreds) => {
-    sessionStorage.setItem(AUTH_KEY, JSON.stringify(c));
     setCreds(c);
   };
 
   const handleLogout = () => {
-    sessionStorage.removeItem(AUTH_KEY);
     setCreds(null);
     toast.success("Logged out");
     navigate({ to: "/" });
@@ -47,11 +47,15 @@ function AdminPage() {
   return (
     <div className="min-h-screen bg-beige">
       <Toaster position="top-center" />
-      {!creds ? <LoginCard onLogin={handleLogin} /> : <Dashboard creds={creds} onLogout={handleLogout} />}
+
+      {!creds ? (
+        <LoginCard onLogin={handleLogin} />
+      ) : (
+        <Dashboard creds={creds} onLogout={handleLogout} />
+      )}
     </div>
   );
 }
-
 function LoginCard({ onLogin }: { onLogin: (c: AdminCreds) => void }) {
   const [mode, setMode] = useState<"login" | "forgot">("login");
   const [email, setEmail] = useState("");
