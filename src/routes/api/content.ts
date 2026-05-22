@@ -152,10 +152,10 @@ export const Route = createFileRoute("/api/content")({
         }
         const current = await readContent();
         const clean: SiteContent = {
-          packages: body.packages !== undefined ? sanitizePackages(body.packages) : current.packages,
-          gallery: body.gallery !== undefined ? sanitizeGallery(body.gallery) : current.gallery,
-          about: body.about !== undefined ? sanitizeAbout(body.about) : current.about,
-          contact: body.contact !== undefined ? sanitizeContact(body.contact) : current.contact,
+          packages: body!.packages !== undefined ? sanitizePackages(body!.packages) : current.packages,
+          gallery: body!.gallery !== undefined ? sanitizeGallery(body!.gallery) : current.gallery,
+          about: body!.about !== undefined ? sanitizeAbout(body!.about) : current.about,
+          contact: body!.contact !== undefined ? sanitizeContact(body!.contact) : current.contact,
         };
         await writeContent(clean);
         return new Response(JSON.stringify({ ok: true, content: clean }), {
