@@ -182,7 +182,7 @@ async function fileToCompressedDataUrl(file: File, maxDim = 1400, quality = 0.8)
 
 type TabId = "packages" | "gallery" | "about" | "contact";
 
-function Dashboard({ creds, onLogout }: { creds: { u: string; p: string }; onLogout: () => void }) {
+function Dashboard({ creds, onLogout }: { creds: AdminCreds; onLogout: () => void }) {
   const [content, setContent] = useState<SiteContent>(DEFAULT_CONTENT);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -201,7 +201,7 @@ function Dashboard({ creds, onLogout }: { creds: { u: string; p: string }; onLog
       const res = await fetch("/api/content", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ username: creds.u, password: creds.p, ...content }),
+        body: JSON.stringify({ email: creds.email, password: creds.password, ...content }),
       });
       if (!res.ok) throw new Error("Save failed");
       toast.success("Changes saved successfully");
