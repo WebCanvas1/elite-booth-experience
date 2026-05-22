@@ -10,19 +10,20 @@ export function SiteHeader() {
   const linkClass = "hover:text-gold transition-colors";
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 backdrop-blur-md bg-background/80 border-b border-border/50">
+    <header className="fixed top-0 left-0 right-0 z-50 backdrop-blur-md bg-background/90 border-b border-border shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 md:py-4 flex items-center justify-between">
-        <Link to="/" className="flex items-center gap-2 sm:gap-3 group" onClick={() => setOpen(false)}>
+        <Link to="/" className="flex items-center gap-2 sm:gap-3 group min-w-0" onClick={() => setOpen(false)}>
           <img
             src={logo}
             alt="Elite MagicBooth"
-            className="h-9 w-9 md:h-12 md:w-12 rounded-full ring-1 ring-gold/40 group-hover:ring-gold transition"
+            className="h-10 w-10 md:h-12 md:w-12 rounded-full ring-1 ring-gold/50 group-hover:ring-gold transition flex-shrink-0"
           />
-          <span className="font-serif text-base sm:text-lg md:text-2xl leading-none tracking-wide">
-            <span className="text-foreground">Elite</span>{" "}
-            <span className="text-gradient-gold italic">MagicBooth</span>
+          <span className="font-serif text-[17px] sm:text-xl md:text-2xl leading-none tracking-wide whitespace-nowrap">
+            <span className="text-foreground font-semibold">Elite</span>{" "}
+            <span className="text-gradient-gold italic font-semibold">MagicBooth</span>
           </span>
         </Link>
+
 
         <nav className="hidden md:flex items-center gap-8 text-sm font-medium">
           <a href="/#packages" className={linkClass}>Packages</a>

@@ -49,7 +49,7 @@ function Home() {
             Transparent pricing, premium inclusions. Every package can be tailored to your event.
           </p>
         </div>
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6">
           {packages.map((pkg, i) => (
             <div
               key={pkg.id}
@@ -58,32 +58,37 @@ function Home() {
               }`}
             >
               {i === 3 && (
-                <span className="absolute top-4 right-4 z-10 rounded-full gradient-gold px-3 py-1 text-xs font-semibold text-ink">
+                <span className="absolute top-4 left-4 z-10 rounded-full gradient-gold px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-ink shadow-luxe">
                   Most Popular
                 </span>
               )}
-              <div className="aspect-[4/3] overflow-hidden">
+              <div className="relative aspect-[4/3] overflow-hidden">
                 <img src={pkg.image} alt={pkg.name} loading="lazy" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                {/* Price pill overlay */}
+                <div className="absolute bottom-3 right-3 inline-flex items-baseline gap-1 rounded-full gradient-gold px-4 py-2 shadow-luxe">
+                  <span className="text-xs font-semibold text-ink/80">$</span>
+                  <span className="font-serif text-2xl font-bold text-ink leading-none">{pkg.price}</span>
+                </div>
               </div>
-              <div className="p-6 flex flex-col flex-1">
-                <h3 className="font-serif text-2xl mb-1">{pkg.name}</h3>
-                <p className="text-4xl font-serif text-gradient-gold mb-5">${pkg.price}</p>
-                <ul className="space-y-2 text-sm text-muted-foreground mb-6 flex-1">
+              <div className="p-5 sm:p-6 flex flex-col flex-1">
+                <h3 className="font-serif text-2xl sm:text-[1.75rem] font-bold text-foreground mb-3 tracking-tight">{pkg.name}</h3>
+                <ul className="space-y-2 text-sm text-muted-foreground mb-5 flex-1">
                   {pkg.features.map((f) => (
                     <li key={f} className="flex gap-2"><Check className="h-4 w-4 text-gold flex-shrink-0 mt-0.5" /><span>{f}</span></li>
                   ))}
                 </ul>
                 <Link
-  to="/enquire"
-  search={{ package: pkg.name }}
-  className="mt-auto inline-flex items-center justify-center rounded-full gradient-gold px-5 py-3 text-sm font-semibold text-ink hover:scale-105 transition-transform"
->
-  Enquire Now
-</Link>
+                  to="/enquire"
+                  search={{ package: pkg.name }}
+                  className="mt-auto inline-flex items-center justify-center rounded-full gradient-gold px-5 py-3.5 text-sm font-bold text-ink shadow-luxe hover:scale-105 transition-transform"
+                >
+                  Enquire Now
+                </Link>
               </div>
             </div>
           ))}
         </div>
+
       </section>
 
       {/* About */}
