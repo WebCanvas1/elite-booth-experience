@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { ADMIN_PASSWORD, ADMIN_USERNAME, type Package } from "@/lib/packages";
+import { type Package } from "@/lib/packages";
+import { verifyAdminCredentials } from "@/lib/admin-auth.server";
 import {
   DEFAULT_CONTENT,
   mergeContent,
@@ -7,6 +8,7 @@ import {
   type AboutContent,
   type ContactContent,
 } from "@/lib/site-content";
+
 
 // ============================================================
 // Cloudflare KV access for full site content.
@@ -137,9 +139,12 @@ export const Route = createFileRoute("/api/content")({
       },
       POST: async ({ request }) => {
         const body = (await request.json().catch(() => null)) as
-          | (Partial<SiteContent> & { username?: string; password?: string })
+          | (Partial<SiteContent> & { email?: string; password?: string })
           | null;
-        if (!body || body.username !== ADMIN_USERNAME || body.password !== ADMIN_PASSWORD) {
+        const email = (body?.email || "").trim().toLowerCase();
+        const password = body?.password || "";
+        const authed = body ? await verifyAdminCredentials(email, password) : false;
+        if (!authed) {
           return new Response(JSON.stringify({ error: "Unauthorized" }), {
             status: 401,
             headers: { "content-type": "application/json" },

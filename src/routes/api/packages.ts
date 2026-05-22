@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { ADMIN_PASSWORD, ADMIN_USERNAME, DEFAULT_PACKAGES, type Package } from "@/lib/packages";
+import { DEFAULT_PACKAGES, type Package } from "@/lib/packages";
+import { verifyAdminCredentials } from "@/lib/admin-auth.server";
 
 // ============================================================
 // LEGACY endpoint kept for backward compatibility.
@@ -75,21 +76,24 @@ export const Route = createFileRoute("/api/packages")({
       },
       POST: async ({ request }) => {
         const body = (await request.json().catch(() => null)) as
-          | { username?: string; password?: string; packages?: Package[] }
+          | { email?: string; password?: string; packages?: Package[] }
           | null;
-        if (!body || body.username !== ADMIN_USERNAME || body.password !== ADMIN_PASSWORD) {
+        const email = (body?.email || "").trim().toLowerCase();
+        const password = body?.password || "";
+        const authed = body ? await verifyAdminCredentials(email, password) : false;
+        if (!authed) {
           return new Response(JSON.stringify({ error: "Unauthorized" }), {
             status: 401,
             headers: { "content-type": "application/json" },
           });
         }
-        if (!Array.isArray(body.packages)) {
+        if (!Array.isArray(body!.packages)) {
           return new Response(JSON.stringify({ error: "Invalid payload" }), {
             status: 400,
             headers: { "content-type": "application/json" },
           });
         }
-        const clean: Package[] = body.packages.map((p) => ({
+        const clean: Package[] = body!.packages.map((p) => ({
           id: String(p.id || crypto.randomUUID()),
           name: String(p.name || "").slice(0, 100),
           price: Number(p.price) || 0,
