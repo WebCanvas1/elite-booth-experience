@@ -1,9 +1,9 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import { Plus, Trash2, Save, LogOut, ArrowLeft, Upload, ArrowUp, ArrowDown, Image as ImageIcon, Info, Phone, Package as PackageIcon } from "lucide-react";
+import { Plus, Trash2, Save, LogOut, ArrowLeft, Upload, ArrowUp, ArrowDown, Image as ImageIcon, Info, Phone, Package as PackageIcon, Sparkles, CalendarHeart, FileText, ShieldCheck } from "lucide-react";
 import { DEFAULT_PACKAGES, type Package } from "@/lib/packages";
-import { DEFAULT_CONTENT, mergeContent, type SiteContent, type AboutContent, type ContactContent } from "@/lib/site-content";
+import { DEFAULT_CONTENT, mergeContent, type SiteContent, type AboutContent, type ContactContent, type EventItem, type AddOnItem, type PolicyContent, type PolicySection } from "@/lib/site-content";
 import { Toaster } from "@/components/ui/sonner";
 import logo from "@/assets/logo.png";
 
