@@ -29,7 +29,7 @@ export const Route = createFileRoute("/")({
 
 function Home() {
   const content = useSiteContent();
-  const { packages, gallery, about, contact } = content;
+  const { packages, gallery, about, contact, events, addOns } = content;
 
 
   return (
