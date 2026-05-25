@@ -7,6 +7,10 @@ import {
   type SiteContent,
   type AboutContent,
   type ContactContent,
+  type EventItem,
+  type AddOnItem,
+  type PolicyContent,
+  type PolicySection,
 } from "@/lib/site-content";
 
 
