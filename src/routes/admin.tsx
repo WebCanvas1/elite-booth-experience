@@ -806,3 +806,274 @@ function AdminField({
     </div>
   );
 }
+
+/* ======================== ADD-ONS TAB ======================== */
+
+function AddOnsTab({ addOns, onChange }: { addOns: AddOnItem[]; onChange: (a: AddOnItem[]) => void }) {
+  const add = () =>
+    onChange([
+      ...addOns,
+      { id: crypto.randomUUID(), title: "New Add-On", description: "", price: "", image: "", popular: false },
+    ]);
+  const remove = (idx: number) => onChange(addOns.filter((_, i) => i !== idx));
+  const update = (idx: number, patch: Partial<AddOnItem>) =>
+    onChange(addOns.map((a, i) => (i === idx ? { ...a, ...patch } : a)));
+  const move = (idx: number, dir: -1 | 1) => {
+    const j = idx + dir;
+    if (j < 0 || j >= addOns.length) return;
+    const next = [...addOns];
+    [next[idx], next[j]] = [next[j], next[idx]];
+    onChange(next);
+  };
+
+  return (
+    <div>
+      <SectionHeader
+        title="Add-Ons"
+        subtitle="Optional extras shown below Packages. Click Save to publish."
+        action={
+          <button onClick={add} className="inline-flex items-center justify-center gap-2 rounded-full border border-gold text-gold px-4 py-2.5 text-sm font-semibold hover:bg-gold hover:text-ink transition">
+            <Plus className="h-4 w-4" /> Add Add-On
+          </button>
+        }
+      />
+      <div className="space-y-5">
+        {addOns.map((a, idx) => (
+          <AddOnEditor
+            key={a.id}
+            item={a}
+            onChange={(patch) => update(idx, patch)}
+            onRemove={() => remove(idx)}
+            onMoveUp={() => move(idx, -1)}
+            onMoveDown={() => move(idx, 1)}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function AddOnEditor({
+  item, onChange, onRemove, onMoveUp, onMoveDown,
+}: {
+  item: AddOnItem;
+  onChange: (patch: Partial<AddOnItem>) => void;
+  onRemove: () => void;
+  onMoveUp: () => void;
+  onMoveDown: () => void;
+}) {
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false);
+  const pickFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const f = e.target.files?.[0];
+    if (!f) return;
+    setUploading(true);
+    try {
+      const url = await fileToCompressedDataUrl(f);
+      onChange({ image: url });
+      toast.success("Image ready — click Save");
+    } catch { toast.error("Could not process image"); }
+    finally { setUploading(false); if (fileRef.current) fileRef.current.value = ""; }
+  };
+  return (
+    <div className="bg-card rounded-3xl border border-border p-5 sm:p-6 shadow-luxe/30">
+      <div className="grid sm:grid-cols-[200px_1fr] gap-5">
+        <div>
+          <div className="aspect-[4/3] rounded-2xl overflow-hidden bg-muted mb-3 border border-border">
+            {item.image
+              ? <img src={item.image} alt={item.title} className="w-full h-full object-cover" />
+              : <div className="w-full h-full flex items-center justify-center text-xs text-muted-foreground">No image</div>}
+          </div>
+          <input ref={fileRef} type="file" accept="image/*" onChange={pickFile} className="hidden" />
+          <button onClick={() => fileRef.current?.click()} disabled={uploading} className="w-full inline-flex items-center justify-center gap-2 rounded-full border border-gold text-gold text-xs font-semibold py-2.5 hover:bg-gold hover:text-ink transition disabled:opacity-60 mb-2">
+            <Upload className="h-3.5 w-3.5" /> {uploading ? "Processing..." : "Upload Image"}
+          </button>
+          <div className="grid grid-cols-2 gap-2">
+            <button onClick={onMoveUp} className="inline-flex items-center justify-center rounded-full border border-border text-xs py-2 hover:text-gold"><ArrowUp className="h-3 w-3" /></button>
+            <button onClick={onMoveDown} className="inline-flex items-center justify-center rounded-full border border-border text-xs py-2 hover:text-gold"><ArrowDown className="h-3 w-3" /></button>
+          </div>
+          <button onClick={onRemove} className="mt-2 w-full inline-flex items-center justify-center gap-1 rounded-full border border-destructive/40 text-destructive text-xs py-2 hover:bg-destructive hover:text-destructive-foreground transition">
+            <Trash2 className="h-3 w-3" /> Delete
+          </button>
+        </div>
+        <div className="space-y-3">
+          <div className="grid sm:grid-cols-2 gap-3">
+            <AdminField label="Title" value={item.title} onChange={(v) => onChange({ title: v })} />
+            <AdminField label="Price (display)" value={item.price} placeholder="$120 or POA" onChange={(v) => onChange({ price: v })} />
+          </div>
+          <div>
+            <label className="block text-xs uppercase tracking-widest text-muted-foreground mb-2">Description</label>
+            <textarea value={item.description} onChange={(e) => onChange({ description: e.target.value })} rows={3} className="w-full rounded-2xl border border-input bg-background px-4 py-3 text-base sm:text-sm focus:border-gold focus:ring-2 focus:ring-gold/20 outline-none" />
+          </div>
+          <label className="inline-flex items-center gap-2 text-sm">
+            <input type="checkbox" checked={item.popular} onChange={(e) => onChange({ popular: e.target.checked })} className="h-4 w-4 accent-[oklch(0.78_0.11_80)]" />
+            Show "Popular" badge
+          </label>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ======================== EVENTS TAB ======================== */
+
+function EventsTab({ events, onChange }: { events: EventItem[]; onChange: (e: EventItem[]) => void }) {
+  const add = () => onChange([...events, { id: crypto.randomUUID(), title: "New Event", description: "", image: "" }]);
+  const remove = (idx: number) => onChange(events.filter((_, i) => i !== idx));
+  const update = (idx: number, patch: Partial<EventItem>) =>
+    onChange(events.map((e, i) => (i === idx ? { ...e, ...patch } : e)));
+  const move = (idx: number, dir: -1 | 1) => {
+    const j = idx + dir;
+    if (j < 0 || j >= events.length) return;
+    const next = [...events];
+    [next[idx], next[j]] = [next[j], next[idx]];
+    onChange(next);
+  };
+
+  return (
+    <div>
+      <SectionHeader
+        title="Events We Cover"
+        subtitle="Manage the event types shown on the homepage."
+        action={
+          <button onClick={add} className="inline-flex items-center justify-center gap-2 rounded-full border border-gold text-gold px-4 py-2.5 text-sm font-semibold hover:bg-gold hover:text-ink transition">
+            <Plus className="h-4 w-4" /> Add Event
+          </button>
+        }
+      />
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {events.map((ev, idx) => (
+          <EventEditor
+            key={ev.id}
+            item={ev}
+            onChange={(patch) => update(idx, patch)}
+            onRemove={() => remove(idx)}
+            onMoveUp={() => move(idx, -1)}
+            onMoveDown={() => move(idx, 1)}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function EventEditor({
+  item, onChange, onRemove, onMoveUp, onMoveDown,
+}: {
+  item: EventItem;
+  onChange: (patch: Partial<EventItem>) => void;
+  onRemove: () => void;
+  onMoveUp: () => void;
+  onMoveDown: () => void;
+}) {
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false);
+  const pickFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const f = e.target.files?.[0];
+    if (!f) return;
+    setUploading(true);
+    try {
+      const url = await fileToCompressedDataUrl(f);
+      onChange({ image: url });
+      toast.success("Image ready — click Save");
+    } catch { toast.error("Could not process image"); }
+    finally { setUploading(false); if (fileRef.current) fileRef.current.value = ""; }
+  };
+  return (
+    <div className="bg-card rounded-3xl border border-border p-4 shadow-luxe/30">
+      <div className="aspect-[3/4] rounded-2xl overflow-hidden bg-muted mb-3 border border-border">
+        {item.image
+          ? <img src={item.image} alt={item.title} className="w-full h-full object-cover" />
+          : <div className="w-full h-full flex items-center justify-center text-xs text-muted-foreground">No image</div>}
+      </div>
+      <input ref={fileRef} type="file" accept="image/*" onChange={pickFile} className="hidden" />
+      <button onClick={() => fileRef.current?.click()} disabled={uploading} className="w-full inline-flex items-center justify-center gap-2 rounded-full border border-gold text-gold text-xs font-semibold py-2 hover:bg-gold hover:text-ink transition disabled:opacity-60 mb-3">
+        <Upload className="h-3.5 w-3.5" /> {uploading ? "Processing..." : "Upload Image"}
+      </button>
+      <AdminField label="Title" value={item.title} onChange={(v) => onChange({ title: v })} />
+      <div className="mt-3">
+        <label className="block text-xs uppercase tracking-widest text-muted-foreground mb-2">Short description</label>
+        <textarea value={item.description} onChange={(e) => onChange({ description: e.target.value })} rows={2} className="w-full rounded-xl border border-input bg-background px-3 py-2 text-base sm:text-sm focus:border-gold focus:ring-2 focus:ring-gold/20 outline-none" />
+      </div>
+      <div className="mt-3 grid grid-cols-3 gap-2">
+        <button onClick={onMoveUp} className="inline-flex items-center justify-center rounded-full border border-border text-xs py-2 hover:text-gold"><ArrowUp className="h-3 w-3" /></button>
+        <button onClick={onMoveDown} className="inline-flex items-center justify-center rounded-full border border-border text-xs py-2 hover:text-gold"><ArrowDown className="h-3 w-3" /></button>
+        <button onClick={onRemove} className="inline-flex items-center justify-center gap-1 rounded-full border border-destructive/40 text-destructive text-xs py-2 hover:bg-destructive hover:text-destructive-foreground transition"><Trash2 className="h-3 w-3" /></button>
+      </div>
+    </div>
+  );
+}
+
+/* ======================== POLICY TAB (Terms & Privacy) ======================== */
+
+function PolicyTab({
+  title, subtitle, policy, onChange,
+}: {
+  title: string;
+  subtitle: string;
+  policy: PolicyContent;
+  onChange: (p: PolicyContent) => void;
+}) {
+  const addSection = () =>
+    onChange({ ...policy, sections: [...policy.sections, { id: crypto.randomUUID(), heading: "New Section", body: "" }] });
+  const removeSection = (idx: number) =>
+    onChange({ ...policy, sections: policy.sections.filter((_, i) => i !== idx) });
+  const updateSection = (idx: number, patch: Partial<PolicySection>) =>
+    onChange({ ...policy, sections: policy.sections.map((s, i) => (i === idx ? { ...s, ...patch } : s)) });
+  const move = (idx: number, dir: -1 | 1) => {
+    const j = idx + dir;
+    if (j < 0 || j >= policy.sections.length) return;
+    const next = [...policy.sections];
+    [next[idx], next[j]] = [next[j], next[idx]];
+    onChange({ ...policy, sections: next });
+  };
+
+  return (
+    <div>
+      <SectionHeader
+        title={title}
+        subtitle={subtitle}
+        action={
+          <button onClick={addSection} className="inline-flex items-center justify-center gap-2 rounded-full border border-gold text-gold px-4 py-2.5 text-sm font-semibold hover:bg-gold hover:text-ink transition">
+            <Plus className="h-4 w-4" /> Add Section
+          </button>
+        }
+      />
+      <div className="bg-card border border-border rounded-3xl p-5 sm:p-6 shadow-luxe/30 space-y-4 mb-6">
+        <AdminField label="Page heading" value={policy.heading} onChange={(v) => onChange({ ...policy, heading: v })} />
+        <div>
+          <label className="block text-xs uppercase tracking-widest text-muted-foreground mb-2">Intro paragraph</label>
+          <textarea value={policy.intro} onChange={(e) => onChange({ ...policy, intro: e.target.value })} rows={3} className="w-full rounded-2xl border border-input bg-background px-4 py-3 text-base sm:text-sm focus:border-gold focus:ring-2 focus:ring-gold/20 outline-none" />
+        </div>
+      </div>
+
+      <div className="space-y-4">
+        {policy.sections.map((s, idx) => (
+          <div key={s.id} className="bg-card border border-border rounded-3xl p-5 sm:p-6 shadow-luxe/30">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-3">
+              <input
+                value={s.heading}
+                onChange={(e) => updateSection(idx, { heading: e.target.value })}
+                placeholder="Section heading"
+                className="flex-1 rounded-xl border border-input bg-background px-3 py-2.5 text-base sm:text-sm font-serif text-lg focus:border-gold focus:ring-2 focus:ring-gold/20 outline-none"
+              />
+              <div className="flex gap-2">
+                <button onClick={() => move(idx, -1)} className="px-3 rounded-full border border-border text-muted-foreground hover:text-gold"><ArrowUp className="h-4 w-4" /></button>
+                <button onClick={() => move(idx, 1)} className="px-3 rounded-full border border-border text-muted-foreground hover:text-gold"><ArrowDown className="h-4 w-4" /></button>
+                <button onClick={() => removeSection(idx)} className="px-3 rounded-full border border-destructive/40 text-destructive hover:bg-destructive hover:text-destructive-foreground transition"><Trash2 className="h-4 w-4" /></button>
+              </div>
+            </div>
+            <textarea
+              value={s.body}
+              onChange={(e) => updateSection(idx, { body: e.target.value })}
+              rows={5}
+              placeholder="Section content"
+              className="w-full rounded-2xl border border-input bg-background px-4 py-3 text-base sm:text-sm focus:border-gold focus:ring-2 focus:ring-gold/20 outline-none"
+            />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
