@@ -34,22 +34,13 @@ export function SiteHeader() {
           </span>
         </Link>
 
-        <nav className="hidden md:flex items-center gap-8 text-sm font-medium">
-          <a href="/#packages" className={linkClass}>
-            Packages
-          </a>
-
-          <a href="/#about" className={linkClass}>
-            About
-          </a>
-
-          <a href="/#gallery" className={linkClass}>
-            Gallery
-          </a>
-
-          <Link to="/enquire" className={linkClass}>
-            Contact
-          </Link>
+        <nav className="hidden md:flex items-center gap-6 lg:gap-7 text-sm font-medium">
+          <a href="/#packages" className={linkClass}>Packages</a>
+          <a href="/#addons" className={linkClass}>Add-Ons</a>
+          <a href="/#events" className={linkClass}>Events</a>
+          <a href="/#about" className={linkClass}>About</a>
+          <a href="/#gallery" className={linkClass}>Gallery</a>
+          <Link to="/enquire" className={linkClass}>Contact</Link>
         </nav>
 
         <div className="flex items-center gap-2">
