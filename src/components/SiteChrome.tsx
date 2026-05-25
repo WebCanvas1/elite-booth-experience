@@ -199,35 +199,15 @@ export function SiteFooter() {
           </h4>
 
           <ul className="space-y-2 text-sm text-muted-foreground">
-            <li>
-              <a href="/#packages" className="hover:text-gold">
-                Packages
-              </a>
-            </li>
-
-            <li>
-              <a href="/#about" className="hover:text-gold">
-                About
-              </a>
-            </li>
-
-            <li>
-              <a href="/#gallery" className="hover:text-gold">
-                Gallery
-              </a>
-            </li>
-
-            <li>
-              <Link to="/enquire" className="hover:text-gold">
-                Get a Quote
-              </Link>
-            </li>
-
-            <li>
-              <Link to="/" className="hover:text-gold">
-                Back to Home
-              </Link>
-            </li>
+            <li><a href="/#packages" className="hover:text-gold">Packages</a></li>
+            <li><a href="/#addons" className="hover:text-gold">Add-Ons</a></li>
+            <li><a href="/#events" className="hover:text-gold">Events We Cover</a></li>
+            <li><a href="/#about" className="hover:text-gold">About</a></li>
+            <li><a href="/#gallery" className="hover:text-gold">Gallery</a></li>
+            <li><Link to="/enquire" className="hover:text-gold">Get a Quote</Link></li>
+            <li><Link to="/terms" className="hover:text-gold">Terms & Conditions</Link></li>
+            <li><Link to="/privacy" className="hover:text-gold">Privacy Policy</Link></li>
+            <li><Link to="/" className="hover:text-gold">Back to Home</Link></li>
           </ul>
         </div>
       </div>
