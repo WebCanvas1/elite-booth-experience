@@ -7,6 +7,10 @@ import {
   type SiteContent,
   type AboutContent,
   type ContactContent,
+  type EventItem,
+  type AddOnItem,
+  type PolicyContent,
+  type PolicySection,
 } from "@/lib/site-content";
 
 
@@ -128,6 +132,53 @@ function sanitizeContact(input: unknown): ContactContent {
   };
 }
 
+function sanitizeEvents(input: unknown): EventItem[] {
+  if (!Array.isArray(input)) return DEFAULT_CONTENT.events;
+  return input.slice(0, 30).map((e) => {
+    const x = e as Partial<EventItem>;
+    return {
+      id: String(x.id || crypto.randomUUID()).slice(0, 80),
+      title: String(x.title || "").slice(0, 100),
+      description: String(x.description || "").slice(0, 400),
+      image: String(x.image || "").slice(0, MAX_IMG),
+    };
+  });
+}
+
+function sanitizeAddOns(input: unknown): AddOnItem[] {
+  if (!Array.isArray(input)) return DEFAULT_CONTENT.addOns;
+  return input.slice(0, 40).map((a) => {
+    const x = a as Partial<AddOnItem>;
+    return {
+      id: String(x.id || crypto.randomUUID()).slice(0, 80),
+      title: String(x.title || "").slice(0, 100),
+      description: String(x.description || "").slice(0, 400),
+      price: String(x.price || "").slice(0, 40),
+      image: String(x.image || "").slice(0, MAX_IMG),
+      popular: Boolean(x.popular),
+    };
+  });
+}
+
+function sanitizePolicy(input: unknown, fallback: PolicyContent): PolicyContent {
+  const p = (input || {}) as Partial<PolicyContent>;
+  const sections: PolicySection[] = Array.isArray(p.sections)
+    ? p.sections.slice(0, 40).map((s) => {
+        const x = s as Partial<PolicySection>;
+        return {
+          id: String(x.id || crypto.randomUUID()).slice(0, 80),
+          heading: String(x.heading || "").slice(0, 200),
+          body: String(x.body || "").slice(0, 5000),
+        };
+      })
+    : fallback.sections;
+  return {
+    heading: String(p.heading ?? fallback.heading).slice(0, 200),
+    intro: String(p.intro ?? fallback.intro).slice(0, 2000),
+    sections,
+  };
+}
+
 export const Route = createFileRoute("/api/content")({
   server: {
     handlers: {
@@ -156,6 +207,10 @@ export const Route = createFileRoute("/api/content")({
           gallery: body!.gallery !== undefined ? sanitizeGallery(body!.gallery) : current.gallery,
           about: body!.about !== undefined ? sanitizeAbout(body!.about) : current.about,
           contact: body!.contact !== undefined ? sanitizeContact(body!.contact) : current.contact,
+          events: body!.events !== undefined ? sanitizeEvents(body!.events) : current.events,
+          addOns: body!.addOns !== undefined ? sanitizeAddOns(body!.addOns) : current.addOns,
+          terms: body!.terms !== undefined ? sanitizePolicy(body!.terms, DEFAULT_CONTENT.terms) : current.terms,
+          privacy: body!.privacy !== undefined ? sanitizePolicy(body!.privacy, DEFAULT_CONTENT.privacy) : current.privacy,
         };
         await writeContent(clean);
         return new Response(JSON.stringify({ ok: true, content: clean }), {

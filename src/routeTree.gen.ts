@@ -9,7 +9,9 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TermsRouteImport } from './routes/terms'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as EnquireRouteImport } from './routes/enquire'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
@@ -19,9 +21,19 @@ import { Route as ApiAdminResetRouteImport } from './routes/api/admin/reset'
 import { Route as ApiAdminLoginRouteImport } from './routes/api/admin/login'
 import { Route as ApiAdminForgotRouteImport } from './routes/api/admin/forgot'
 
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
   path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EnquireRoute = EnquireRouteImport.update({
@@ -69,7 +81,9 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/enquire': typeof EnquireRoute
+  '/privacy': typeof PrivacyRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/terms': typeof TermsRoute
   '/api/content': typeof ApiContentRoute
   '/api/packages': typeof ApiPackagesRoute
   '/api/admin/forgot': typeof ApiAdminForgotRoute
@@ -80,7 +94,9 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/enquire': typeof EnquireRoute
+  '/privacy': typeof PrivacyRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/terms': typeof TermsRoute
   '/api/content': typeof ApiContentRoute
   '/api/packages': typeof ApiPackagesRoute
   '/api/admin/forgot': typeof ApiAdminForgotRoute
@@ -92,7 +108,9 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/enquire': typeof EnquireRoute
+  '/privacy': typeof PrivacyRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/terms': typeof TermsRoute
   '/api/content': typeof ApiContentRoute
   '/api/packages': typeof ApiPackagesRoute
   '/api/admin/forgot': typeof ApiAdminForgotRoute
@@ -105,7 +123,9 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/enquire'
+    | '/privacy'
     | '/reset-password'
+    | '/terms'
     | '/api/content'
     | '/api/packages'
     | '/api/admin/forgot'
@@ -116,7 +136,9 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/enquire'
+    | '/privacy'
     | '/reset-password'
+    | '/terms'
     | '/api/content'
     | '/api/packages'
     | '/api/admin/forgot'
@@ -127,7 +149,9 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/enquire'
+    | '/privacy'
     | '/reset-password'
+    | '/terms'
     | '/api/content'
     | '/api/packages'
     | '/api/admin/forgot'
@@ -139,7 +163,9 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRoute
   EnquireRoute: typeof EnquireRoute
+  PrivacyRoute: typeof PrivacyRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
+  TermsRoute: typeof TermsRoute
   ApiContentRoute: typeof ApiContentRoute
   ApiPackagesRoute: typeof ApiPackagesRoute
   ApiAdminForgotRoute: typeof ApiAdminForgotRoute
@@ -149,11 +175,25 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/reset-password': {
       id: '/reset-password'
       path: '/reset-password'
       fullPath: '/reset-password'
       preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/enquire': {
@@ -219,7 +259,9 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRoute,
   EnquireRoute: EnquireRoute,
+  PrivacyRoute: PrivacyRoute,
   ResetPasswordRoute: ResetPasswordRoute,
+  TermsRoute: TermsRoute,
   ApiContentRoute: ApiContentRoute,
   ApiPackagesRoute: ApiPackagesRoute,
   ApiAdminForgotRoute: ApiAdminForgotRoute,

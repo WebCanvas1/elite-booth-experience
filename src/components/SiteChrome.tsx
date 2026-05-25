@@ -34,22 +34,13 @@ export function SiteHeader() {
           </span>
         </Link>
 
-        <nav className="hidden md:flex items-center gap-8 text-sm font-medium">
-          <a href="/#packages" className={linkClass}>
-            Packages
-          </a>
-
-          <a href="/#about" className={linkClass}>
-            About
-          </a>
-
-          <a href="/#gallery" className={linkClass}>
-            Gallery
-          </a>
-
-          <Link to="/enquire" className={linkClass}>
-            Contact
-          </Link>
+        <nav className="hidden md:flex items-center gap-6 lg:gap-7 text-sm font-medium">
+          <a href="/#packages" className={linkClass}>Packages</a>
+          <a href="/#addons" className={linkClass}>Add-Ons</a>
+          <a href="/#events" className={linkClass}>Events</a>
+          <a href="/#about" className={linkClass}>About</a>
+          <a href="/#gallery" className={linkClass}>Gallery</a>
+          <Link to="/enquire" className={linkClass}>Contact</Link>
         </nav>
 
         <div className="flex items-center gap-2">
@@ -82,6 +73,8 @@ export function SiteHeader() {
           <nav className="px-4 py-4 flex flex-col gap-1 text-base">
             {[
               { href: "/#packages", label: "Packages" },
+              { href: "/#addons", label: "Add-Ons" },
+              { href: "/#events", label: "Events" },
               { href: "/#about", label: "About" },
               { href: "/#gallery", label: "Gallery" },
             ].map((l) => (
@@ -102,6 +95,14 @@ export function SiteHeader() {
             >
               Contact
             </Link>
+
+            <Link to="/terms" onClick={() => setOpen(false)} className="py-3 px-2 rounded-xl text-white/80 hover:bg-white/5 hover:text-[#d4af37] transition text-sm">
+              Terms & Conditions
+            </Link>
+            <Link to="/privacy" onClick={() => setOpen(false)} className="py-3 px-2 rounded-xl text-white/80 hover:bg-white/5 hover:text-[#d4af37] transition text-sm">
+              Privacy Policy
+            </Link>
+
 
             <Link
               to="/enquire"
@@ -198,35 +199,15 @@ export function SiteFooter() {
           </h4>
 
           <ul className="space-y-2 text-sm text-muted-foreground">
-            <li>
-              <a href="/#packages" className="hover:text-gold">
-                Packages
-              </a>
-            </li>
-
-            <li>
-              <a href="/#about" className="hover:text-gold">
-                About
-              </a>
-            </li>
-
-            <li>
-              <a href="/#gallery" className="hover:text-gold">
-                Gallery
-              </a>
-            </li>
-
-            <li>
-              <Link to="/enquire" className="hover:text-gold">
-                Get a Quote
-              </Link>
-            </li>
-
-            <li>
-              <Link to="/" className="hover:text-gold">
-                Back to Home
-              </Link>
-            </li>
+            <li><a href="/#packages" className="hover:text-gold">Packages</a></li>
+            <li><a href="/#addons" className="hover:text-gold">Add-Ons</a></li>
+            <li><a href="/#events" className="hover:text-gold">Events We Cover</a></li>
+            <li><a href="/#about" className="hover:text-gold">About</a></li>
+            <li><a href="/#gallery" className="hover:text-gold">Gallery</a></li>
+            <li><Link to="/enquire" className="hover:text-gold">Get a Quote</Link></li>
+            <li><Link to="/terms" className="hover:text-gold">Terms & Conditions</Link></li>
+            <li><Link to="/privacy" className="hover:text-gold">Privacy Policy</Link></li>
+            <li><Link to="/" className="hover:text-gold">Back to Home</Link></li>
           </ul>
         </div>
       </div>

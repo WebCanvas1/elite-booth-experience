@@ -29,7 +29,7 @@ export const Route = createFileRoute("/")({
 
 function Home() {
   const content = useSiteContent();
-  const { packages, gallery, about, contact } = content;
+  const { packages, gallery, about, contact, events, addOns } = content;
 
 
   return (
@@ -91,7 +91,68 @@ function Home() {
 
       </section>
 
-      {/* About */}
+      {/* Add-Ons */}
+      <section id="addons" className="bg-beige py-16 md:py-24">
+        <div className="max-w-7xl mx-auto px-5 sm:px-6">
+          <div className="text-center max-w-2xl mx-auto mb-12">
+            <p className="text-xs uppercase tracking-[0.3em] text-gold mb-3">Premium extras</p>
+            <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl mb-4">Add-Ons</h2>
+            <p className="text-muted-foreground">Elevate your event with elegant optional extras, hand-picked to add extra magic.</p>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
+            {addOns.map((a) => (
+              <div key={a.id} className="group relative flex flex-col rounded-3xl bg-card border border-border overflow-hidden shadow-luxe hover:-translate-y-1.5 transition-transform duration-500">
+                {a.popular && (
+                  <span className="absolute top-4 left-4 z-10 rounded-full gradient-gold px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-ink shadow-luxe">
+                    Popular
+                  </span>
+                )}
+                <div className="relative aspect-[4/3] overflow-hidden">
+                  <img src={a.image} alt={a.title} loading="lazy" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                  {a.price && (
+                    <div className="absolute bottom-3 right-3 rounded-full bg-card/95 backdrop-blur px-3 py-1.5 text-sm font-semibold text-foreground shadow-luxe border border-border">
+                      {a.price}
+                    </div>
+                  )}
+                </div>
+                <div className="p-5 sm:p-6 flex flex-col flex-1">
+                  <h3 className="font-serif text-xl sm:text-2xl font-bold text-foreground mb-2">{a.title}</h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed flex-1">{a.description}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="text-center mt-10">
+            <Link to="/enquire" className="inline-flex items-center gap-2 rounded-full gradient-gold px-7 py-3.5 font-semibold text-ink shadow-luxe hover:scale-105 transition">
+              Build Your Package <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Events We Cover */}
+      <section id="events" className="max-w-7xl mx-auto px-5 sm:px-6 py-16 md:py-24">
+        <div className="text-center max-w-2xl mx-auto mb-12">
+          <p className="text-xs uppercase tracking-[0.3em] text-gold mb-3">Occasions</p>
+          <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl mb-4">Events We Cover</h2>
+          <p className="text-muted-foreground">From intimate gatherings to grand celebrations — we bring the magic.</p>
+        </div>
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-5">
+          {events.map((ev) => (
+            <div key={ev.id} className="group relative rounded-2xl sm:rounded-3xl overflow-hidden shadow-luxe aspect-[3/4] border border-border">
+              <img src={ev.image} alt={ev.title} loading="lazy" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+              <div className="absolute inset-x-0 bottom-0 p-3 sm:p-4 text-white">
+                <h3 className="font-serif text-base sm:text-lg leading-tight mb-1">{ev.title}</h3>
+                {ev.description && (
+                  <p className="text-xs text-white/80 leading-snug hidden sm:block">{ev.description}</p>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
       <section id="about" className="bg-beige py-16 md:py-24">
         <div className="max-w-6xl mx-auto px-5 sm:px-6 grid md:grid-cols-2 gap-10 md:gap-16 items-center">
           <div className="relative">
