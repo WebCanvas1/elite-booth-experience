@@ -408,6 +408,18 @@ function Dashboard({ creds, onLogout }: { creds: AdminCreds; onLogout: () => voi
         {tab === "contact" && (
           <ContactTab contact={content.contact} onChange={(contact) => setContent((c) => ({ ...c, contact }))} />
         )}
+        {tab === "addons" && (
+          <AddOnsTab addOns={content.addOns} onChange={(addOns) => setContent((c) => ({ ...c, addOns }))} />
+        )}
+        {tab === "events" && (
+          <EventsTab events={content.events} onChange={(events) => setContent((c) => ({ ...c, events }))} />
+        )}
+        {tab === "terms" && (
+          <PolicyTab title="Terms & Conditions" subtitle="Edit the Terms & Conditions content shown on /terms." policy={content.terms} onChange={(terms) => setContent((c) => ({ ...c, terms }))} />
+        )}
+        {tab === "privacy" && (
+          <PolicyTab title="Privacy Policy" subtitle="Edit the Privacy Policy content shown on /privacy." policy={content.privacy} onChange={(privacy) => setContent((c) => ({ ...c, privacy }))} />
+        )}
 
         <div className="mt-10 flex justify-end">
           <button onClick={save} disabled={saving} className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-full gradient-gold px-7 py-3.5 font-semibold text-ink shadow-luxe hover:scale-105 transition disabled:opacity-60">
