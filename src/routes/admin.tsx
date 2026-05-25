@@ -342,9 +342,13 @@ function Dashboard({ creds, onLogout }: { creds: AdminCreds; onLogout: () => voi
 
   const tabs: { id: TabId; label: string; icon: typeof PackageIcon }[] = [
     { id: "packages", label: "Packages", icon: PackageIcon },
+    { id: "addons", label: "Add-Ons", icon: Sparkles },
+    { id: "events", label: "Events", icon: CalendarHeart },
     { id: "gallery", label: "Gallery", icon: ImageIcon },
     { id: "about", label: "About", icon: Info },
     { id: "contact", label: "Contact", icon: Phone },
+    { id: "terms", label: "Terms", icon: FileText },
+    { id: "privacy", label: "Privacy", icon: ShieldCheck },
   ];
 
   return (
