@@ -73,6 +73,8 @@ export function SiteHeader() {
           <nav className="px-4 py-4 flex flex-col gap-1 text-base">
             {[
               { href: "/#packages", label: "Packages" },
+              { href: "/#addons", label: "Add-Ons" },
+              { href: "/#events", label: "Events" },
               { href: "/#about", label: "About" },
               { href: "/#gallery", label: "Gallery" },
             ].map((l) => (
@@ -93,6 +95,14 @@ export function SiteHeader() {
             >
               Contact
             </Link>
+
+            <Link to="/terms" onClick={() => setOpen(false)} className="py-3 px-2 rounded-xl text-white/80 hover:bg-white/5 hover:text-[#d4af37] transition text-sm">
+              Terms & Conditions
+            </Link>
+            <Link to="/privacy" onClick={() => setOpen(false)} className="py-3 px-2 rounded-xl text-white/80 hover:bg-white/5 hover:text-[#d4af37] transition text-sm">
+              Privacy Policy
+            </Link>
+
 
             <Link
               to="/enquire"
