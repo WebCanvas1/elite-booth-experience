@@ -27,6 +27,19 @@ export const Route = createFileRoute("/enquire")({
 
 const EVENT_TYPES = ["Wedding", "Birthday", "Corporate", "Baby Shower", "Engagement", "Party", "Other"];
 
+const ADD_ONS = [
+  "Audio Guest Book",
+  "Red Carpet & Bollards",
+  "Designer Scrapbook Album",
+  "Extra Prints",
+  "Flower Walls",
+  "Premium Backdrops",
+  "Neon Signs",
+  "Custom Props",
+  "Instant Sharing",
+  "Additional Event Hours",
+];
+
 function EnquirePage() {
   const search = Route.useSearch();
   const selectedPackage = search.package || "";
@@ -198,6 +211,14 @@ function EnquirePage() {
                 defaultValue={selectedPackage}
               />
             </div>
+
+            <div className="md:col-span-2">
+              <SelectField
+                label="Add-On Interested In"
+                name="addOn"
+                options={ADD_ONS}
+              />
+            </div>
           </div>
 
           <div>
@@ -213,6 +234,19 @@ function EnquirePage() {
               placeholder="Tell us a bit more about your event..."
             />
           </div>
+
+          <label className="flex items-start gap-3 text-sm text-muted-foreground pt-2">
+            <input
+              type="checkbox"
+              name="termsAccepted"
+              required
+              className="mt-1 h-4 w-4 rounded border-input accent-yellow-500"
+            />
+
+            <span>
+              I have read and agree to the Terms & Conditions and Privacy Policy.
+            </span>
+          </label>
 
           <button
             disabled={submitting}
