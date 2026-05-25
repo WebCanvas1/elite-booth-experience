@@ -306,7 +306,7 @@ async function fileToCompressedDataUrl(file: File, maxDim = 1400, quality = 0.8)
   return canvas.toDataURL("image/jpeg", quality);
 }
 
-type TabId = "packages" | "gallery" | "about" | "contact";
+type TabId = "packages" | "addons" | "events" | "gallery" | "about" | "contact" | "terms" | "privacy";
 
 function Dashboard({ creds, onLogout }: { creds: AdminCreds; onLogout: () => void }) {
   const [content, setContent] = useState<SiteContent>(DEFAULT_CONTENT);
