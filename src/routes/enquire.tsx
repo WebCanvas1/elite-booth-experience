@@ -236,17 +236,35 @@ function EnquirePage() {
           </div>
 
           <label className="flex items-start gap-3 text-sm text-muted-foreground pt-2">
-            <input
-              type="checkbox"
-              name="termsAccepted"
-              required
-              className="mt-1 h-4 w-4 rounded border-input accent-yellow-500"
-            />
+  <input
+    type="checkbox"
+    name="termsAccepted"
+    required
+    className="mt-1 h-4 w-4 rounded border-input accent-yellow-500"
+  />
 
-            <span>
-              I have read and agree to the Terms & Conditions and Privacy Policy.
-            </span>
-          </label>
+  <span>
+    I have read and agree to the{" "}
+    
+    <Link
+      to="/terms"
+      className="text-gold hover:underline font-medium"
+      target="_blank"
+    >
+      Terms & Conditions
+    </Link>
+
+    {" "}and{" "}
+
+    <Link
+      to="/privacy-policy"
+      className="text-gold hover:underline font-medium"
+      target="_blank"
+    >
+      Privacy Policy
+    </Link>.
+  </span>
+</label>
 
           <button
             disabled={submitting}
