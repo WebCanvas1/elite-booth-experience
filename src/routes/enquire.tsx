@@ -257,7 +257,7 @@ function EnquirePage() {
     {" "}and{" "}
 
     <Link
-      to="/privacy-policy"
+      to="/privacy"
       className="text-gold hover:underline font-medium"
       target="_blank"
     >
