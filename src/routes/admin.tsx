@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { Plus, Trash2, Save, LogOut, ArrowLeft, Upload, ArrowUp, ArrowDown, Image as ImageIcon, Info, Phone, Package as PackageIcon, Sparkles, CalendarHeart, FileText, ShieldCheck } from "lucide-react";
 import { DEFAULT_PACKAGES, type Package } from "@/lib/packages";
-import { DEFAULT_CONTENT, mergeContent, type SiteContent, type AboutContent, type ContactContent, type EventItem, type AddOnItem, type PolicyContent, type PolicySection } from "@/lib/site-content";
+import { DEFAULT_CONTENT, mergeContent, type SiteContent, type AboutContent, type ContactContent, type EventItem, type PastEventItem, type AddOnItem, type PolicyContent, type PolicySection } from "@/lib/site-content";
 import { Toaster } from "@/components/ui/sonner";
 import logo from "@/assets/logo.png";
 
@@ -306,7 +306,7 @@ async function fileToCompressedDataUrl(file: File, maxDim = 1400, quality = 0.8)
   return canvas.toDataURL("image/jpeg", quality);
 }
 
-type TabId = "packages" | "addons" | "events" | "gallery" | "about" | "contact" | "terms" | "privacy";
+type TabId = "packages" | "addons" | "events" | "pastEvents" | "gallery" | "about" | "contact" | "terms" | "privacy";
 
 function Dashboard({ creds, onLogout }: { creds: AdminCreds; onLogout: () => void }) {
   const [content, setContent] = useState<SiteContent>(DEFAULT_CONTENT);
@@ -344,6 +344,7 @@ function Dashboard({ creds, onLogout }: { creds: AdminCreds; onLogout: () => voi
     { id: "packages", label: "Packages", icon: PackageIcon },
     { id: "addons", label: "Add-Ons", icon: Sparkles },
     { id: "events", label: "Events", icon: CalendarHeart },
+    { id: "pastEvents", label: "Event Galleries", icon: ImageIcon },
     { id: "gallery", label: "Gallery", icon: ImageIcon },
     { id: "about", label: "About", icon: Info },
     { id: "contact", label: "Contact", icon: Phone },
@@ -413,6 +414,12 @@ function Dashboard({ creds, onLogout }: { creds: AdminCreds; onLogout: () => voi
         )}
         {tab === "events" && (
           <EventsTab events={content.events} onChange={(events) => setContent((c) => ({ ...c, events }))} />
+        )}
+        {tab === "pastEvents" && (
+          <PastEventsTab
+            pastEvents={content.pastEvents}
+            onChange={(pastEvents) => setContent((c) => ({ ...c, pastEvents }))}
+          />
         )}
         {tab === "terms" && (
           <PolicyTab title="Terms & Conditions" subtitle="Edit the Terms & Conditions content shown on /terms." policy={content.terms} onChange={(terms) => setContent((c) => ({ ...c, terms }))} />
@@ -999,6 +1006,157 @@ function EventEditor({
         <button onClick={onMoveUp} className="inline-flex items-center justify-center rounded-full border border-border text-xs py-2 hover:text-gold"><ArrowUp className="h-3 w-3" /></button>
         <button onClick={onMoveDown} className="inline-flex items-center justify-center rounded-full border border-border text-xs py-2 hover:text-gold"><ArrowDown className="h-3 w-3" /></button>
         <button onClick={onRemove} className="inline-flex items-center justify-center gap-1 rounded-full border border-destructive/40 text-destructive text-xs py-2 hover:bg-destructive hover:text-destructive-foreground transition"><Trash2 className="h-3 w-3" /></button>
+      </div>
+    </div>
+  );
+}
+
+
+/* ======================== PAST EVENTS TAB ======================== */
+
+function PastEventsTab({
+  pastEvents,
+  onChange,
+}: {
+  pastEvents: PastEventItem[];
+  onChange: (e: PastEventItem[]) => void;
+}) {
+  const add = () =>
+    onChange([
+      ...pastEvents,
+      {
+        id: crypto.randomUUID(),
+        title: "New Event Gallery",
+        date: "",
+        coverImage: "",
+        galleryUrl: "",
+        note: "Password protected gallery. Please use the password shared with you.",
+      },
+    ]);
+
+  const remove = (idx: number) => onChange(pastEvents.filter((_, i) => i !== idx));
+
+  const update = (idx: number, patch: Partial<PastEventItem>) =>
+    onChange(pastEvents.map((e, i) => (i === idx ? { ...e, ...patch } : e)));
+
+  const move = (idx: number, dir: -1 | 1) => {
+    const j = idx + dir;
+    if (j < 0 || j >= pastEvents.length) return;
+    const next = [...pastEvents];
+    [next[idx], next[j]] = [next[j], next[idx]];
+    onChange(next);
+  };
+
+  return (
+    <div>
+      <SectionHeader
+        title="Event Galleries"
+        subtitle="Manage past event galleries shown on the website. Add the event name, date, cover image, cloud link, and password note."
+        action={
+          <button onClick={add} className="inline-flex items-center justify-center gap-2 rounded-full border border-gold text-gold px-4 py-2.5 text-sm font-semibold hover:bg-gold hover:text-ink transition">
+            <Plus className="h-4 w-4" /> Add Event Gallery
+          </button>
+        }
+      />
+
+      {pastEvents.length === 0 ? (
+        <div className="text-center py-16 text-muted-foreground bg-card rounded-3xl border border-border border-dashed">
+          No event galleries yet. Add one to get started.
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {pastEvents.map((ev, idx) => (
+            <PastEventEditor
+              key={ev.id}
+              item={ev}
+              onChange={(patch) => update(idx, patch)}
+              onRemove={() => remove(idx)}
+              onMoveUp={() => move(idx, -1)}
+              onMoveDown={() => move(idx, 1)}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function PastEventEditor({
+  item,
+  onChange,
+  onRemove,
+  onMoveUp,
+  onMoveDown,
+}: {
+  item: PastEventItem;
+  onChange: (patch: Partial<PastEventItem>) => void;
+  onRemove: () => void;
+  onMoveUp: () => void;
+  onMoveDown: () => void;
+}) {
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false);
+
+  const pickFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const f = e.target.files?.[0];
+    if (!f) return;
+    if (!f.type.startsWith("image/")) { toast.error("Please select an image file"); return; }
+
+    setUploading(true);
+    try {
+      const url = await fileToCompressedDataUrl(f);
+      onChange({ coverImage: url });
+      toast.success("Cover image ready — click Save Changes to publish");
+    } catch {
+      toast.error("Could not process image");
+    } finally {
+      setUploading(false);
+      if (fileRef.current) fileRef.current.value = "";
+    }
+  };
+
+  return (
+    <div className="bg-card rounded-3xl border border-border p-4 shadow-luxe/30">
+      <div className="aspect-[4/3] rounded-2xl overflow-hidden bg-muted mb-3 border border-border">
+        {item.coverImage ? (
+          <img src={item.coverImage} alt={item.title} className="w-full h-full object-cover" />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center text-xs text-muted-foreground">No cover image</div>
+        )}
+      </div>
+
+      <input ref={fileRef} type="file" accept="image/*" onChange={pickFile} className="hidden" />
+      <button onClick={() => fileRef.current?.click()} disabled={uploading} className="w-full inline-flex items-center justify-center gap-2 rounded-full border border-gold text-gold text-xs font-semibold py-2 hover:bg-gold hover:text-ink transition disabled:opacity-60 mb-3">
+        <Upload className="h-3.5 w-3.5" /> {uploading ? "Processing..." : "Upload Cover Image"}
+      </button>
+
+      <div className="space-y-3">
+        <AdminField label="Event Title" value={item.title} onChange={(v) => onChange({ title: v })} />
+        <AdminField label="Event Date" value={item.date} placeholder="e.g. 12 April 2026" onChange={(v) => onChange({ date: v })} />
+        <AdminField label="Cloud Gallery URL" value={item.galleryUrl} placeholder="https://..." onChange={(v) => onChange({ galleryUrl: v })} />
+
+        <div>
+          <label className="block text-xs uppercase tracking-widest text-muted-foreground mb-2">Password Note / Instructions</label>
+          <textarea
+            value={item.note}
+            onChange={(e) => onChange({ note: e.target.value })}
+            rows={3}
+            placeholder="Password protected gallery. Please use the password shared with you."
+            className="w-full rounded-xl border border-input bg-background px-3 py-2 text-base sm:text-sm focus:border-gold focus:ring-2 focus:ring-gold/20 outline-none"
+          />
+        </div>
+      </div>
+
+      <div className="mt-4 grid grid-cols-3 gap-2">
+        <button onClick={onMoveUp} className="inline-flex items-center justify-center rounded-full border border-border text-xs py-2 hover:text-gold">
+          <ArrowUp className="h-3 w-3" />
+        </button>
+        <button onClick={onMoveDown} className="inline-flex items-center justify-center rounded-full border border-border text-xs py-2 hover:text-gold">
+          <ArrowDown className="h-3 w-3" />
+        </button>
+        <button onClick={onRemove} className="inline-flex items-center justify-center gap-1 rounded-full border border-destructive/40 text-destructive text-xs py-2 hover:bg-destructive hover:text-destructive-foreground transition">
+          <Trash2 className="h-3 w-3" />
+        </button>
       </div>
     </div>
   );
