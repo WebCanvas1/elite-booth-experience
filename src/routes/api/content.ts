@@ -8,6 +8,7 @@ import {
   type AboutContent,
   type ContactContent,
   type EventItem,
+  type PastEventItem,
   type AddOnItem,
   type PolicyContent,
   type PolicySection,
@@ -145,6 +146,24 @@ function sanitizeEvents(input: unknown): EventItem[] {
   });
 }
 
+
+function sanitizePastEvents(input: unknown): PastEventItem[] {
+  if (!Array.isArray(input)) return DEFAULT_CONTENT.pastEvents;
+
+  return input.slice(0, 50).map((e) => {
+    const x = e as Partial<PastEventItem>;
+
+    return {
+      id: String(x.id || crypto.randomUUID()).slice(0, 80),
+      title: String(x.title || "").slice(0, 120),
+      date: String(x.date || "").slice(0, 80),
+      coverImage: String(x.coverImage || "").slice(0, MAX_IMG),
+      galleryUrl: String(x.galleryUrl || "").slice(0, 500),
+      note: String(x.note || "").slice(0, 500),
+    };
+  });
+}
+
 function sanitizeAddOns(input: unknown): AddOnItem[] {
   if (!Array.isArray(input)) return DEFAULT_CONTENT.addOns;
   return input.slice(0, 40).map((a) => {
@@ -208,6 +227,7 @@ export const Route = createFileRoute("/api/content")({
           about: body!.about !== undefined ? sanitizeAbout(body!.about) : current.about,
           contact: body!.contact !== undefined ? sanitizeContact(body!.contact) : current.contact,
           events: body!.events !== undefined ? sanitizeEvents(body!.events) : current.events,
+          pastEvents: body!.pastEvents !== undefined ? sanitizePastEvents(body!.pastEvents) : current.pastEvents,
           addOns: body!.addOns !== undefined ? sanitizeAddOns(body!.addOns) : current.addOns,
           terms: body!.terms !== undefined ? sanitizePolicy(body!.terms, DEFAULT_CONTENT.terms) : current.terms,
           privacy: body!.privacy !== undefined ? sanitizePolicy(body!.privacy, DEFAULT_CONTENT.privacy) : current.privacy,
