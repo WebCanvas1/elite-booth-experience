@@ -29,7 +29,7 @@ export const Route = createFileRoute("/")({
 
 function Home() {
   const content = useSiteContent();
-  const { packages, gallery, about, contact, events, addOns, pastEvents } = content;
+  const { packages, gallery, about, contact, events, addOns, pastEvents, faqs } = content;
 
 
   return (
@@ -118,6 +118,13 @@ function Home() {
                 <div className="p-5 sm:p-6 flex flex-col flex-1">
                   <h3 className="font-serif text-xl sm:text-2xl font-bold text-foreground mb-2">{a.title}</h3>
                   <p className="text-sm text-muted-foreground leading-relaxed flex-1">{a.description}</p>
+                  <Link
+                    to="/enquire"
+                    search={{ package: a.title }}
+                    className="mt-5 inline-flex items-center justify-center rounded-full gradient-gold px-5 py-3 text-sm font-bold text-ink shadow-luxe hover:scale-105 transition-transform"
+                  >
+                    Enquire Now
+                  </Link>
                 </div>
               </div>
             ))}
@@ -297,14 +304,75 @@ function Home() {
         ))}
       </section>
 
+      {/* FAQ */}
+      <section id="faq" className="bg-beige py-16 md:py-24">
+        <div className="max-w-4xl mx-auto px-5 sm:px-6">
+          <div className="text-center max-w-2xl mx-auto mb-12">
+            <p className="text-xs uppercase tracking-[0.3em] text-gold mb-3">
+              FAQ
+            </p>
+            <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl mb-4">
+              Frequently Asked Questions
+            </h2>
+            <p className="text-muted-foreground">
+              Quick answers to common questions about bookings, galleries and event setup.
+            </p>
+          </div>
+
+          <div className="space-y-4">
+            {faqs.map((faq) => (
+              <details
+                key={faq.id}
+                className="bg-card border border-border rounded-2xl p-5 shadow-luxe/30"
+              >
+                <summary className="cursor-pointer font-serif text-xl text-foreground">
+                  {faq.question}
+                </summary>
+                <p className="mt-3 text-muted-foreground leading-relaxed whitespace-pre-line">
+                  {faq.answer}
+                </p>
+              </details>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Contact */}
       <ContactSection packages={packages} contact={contact} />
 
 
 
 
+      <ScrollToTopButton />
+
       <SiteFooter />
     </div>
+  );
+}
+
+function ScrollToTopButton() {
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setVisible(window.scrollY > 400);
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  if (!visible) return null;
+
+  return (
+    <button
+      type="button"
+      onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+      className="fixed bottom-6 right-6 z-50 h-12 w-12 rounded-full gradient-gold text-ink shadow-luxe flex items-center justify-center text-2xl font-bold hover:scale-110 transition"
+      aria-label="Scroll to top"
+    >
+      ↑
+    </button>
   );
 }
 
