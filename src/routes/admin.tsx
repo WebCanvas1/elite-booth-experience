@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { Plus, Trash2, Save, LogOut, ArrowLeft, Upload, ArrowUp, ArrowDown, Image as ImageIcon, Info, Phone, Package as PackageIcon, Sparkles, CalendarHeart, FileText, ShieldCheck } from "lucide-react";
 import { DEFAULT_PACKAGES, type Package } from "@/lib/packages";
-import { DEFAULT_CONTENT, mergeContent, type SiteContent, type AboutContent, type ContactContent, type EventItem, type PastEventItem, type AddOnItem, type PolicyContent, type PolicySection } from "@/lib/site-content";
+import { DEFAULT_CONTENT, mergeContent, type SiteContent, type AboutContent, type ContactContent, type EventItem, type PastEventItem, type FAQItem, type AddOnItem, type PolicyContent, type PolicySection } from "@/lib/site-content";
 import { Toaster } from "@/components/ui/sonner";
 import logo from "@/assets/logo.png";
 
@@ -306,7 +306,7 @@ async function fileToCompressedDataUrl(file: File, maxDim = 1400, quality = 0.8)
   return canvas.toDataURL("image/jpeg", quality);
 }
 
-type TabId = "packages" | "addons" | "events" | "pastEvents" | "gallery" | "about" | "contact" | "terms" | "privacy";
+type TabId = "packages" | "addons" | "events" | "pastEvents" | "gallery" | "about" | "contact" | "faqs" | "terms" | "privacy";
 
 function Dashboard({ creds, onLogout }: { creds: AdminCreds; onLogout: () => void }) {
   const [content, setContent] = useState<SiteContent>(DEFAULT_CONTENT);
@@ -348,6 +348,7 @@ function Dashboard({ creds, onLogout }: { creds: AdminCreds; onLogout: () => voi
     { id: "gallery", label: "Gallery", icon: ImageIcon },
     { id: "about", label: "About", icon: Info },
     { id: "contact", label: "Contact", icon: Phone },
+    { id: "faqs", label: "FAQ", icon: Info },
     { id: "terms", label: "Terms", icon: FileText },
     { id: "privacy", label: "Privacy", icon: ShieldCheck },
   ];
@@ -419,6 +420,12 @@ function Dashboard({ creds, onLogout }: { creds: AdminCreds; onLogout: () => voi
           <PastEventsTab
             pastEvents={content.pastEvents}
             onChange={(pastEvents) => setContent((c) => ({ ...c, pastEvents }))}
+          />
+        )}
+        {tab === "faqs" && (
+          <FaqTab
+            faqs={content.faqs}
+            onChange={(faqs) => setContent((c) => ({ ...c, faqs }))}
           />
         )}
         {tab === "terms" && (
@@ -1158,6 +1165,97 @@ function PastEventEditor({
           <Trash2 className="h-3 w-3" />
         </button>
       </div>
+    </div>
+  );
+}
+
+
+/* ======================== FAQ TAB ======================== */
+
+function FaqTab({
+  faqs,
+  onChange,
+}: {
+  faqs: FAQItem[];
+  onChange: (f: FAQItem[]) => void;
+}) {
+  const add = () =>
+    onChange([
+      ...faqs,
+      {
+        id: crypto.randomUUID(),
+        question: "New question",
+        answer: "",
+      },
+    ]);
+
+  const remove = (idx: number) => onChange(faqs.filter((_, i) => i !== idx));
+
+  const update = (idx: number, patch: Partial<FAQItem>) =>
+    onChange(faqs.map((f, i) => (i === idx ? { ...f, ...patch } : f)));
+
+  const move = (idx: number, dir: -1 | 1) => {
+    const j = idx + dir;
+    if (j < 0 || j >= faqs.length) return;
+    const next = [...faqs];
+    [next[idx], next[j]] = [next[j], next[idx]];
+    onChange(next);
+  };
+
+  return (
+    <div>
+      <SectionHeader
+        title="FAQ"
+        subtitle="Add, edit, reorder, or remove frequently asked questions shown on the website."
+        action={
+          <button onClick={add} className="inline-flex items-center justify-center gap-2 rounded-full border border-gold text-gold px-4 py-2.5 text-sm font-semibold hover:bg-gold hover:text-ink transition">
+            <Plus className="h-4 w-4" /> Add FAQ
+          </button>
+        }
+      />
+
+      {faqs.length === 0 ? (
+        <div className="text-center py-16 text-muted-foreground bg-card rounded-3xl border border-border border-dashed">
+          No FAQs yet. Add one to get started.
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {faqs.map((faq, idx) => (
+            <div key={faq.id} className="bg-card border border-border rounded-3xl p-5 sm:p-6 shadow-luxe/30">
+              <AdminField
+                label="Question"
+                value={faq.question}
+                onChange={(v) => update(idx, { question: v })}
+              />
+
+              <div className="mt-3">
+                <label className="block text-xs uppercase tracking-widest text-muted-foreground mb-2">
+                  Answer
+                </label>
+                <textarea
+                  value={faq.answer}
+                  onChange={(e) => update(idx, { answer: e.target.value })}
+                  rows={4}
+                  placeholder="Write the answer here..."
+                  className="w-full rounded-2xl border border-input bg-background px-4 py-3 text-base sm:text-sm focus:border-gold focus:ring-2 focus:ring-gold/20 outline-none"
+                />
+              </div>
+
+              <div className="mt-4 grid grid-cols-3 gap-2 sm:flex sm:justify-end">
+                <button onClick={() => move(idx, -1)} className="inline-flex items-center justify-center rounded-full border border-border text-xs py-2 px-4 hover:text-gold">
+                  <ArrowUp className="h-3 w-3" />
+                </button>
+                <button onClick={() => move(idx, 1)} className="inline-flex items-center justify-center rounded-full border border-border text-xs py-2 px-4 hover:text-gold">
+                  <ArrowDown className="h-3 w-3" />
+                </button>
+                <button onClick={() => remove(idx)} className="inline-flex items-center justify-center gap-1 rounded-full border border-destructive/40 text-destructive text-xs py-2 px-4 hover:bg-destructive hover:text-destructive-foreground transition">
+                  <Trash2 className="h-3 w-3" /> Delete
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
