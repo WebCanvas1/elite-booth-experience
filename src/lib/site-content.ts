@@ -34,6 +34,12 @@ export type PastEventItem = {
   note: string;
 };
 
+export type FAQItem = {
+  id: string;
+  question: string;
+  answer: string;
+};
+
 export type AddOnItem = {
   id: string;
   title: string;
@@ -63,6 +69,7 @@ export type SiteContent = {
   events: EventItem[];
   pastEvents: PastEventItem[];
   addOns: AddOnItem[];
+  faqs: FAQItem[];
   terms: PolicyContent;
   privacy: PolicyContent;
 };
@@ -136,6 +143,33 @@ export const DEFAULT_PAST_EVENTS: PastEventItem[] = [
   },
 ];
 
+export const DEFAULT_FAQS: FAQItem[] = [
+  {
+    id: "booking-process",
+    question: "How do I book Elite MagicBooth?",
+    answer:
+      "Simply submit an enquiry through the website and we’ll get back to you with availability, package options, and booking details.",
+  },
+  {
+    id: "event-setup",
+    question: "How much space do you need for setup?",
+    answer:
+      "We generally require a safe, level setup area with access to power. Exact space requirements may depend on the selected booth, backdrop, and add-ons.",
+  },
+  {
+    id: "gallery-access",
+    question: "How do guests access event photos?",
+    answer:
+      "Event galleries can be shared through a secure cloud gallery link. Password details can be provided if required.",
+  },
+  {
+    id: "customisation",
+    question: "Can the photo template be customised?",
+    answer:
+      "Yes, photo templates can be customised to suit your event theme, colours, names, branding, or special occasion.",
+  },
+];
+
 const ad = (title: string, description: string, price: string, image: string, popular = false): AddOnItem => ({
   id: title.toLowerCase().replace(/\s+/g, "-"),
   title, description, price, image, popular,
@@ -202,6 +236,7 @@ export const DEFAULT_CONTENT: SiteContent = {
   events: DEFAULT_EVENTS,
   pastEvents: DEFAULT_PAST_EVENTS,
   addOns: DEFAULT_ADDONS,
+  faqs: DEFAULT_FAQS,
   terms: DEFAULT_TERMS,
   privacy: DEFAULT_PRIVACY,
 };
@@ -216,6 +251,7 @@ export function mergeContent(partial: Partial<SiteContent> | null | undefined): 
     events: Array.isArray(partial.events) && partial.events.length ? partial.events : DEFAULT_EVENTS,
     pastEvents: Array.isArray(partial.pastEvents) && partial.pastEvents.length ? partial.pastEvents : DEFAULT_PAST_EVENTS,
     addOns: Array.isArray(partial.addOns) && partial.addOns.length ? partial.addOns : DEFAULT_ADDONS,
+    faqs: Array.isArray(partial.faqs) && partial.faqs.length ? partial.faqs : DEFAULT_FAQS,
     terms: partial.terms
       ? { ...DEFAULT_TERMS, ...partial.terms, sections: Array.isArray(partial.terms.sections) && partial.terms.sections.length ? partial.terms.sections : DEFAULT_TERMS.sections }
       : DEFAULT_TERMS,
