@@ -25,11 +25,20 @@ export type EventItem = {
   image: string;
 };
 
+export type PastEventItem = {
+  id: string;
+  title: string;
+  date: string;
+  coverImage: string;
+  galleryUrl: string;
+  note: string;
+};
+
 export type AddOnItem = {
   id: string;
   title: string;
   description: string;
-  price: string; // free-text e.g. "$120" or "POA"
+  price: string;
   image: string;
   popular: boolean;
 };
@@ -52,6 +61,7 @@ export type SiteContent = {
   about: AboutContent;
   contact: ContactContent;
   events: EventItem[];
+  pastEvents: PastEventItem[];
   addOns: AddOnItem[];
   terms: PolicyContent;
   privacy: PolicyContent;
@@ -112,6 +122,18 @@ export const DEFAULT_EVENTS: EventItem[] = [
   evt("Cultural Events", "Celebrate tradition with style and prints to keep.", "https://images.unsplash.com/photo-1478146896981-b80fe463b330?auto=format&fit=crop&w=900&q=80"),
   evt("Christmas Parties", "Festive fun for family, friends & coworkers.", "https://images.unsplash.com/photo-1543589077-47d81606c1bf?auto=format&fit=crop&w=900&q=80"),
   evt("Private Parties", "Whatever the occasion — we bring the magic.", "https://images.unsplash.com/photo-1505236858219-8359eb29e329?auto=format&fit=crop&w=900&q=80"),
+];
+
+export const DEFAULT_PAST_EVENTS: PastEventItem[] = [
+  {
+    id: "sample-event",
+    title: "Sample Event Gallery",
+    date: "March 2026",
+    coverImage:
+      "https://images.unsplash.com/photo-1519225421980-715cb0215aed?auto=format&fit=crop&w=900&q=80",
+    galleryUrl: "https://your-cloud-gallery-link.com",
+    note: "Password protected gallery. Please use the password shared with you.",
+  },
 ];
 
 const ad = (title: string, description: string, price: string, image: string, popular = false): AddOnItem => ({
@@ -178,6 +200,7 @@ export const DEFAULT_CONTENT: SiteContent = {
   about: DEFAULT_ABOUT,
   contact: DEFAULT_CONTACT,
   events: DEFAULT_EVENTS,
+  pastEvents: DEFAULT_PAST_EVENTS,
   addOns: DEFAULT_ADDONS,
   terms: DEFAULT_TERMS,
   privacy: DEFAULT_PRIVACY,
@@ -191,6 +214,7 @@ export function mergeContent(partial: Partial<SiteContent> | null | undefined): 
     about: { ...DEFAULT_ABOUT, ...(partial.about || {}) },
     contact: { ...DEFAULT_CONTACT, ...(partial.contact || {}) },
     events: Array.isArray(partial.events) && partial.events.length ? partial.events : DEFAULT_EVENTS,
+    pastEvents: Array.isArray(partial.pastEvents) && partial.pastEvents.length ? partial.pastEvents : DEFAULT_PAST_EVENTS,
     addOns: Array.isArray(partial.addOns) && partial.addOns.length ? partial.addOns : DEFAULT_ADDONS,
     terms: partial.terms
       ? { ...DEFAULT_TERMS, ...partial.terms, sections: Array.isArray(partial.terms.sections) && partial.terms.sections.length ? partial.terms.sections : DEFAULT_TERMS.sections }
