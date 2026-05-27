@@ -10,6 +10,7 @@ import {
   type EventItem,
   type PastEventItem,
   type AddOnItem,
+  type FAQItem,
   type PolicyContent,
   type PolicySection,
 } from "@/lib/site-content";
@@ -179,6 +180,21 @@ function sanitizeAddOns(input: unknown): AddOnItem[] {
   });
 }
 
+
+function sanitizeFaqs(input: unknown): FAQItem[] {
+  if (!Array.isArray(input)) return DEFAULT_CONTENT.faqs;
+
+  return input.slice(0, 30).map((f) => {
+    const x = f as Partial<FAQItem>;
+
+    return {
+      id: String(x.id || crypto.randomUUID()).slice(0, 80),
+      question: String(x.question || "").slice(0, 300),
+      answer: String(x.answer || "").slice(0, 2000),
+    };
+  });
+}
+
 function sanitizePolicy(input: unknown, fallback: PolicyContent): PolicyContent {
   const p = (input || {}) as Partial<PolicyContent>;
   const sections: PolicySection[] = Array.isArray(p.sections)
@@ -229,6 +245,7 @@ export const Route = createFileRoute("/api/content")({
           events: body!.events !== undefined ? sanitizeEvents(body!.events) : current.events,
           pastEvents: body!.pastEvents !== undefined ? sanitizePastEvents(body!.pastEvents) : current.pastEvents,
           addOns: body!.addOns !== undefined ? sanitizeAddOns(body!.addOns) : current.addOns,
+          faqs: body!.faqs !== undefined ? sanitizeFaqs(body!.faqs) : current.faqs,
           terms: body!.terms !== undefined ? sanitizePolicy(body!.terms, DEFAULT_CONTENT.terms) : current.terms,
           privacy: body!.privacy !== undefined ? sanitizePolicy(body!.privacy, DEFAULT_CONTENT.privacy) : current.privacy,
         };
