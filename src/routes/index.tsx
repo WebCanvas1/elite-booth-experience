@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
-import { Check, Phone, Mail, MapPin, Camera, Sparkles, Heart, Users, ArrowRight, Star, Instagram, Facebook } from "lucide-react";
+import { Check, Phone, Mail, MapPin, Camera, Sparkles, Heart, Users, ArrowRight, Star, Instagram, Facebook, ExternalLink, Calendar } from "lucide-react";
 import { toast } from "sonner";
 import heroImg from "@/assets/hero.jpg";
 import logo from "@/assets/logo.png";
@@ -29,7 +29,7 @@ export const Route = createFileRoute("/")({
 
 function Home() {
   const content = useSiteContent();
-  const { packages, gallery, about, contact, events, addOns } = content;
+  const { packages, gallery, about, contact, events, addOns, pastEvents } = content;
 
 
   return (
@@ -152,6 +152,72 @@ function Home() {
           ))}
         </div>
       </section>
+
+{/* Event Galleries */}
+<section id="event-galleries" className="bg-beige py-16 md:py-24">
+  <div className="max-w-7xl mx-auto px-5 sm:px-6">
+    <div className="text-center max-w-2xl mx-auto mb-12">
+      <p className="text-xs uppercase tracking-[0.3em] text-gold mb-3">
+        Event Galleries
+      </p>
+
+      <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl mb-4">
+        Past Events
+      </h2>
+
+      <p className="text-muted-foreground">
+        View selected event galleries from previous events.
+      </p>
+    </div>
+
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
+      {pastEvents.map((event) => (
+        <div
+          key={event.id}
+          className="group rounded-3xl bg-card border border-border overflow-hidden shadow-luxe hover:-translate-y-1.5 transition-transform duration-500"
+        >
+          <div className="relative aspect-[4/3] overflow-hidden">
+            <img
+              src={event.coverImage}
+              alt={event.title}
+              loading="lazy"
+              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+            />
+          </div>
+
+          <div className="p-5 sm:p-6">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
+              <Calendar className="h-4 w-4 text-gold" />
+              <span>{event.date}</span>
+            </div>
+
+            <h3 className="font-serif text-2xl font-bold text-foreground mb-3">
+              {event.title}
+            </h3>
+
+            {event.note && (
+              <p className="text-sm text-muted-foreground leading-relaxed mb-5">
+                {event.note}
+              </p>
+            )}
+
+            {event.galleryUrl && (
+              <a
+                href={event.galleryUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 rounded-full gradient-gold px-5 py-3 text-sm font-bold text-ink shadow-luxe hover:scale-105 transition-transform"
+              >
+                View Gallery
+                <ExternalLink className="h-4 w-4" />
+              </a>
+            )}
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
 
       <section id="about" className="bg-beige py-16 md:py-24">
         <div className="max-w-6xl mx-auto px-5 sm:px-6 grid md:grid-cols-2 gap-10 md:gap-16 items-center">
