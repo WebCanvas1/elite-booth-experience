@@ -6,6 +6,8 @@ type EventVideoItem = {
   title: string;
   description: string;
   youtubeUrl: string;
+  videoUrl?: string;
+  thumbnailUrl?: string;
   featured?: boolean;
 };
 
@@ -15,6 +17,10 @@ function getYouTubeId(url: string) {
 
   const match = url.match(regExp);
   return match && match[1].length === 11 ? match[1] : "";
+}
+
+function isDirectVideo(url?: string) {
+  return Boolean(url && /\.(mp4|webm|ogg)(\?.*)?$/i.test(url));
 }
 
 function getYouTubeThumbnail(url: string) {
@@ -27,10 +33,24 @@ function getYouTubeEmbedUrl(url: string) {
   return id ? `https://www.youtube.com/embed/${id}?autoplay=1&rel=0` : "";
 }
 
+function hasPlayableVideo(video: EventVideoItem) {
+  return Boolean(isDirectVideo(video.videoUrl) || getYouTubeId(video.youtubeUrl));
+}
+
+function getThumbnail(video: EventVideoItem) {
+  if (video.thumbnailUrl) return video.thumbnailUrl;
+
+  if (getYouTubeId(video.youtubeUrl)) {
+    return getYouTubeThumbnail(video.youtubeUrl);
+  }
+
+  return "";
+}
+
 export function EventVideos({ videos }: { videos: EventVideoItem[] }) {
   const [activeVideo, setActiveVideo] = useState<EventVideoItem | null>(null);
 
-  const validVideos = videos.filter((video) => getYouTubeId(video.youtubeUrl));
+  const validVideos = videos.filter(hasPlayableVideo);
 
   if (!validVideos.length) return null;
 
@@ -43,55 +63,63 @@ export function EventVideos({ videos }: { videos: EventVideoItem[] }) {
   }: {
     video: EventVideoItem;
     featuredCard?: boolean;
-  }) => (
-    <button
-      type="button"
-      onClick={() => setActiveVideo(video)}
-      className="group w-full text-left rounded-[2rem] overflow-hidden bg-card border border-border shadow-luxe hover:-translate-y-1 transition-transform duration-500"
-    >
-      <div className="relative aspect-video bg-black overflow-hidden">
-        <img
-          src={getYouTubeThumbnail(video.youtubeUrl)}
-          alt={video.title}
-          loading="lazy"
-          className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-700"
-        />
+  }) => {
+    const thumbnail = getThumbnail(video);
 
-        <div className="absolute inset-0 bg-black/35 group-hover:bg-black/20 transition-colors" />
+    return (
+      <button
+        type="button"
+        onClick={() => setActiveVideo(video)}
+        className="group w-full text-left rounded-[2rem] overflow-hidden bg-card border border-border shadow-luxe hover:-translate-y-1 transition-transform duration-500"
+      >
+        <div className="relative aspect-video bg-black overflow-hidden">
+          {thumbnail ? (
+            <img
+              src={thumbnail}
+              alt={video.title}
+              loading="lazy"
+              className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-700"
+            />
+          ) : (
+            <div className="h-full w-full bg-gradient-to-br from-black via-primary/70 to-black" />
+          )}
 
-        <div className="absolute inset-0 flex items-center justify-center">
-          <span className="h-16 w-16 md:h-20 md:w-20 rounded-full gradient-gold text-ink flex items-center justify-center shadow-luxe group-hover:scale-110 transition-transform">
-            <Play className="h-7 w-7 md:h-9 md:w-9 fill-current ml-1" />
-          </span>
-        </div>
-      </div>
+          <div className="absolute inset-0 bg-black/35 group-hover:bg-black/20 transition-colors" />
 
-      <div className={featuredCard ? "p-6 md:p-8" : "p-5"}>
-        {featuredCard && (
-          <div className="inline-flex items-center gap-2 rounded-full bg-gold/15 px-4 py-1.5 text-sm font-medium text-gold mb-4">
-            <Play className="h-4 w-4 fill-current" />
-            Featured Video
+          <div className="absolute inset-0 flex items-center justify-center">
+            <span className="h-16 w-16 md:h-20 md:w-20 rounded-full gradient-gold text-ink flex items-center justify-center shadow-luxe group-hover:scale-110 transition-transform">
+              <Play className="h-7 w-7 md:h-9 md:w-9 fill-current ml-1" />
+            </span>
           </div>
-        )}
+        </div>
 
-        <h3
-          className={
-            featuredCard
-              ? "font-display text-3xl text-primary"
-              : "font-display text-2xl text-primary"
-          }
-        >
-          {video.title}
-        </h3>
+        <div className={featuredCard ? "p-6 md:p-8" : "p-5"}>
+          {featuredCard && (
+            <div className="inline-flex items-center gap-2 rounded-full bg-gold/15 px-4 py-1.5 text-sm font-medium text-gold mb-4">
+              <Play className="h-4 w-4 fill-current" />
+              Featured Video
+            </div>
+          )}
 
-        {video.description && (
-          <p className="mt-2 text-sm text-muted-foreground">
-            {video.description}
-          </p>
-        )}
-      </div>
-    </button>
-  );
+          <h3
+            className={
+              featuredCard
+                ? "font-display text-3xl text-primary"
+                : "font-display text-2xl text-primary"
+            }
+          >
+            {video.title}
+          </h3>
+
+          {video.description && (
+            <p className="mt-2 text-sm text-muted-foreground">
+              {video.description}
+            </p>
+          )}
+        </div>
+      </button>
+    );
+  };
 
   return (
     <>
@@ -147,13 +175,24 @@ export function EventVideos({ videos }: { videos: EventVideoItem[] }) {
               <X className="h-8 w-8" />
             </button>
 
-            <iframe
-              src={getYouTubeEmbedUrl(activeVideo.youtubeUrl)}
-              title={activeVideo.title}
-              className="h-full w-full"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-              allowFullScreen
-            />
+            {isDirectVideo(activeVideo.videoUrl) ? (
+              <video
+                src={activeVideo.videoUrl}
+                controls
+                autoPlay
+                playsInline
+                className="h-full w-full"
+                poster={activeVideo.thumbnailUrl || undefined}
+              />
+            ) : (
+              <iframe
+                src={getYouTubeEmbedUrl(activeVideo.youtubeUrl)}
+                title={activeVideo.title}
+                className="h-full w-full"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowFullScreen
+              />
+            )}
           </div>
         </div>
       )}
