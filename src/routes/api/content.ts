@@ -9,20 +9,13 @@ import {
   type ContactContent,
   type EventItem,
   type PastEventItem,
+  type EventVideoItem,
   type AddOnItem,
   type FAQItem,
   type PolicyContent,
   type PolicySection,
 } from "@/lib/site-content";
 
-
-// ============================================================
-// Cloudflare KV access for full site content.
-// Binding "PHOTOBOOTH_KV" is configured in wrangler.jsonc.
-// In production (Cloudflare Workers), `env.PHOTOBOOTH_KV` is the KVNamespace.
-// In local dev without a configured KV, falls back to memory.
-// Single key stores packages, gallery, about, contact as JSON.
-// ============================================================
 const KV_KEY = "site:v1";
 const LEGACY_PACKAGES_KEY = "packages:v1";
 
@@ -57,7 +50,7 @@ async function readContent(): Promise<SiteContent> {
         // fall through
       }
     }
-    // Legacy: prior version stored just packages array
+
     const legacy = await kv.get(LEGACY_PACKAGES_KEY);
     if (legacy) {
       try {
@@ -67,8 +60,10 @@ async function readContent(): Promise<SiteContent> {
         // ignore
       }
     }
+
     return DEFAULT_CONTENT;
   }
+
   return memoryStore ?? DEFAULT_CONTENT;
 }
 
@@ -81,13 +76,14 @@ async function writeContent(content: SiteContent): Promise<void> {
   }
 }
 
-// Cap on stored image data URL size (~2MB raw) to keep KV values reasonable.
 const MAX_IMG = 2_500_000;
 
 function sanitizePackages(input: unknown): Package[] {
   if (!Array.isArray(input)) return DEFAULT_CONTENT.packages;
+
   return input.map((p) => {
     const pkg = p as Partial<Package>;
+
     return {
       id: String(pkg.id || crypto.randomUUID()),
       name: String(pkg.name || "").slice(0, 100),
@@ -102,6 +98,7 @@ function sanitizePackages(input: unknown): Package[] {
 
 function sanitizeGallery(input: unknown): string[] {
   if (!Array.isArray(input)) return DEFAULT_CONTENT.gallery;
+
   return input
     .map((s) => String(s || "").slice(0, MAX_IMG))
     .filter((s) => s.length > 0)
@@ -110,6 +107,7 @@ function sanitizeGallery(input: unknown): string[] {
 
 function sanitizeAbout(input: unknown): AboutContent {
   const a = (input || {}) as Partial<AboutContent>;
+
   return {
     eyebrow: String(a.eyebrow ?? DEFAULT_CONTENT.about.eyebrow).slice(0, 80),
     heading: String(a.heading ?? DEFAULT_CONTENT.about.heading).slice(0, 200),
@@ -123,6 +121,7 @@ function sanitizeAbout(input: unknown): AboutContent {
 
 function sanitizeContact(input: unknown): ContactContent {
   const c = (input || {}) as Partial<ContactContent>;
+
   return {
     heading: String(c.heading ?? DEFAULT_CONTENT.contact.heading).slice(0, 200),
     subtext: String(c.subtext ?? DEFAULT_CONTENT.contact.subtext).slice(0, 600),
@@ -136,8 +135,10 @@ function sanitizeContact(input: unknown): ContactContent {
 
 function sanitizeEvents(input: unknown): EventItem[] {
   if (!Array.isArray(input)) return DEFAULT_CONTENT.events;
+
   return input.slice(0, 30).map((e) => {
     const x = e as Partial<EventItem>;
+
     return {
       id: String(x.id || crypto.randomUUID()).slice(0, 80),
       title: String(x.title || "").slice(0, 100),
@@ -146,7 +147,6 @@ function sanitizeEvents(input: unknown): EventItem[] {
     };
   });
 }
-
 
 function sanitizePastEvents(input: unknown): PastEventItem[] {
   if (!Array.isArray(input)) return DEFAULT_CONTENT.pastEvents;
@@ -165,10 +165,28 @@ function sanitizePastEvents(input: unknown): PastEventItem[] {
   });
 }
 
+function sanitizeEventVideos(input: unknown): EventVideoItem[] {
+  if (!Array.isArray(input)) return DEFAULT_CONTENT.eventVideos;
+
+  return input.slice(0, 30).map((v) => {
+    const x = v as Partial<EventVideoItem>;
+
+    return {
+      id: String(x.id || crypto.randomUUID()).slice(0, 80),
+      title: String(x.title || "").slice(0, 120),
+      description: String(x.description || "").slice(0, 500),
+      youtubeUrl: String(x.youtubeUrl || "").slice(0, 500),
+      featured: Boolean(x.featured),
+    };
+  });
+}
+
 function sanitizeAddOns(input: unknown): AddOnItem[] {
   if (!Array.isArray(input)) return DEFAULT_CONTENT.addOns;
+
   return input.slice(0, 40).map((a) => {
     const x = a as Partial<AddOnItem>;
+
     return {
       id: String(x.id || crypto.randomUUID()).slice(0, 80),
       title: String(x.title || "").slice(0, 100),
@@ -179,7 +197,6 @@ function sanitizeAddOns(input: unknown): AddOnItem[] {
     };
   });
 }
-
 
 function sanitizeFaqs(input: unknown): FAQItem[] {
   if (!Array.isArray(input)) return DEFAULT_CONTENT.faqs;
@@ -197,9 +214,11 @@ function sanitizeFaqs(input: unknown): FAQItem[] {
 
 function sanitizePolicy(input: unknown, fallback: PolicyContent): PolicyContent {
   const p = (input || {}) as Partial<PolicyContent>;
+
   const sections: PolicySection[] = Array.isArray(p.sections)
     ? p.sections.slice(0, 40).map((s) => {
         const x = s as Partial<PolicySection>;
+
         return {
           id: String(x.id || crypto.randomUUID()).slice(0, 80),
           heading: String(x.heading || "").slice(0, 200),
@@ -207,6 +226,7 @@ function sanitizePolicy(input: unknown, fallback: PolicyContent): PolicyContent 
         };
       })
     : fallback.sections;
+
   return {
     heading: String(p.heading ?? fallback.heading).slice(0, 200),
     intro: String(p.intro ?? fallback.intro).slice(0, 2000),
@@ -219,37 +239,89 @@ export const Route = createFileRoute("/api/content")({
     handlers: {
       GET: async () => {
         const content = await readContent();
+
         return new Response(JSON.stringify(content), {
           headers: { "content-type": "application/json" },
         });
       },
+
       POST: async ({ request }) => {
         const body = (await request.json().catch(() => null)) as
           | (Partial<SiteContent> & { email?: string; password?: string })
           | null;
+
         const email = (body?.email || "").trim().toLowerCase();
         const password = body?.password || "";
         const authed = body ? await verifyAdminCredentials(email, password) : false;
+
         if (!authed) {
           return new Response(JSON.stringify({ error: "Unauthorized" }), {
             status: 401,
             headers: { "content-type": "application/json" },
           });
         }
+
         const current = await readContent();
+
         const clean: SiteContent = {
-          packages: body!.packages !== undefined ? sanitizePackages(body!.packages) : current.packages,
-          gallery: body!.gallery !== undefined ? sanitizeGallery(body!.gallery) : current.gallery,
-          about: body!.about !== undefined ? sanitizeAbout(body!.about) : current.about,
-          contact: body!.contact !== undefined ? sanitizeContact(body!.contact) : current.contact,
-          events: body!.events !== undefined ? sanitizeEvents(body!.events) : current.events,
-          pastEvents: body!.pastEvents !== undefined ? sanitizePastEvents(body!.pastEvents) : current.pastEvents,
-          addOns: body!.addOns !== undefined ? sanitizeAddOns(body!.addOns) : current.addOns,
-          faqs: body!.faqs !== undefined ? sanitizeFaqs(body!.faqs) : current.faqs,
-          terms: body!.terms !== undefined ? sanitizePolicy(body!.terms, DEFAULT_CONTENT.terms) : current.terms,
-          privacy: body!.privacy !== undefined ? sanitizePolicy(body!.privacy, DEFAULT_CONTENT.privacy) : current.privacy,
+          packages:
+            body!.packages !== undefined
+              ? sanitizePackages(body!.packages)
+              : current.packages,
+
+          gallery:
+            body!.gallery !== undefined
+              ? sanitizeGallery(body!.gallery)
+              : current.gallery,
+
+          about:
+            body!.about !== undefined
+              ? sanitizeAbout(body!.about)
+              : current.about,
+
+          contact:
+            body!.contact !== undefined
+              ? sanitizeContact(body!.contact)
+              : current.contact,
+
+          events:
+            body!.events !== undefined
+              ? sanitizeEvents(body!.events)
+              : current.events,
+
+          pastEvents:
+            body!.pastEvents !== undefined
+              ? sanitizePastEvents(body!.pastEvents)
+              : current.pastEvents,
+
+          eventVideos:
+            body!.eventVideos !== undefined
+              ? sanitizeEventVideos(body!.eventVideos)
+              : current.eventVideos,
+
+          addOns:
+            body!.addOns !== undefined
+              ? sanitizeAddOns(body!.addOns)
+              : current.addOns,
+
+          faqs:
+            body!.faqs !== undefined
+              ? sanitizeFaqs(body!.faqs)
+              : current.faqs,
+
+          terms:
+            body!.terms !== undefined
+              ? sanitizePolicy(body!.terms, DEFAULT_CONTENT.terms)
+              : current.terms,
+
+          privacy:
+            body!.privacy !== undefined
+              ? sanitizePolicy(body!.privacy, DEFAULT_CONTENT.privacy)
+              : current.privacy,
         };
+
         await writeContent(clean);
+
         return new Response(JSON.stringify({ ok: true, content: clean }), {
           headers: { "content-type": "application/json" },
         });
