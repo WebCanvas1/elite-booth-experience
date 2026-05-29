@@ -1,6 +1,5 @@
 import { PlayCircle } from "lucide-react";
 
-
 type EventVideoItem = {
   id: string;
   title: string;
@@ -16,7 +15,7 @@ function getYouTubeEmbedUrl(url: string) {
   const match = url.match(regExp);
   const videoId = match && match[1].length === 11 ? match[1] : null;
 
-  return videoId ? `https://www.youtube.com/embed/${videoId}` : "";
+  return videoId ? `https://www.youtube.com/embed/${videoId}?rel=0` : "";
 }
 
 export function EventVideos({ videos }: { videos: EventVideoItem[] }) {
