@@ -9,6 +9,7 @@ import { SiteHeader, SiteFooter } from "@/components/SiteChrome";
 import { Toaster } from "@/components/ui/sonner";
 import { useSiteContent } from "@/hooks/use-site-content";
 import type { ContactContent } from "@/lib/site-content";
+import { EventVideos } from "@/components/EventVideos";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -29,15 +30,13 @@ export const Route = createFileRoute("/")({
 
 function Home() {
   const content = useSiteContent();
-  const { packages, gallery, about, contact, events, addOns, pastEvents, faqs } = content;
-
+  const { packages, gallery, about, contact, events, addOns, pastEvents, faqs, eventVideos } = content;
 
   return (
     <div className="min-h-screen bg-background">
       <Toaster position="top-center" />
       <SiteHeader />
 
-      {/* Hero */}
       <Hero />
 
       {/* Packages */}
@@ -49,6 +48,7 @@ function Home() {
             Transparent pricing, premium inclusions. Every package can be tailored to your event.
           </p>
         </div>
+
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6">
           {packages.map((pkg, i) => (
             <div
@@ -62,21 +62,27 @@ function Home() {
                   Most Popular
                 </span>
               )}
+
               <div className="relative aspect-[4/3] overflow-hidden">
                 <img src={pkg.image} alt={pkg.name} loading="lazy" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
-                {/* Price pill overlay */}
                 <div className="absolute bottom-3 right-3 inline-flex items-baseline gap-1 rounded-full gradient-gold px-4 py-2 shadow-luxe">
                   <span className="text-xs font-semibold text-ink/80">$</span>
                   <span className="font-serif text-2xl font-bold text-ink leading-none">{pkg.price}</span>
                 </div>
               </div>
+
               <div className="p-5 sm:p-6 flex flex-col flex-1">
                 <h3 className="font-serif text-2xl sm:text-[1.75rem] font-bold text-foreground mb-3 tracking-tight">{pkg.name}</h3>
+
                 <ul className="space-y-2 text-sm text-muted-foreground mb-5 flex-1">
                   {pkg.features.map((f) => (
-                    <li key={f} className="flex gap-2"><Check className="h-4 w-4 text-gold flex-shrink-0 mt-0.5" /><span>{f}</span></li>
+                    <li key={f} className="flex gap-2">
+                      <Check className="h-4 w-4 text-gold flex-shrink-0 mt-0.5" />
+                      <span>{f}</span>
+                    </li>
                   ))}
                 </ul>
+
                 <Link
                   to="/enquire"
                   search={{ package: pkg.name }}
@@ -88,7 +94,6 @@ function Home() {
             </div>
           ))}
         </div>
-
       </section>
 
       {/* Add-Ons */}
@@ -99,6 +104,7 @@ function Home() {
             <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl mb-4">Add-Ons</h2>
             <p className="text-muted-foreground">Elevate your event with elegant optional extras, hand-picked to add extra magic.</p>
           </div>
+
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
             {addOns.map((a) => (
               <div key={a.id} className="group relative flex flex-col rounded-3xl bg-card border border-border overflow-hidden shadow-luxe hover:-translate-y-1.5 transition-transform duration-500">
@@ -107,6 +113,7 @@ function Home() {
                     Popular
                   </span>
                 )}
+
                 <div className="relative aspect-[4/3] overflow-hidden">
                   <img src={a.image} alt={a.title} loading="lazy" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
                   {a.price && (
@@ -115,9 +122,11 @@ function Home() {
                     </div>
                   )}
                 </div>
+
                 <div className="p-5 sm:p-6 flex flex-col flex-1">
                   <h3 className="font-serif text-xl sm:text-2xl font-bold text-foreground mb-2">{a.title}</h3>
                   <p className="text-sm text-muted-foreground leading-relaxed flex-1">{a.description}</p>
+
                   <Link
                     to="/enquire"
                     search={{ package: a.title }}
@@ -129,6 +138,7 @@ function Home() {
               </div>
             ))}
           </div>
+
           <div className="text-center mt-10">
             <Link to="/enquire" className="inline-flex items-center gap-2 rounded-full gradient-gold px-7 py-3.5 font-semibold text-ink shadow-luxe hover:scale-105 transition">
               Build Your Package <ArrowRight className="h-4 w-4" />
@@ -144,6 +154,7 @@ function Home() {
           <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl mb-4">Events We Cover</h2>
           <p className="text-muted-foreground">From intimate gatherings to grand celebrations — we bring the magic.</p>
         </div>
+
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-5">
           {events.map((ev) => (
             <div key={ev.id} className="group relative rounded-2xl sm:rounded-3xl overflow-hidden shadow-luxe aspect-[3/4] border border-border">
@@ -160,71 +171,74 @@ function Home() {
         </div>
       </section>
 
-{/* Event Galleries */}
-<section id="event-galleries" className="bg-beige py-16 md:py-24">
-  <div className="max-w-7xl mx-auto px-5 sm:px-6">
-    <div className="text-center max-w-2xl mx-auto mb-12">
-      <p className="text-xs uppercase tracking-[0.3em] text-gold mb-3">
-        Event Galleries
-      </p>
+      {/* Event Galleries */}
+      <section id="event-galleries" className="bg-beige py-16 md:py-24">
+        <div className="max-w-7xl mx-auto px-5 sm:px-6">
+          <div className="text-center max-w-2xl mx-auto mb-12">
+            <p className="text-xs uppercase tracking-[0.3em] text-gold mb-3">
+              Event Galleries
+            </p>
 
-      <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl mb-4">
-        Past Events
-      </h2>
+            <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl mb-4">
+              Past Events
+            </h2>
 
-      <p className="text-muted-foreground">
-        View selected event galleries from previous events.
-      </p>
-    </div>
-
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
-      {pastEvents.map((event) => (
-        <div
-          key={event.id}
-          className="group rounded-3xl bg-card border border-border overflow-hidden shadow-luxe hover:-translate-y-1.5 transition-transform duration-500"
-        >
-          <div className="relative aspect-[4/3] overflow-hidden">
-            <img
-              src={event.coverImage}
-              alt={event.title}
-              loading="lazy"
-              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-            />
+            <p className="text-muted-foreground">
+              View selected event galleries from previous events.
+            </p>
           </div>
 
-          <div className="p-5 sm:p-6">
-            <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
-              <Calendar className="h-4 w-4 text-gold" />
-              <span>{event.date}</span>
-            </div>
-
-            <h3 className="font-serif text-2xl font-bold text-foreground mb-3">
-              {event.title}
-            </h3>
-
-            {event.note && (
-              <p className="text-sm text-muted-foreground leading-relaxed mb-5">
-                {event.note}
-              </p>
-            )}
-
-            {event.galleryUrl && (
-              <a
-                href={event.galleryUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 rounded-full gradient-gold px-5 py-3 text-sm font-bold text-ink shadow-luxe hover:scale-105 transition-transform"
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
+            {pastEvents.map((event) => (
+              <div
+                key={event.id}
+                className="group rounded-3xl bg-card border border-border overflow-hidden shadow-luxe hover:-translate-y-1.5 transition-transform duration-500"
               >
-                View Gallery
-                <ExternalLink className="h-4 w-4" />
-              </a>
-            )}
+                <div className="relative aspect-[4/3] overflow-hidden">
+                  <img
+                    src={event.coverImage}
+                    alt={event.title}
+                    loading="lazy"
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                  />
+                </div>
+
+                <div className="p-5 sm:p-6">
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
+                    <Calendar className="h-4 w-4 text-gold" />
+                    <span>{event.date}</span>
+                  </div>
+
+                  <h3 className="font-serif text-2xl font-bold text-foreground mb-3">
+                    {event.title}
+                  </h3>
+
+                  {event.note && (
+                    <p className="text-sm text-muted-foreground leading-relaxed mb-5">
+                      {event.note}
+                    </p>
+                  )}
+
+                  {event.galleryUrl && (
+                    <a
+                      href={event.galleryUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 rounded-full gradient-gold px-5 py-3 text-sm font-bold text-ink shadow-luxe hover:scale-105 transition-transform"
+                    >
+                      View Gallery
+                      <ExternalLink className="h-4 w-4" />
+                    </a>
+                  )}
+                </div>
+              </div>
+            ))}
           </div>
         </div>
-      ))}
-    </div>
-  </div>
-</section>
+      </section>
+
+      {/* Event Videos */}
+      <EventVideos videos={eventVideos} />
 
       <section id="about" className="bg-beige py-16 md:py-24">
         <div className="max-w-6xl mx-auto px-5 sm:px-6 grid md:grid-cols-2 gap-10 md:gap-16 items-center">
@@ -235,11 +249,13 @@ function Home() {
               loading="lazy"
               className="rounded-3xl shadow-luxe w-full aspect-[4/5] object-cover"
             />
+
             <div className="absolute -bottom-6 -right-6 hidden md:block bg-card rounded-2xl p-6 shadow-luxe border border-border max-w-[220px]">
               <p className="text-3xl font-serif text-gradient-gold">500+</p>
               <p className="text-sm text-muted-foreground">events styled across {contact.location || "Melbourne"}</p>
             </div>
           </div>
+
           <div>
             <p className="text-xs uppercase tracking-[0.3em] text-gold mb-3">{about.eyebrow}</p>
             <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl mb-6 leading-tight">
@@ -248,10 +264,14 @@ function Home() {
             <p className="text-muted-foreground leading-relaxed mb-6 whitespace-pre-line">
               {about.body}
             </p>
+
             {about.highlights.length > 0 && (
               <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
                 {about.highlights.map((t) => (
-                  <li key={t} className="flex items-center gap-2"><Check className="h-4 w-4 text-gold flex-shrink-0" />{t}</li>
+                  <li key={t} className="flex items-center gap-2">
+                    <Check className="h-4 w-4 text-gold flex-shrink-0" />
+                    {t}
+                  </li>
                 ))}
               </ul>
             )}
@@ -268,6 +288,7 @@ function Home() {
             From wedding celebrations to corporate galas — a glimpse of the moments we love creating.
           </p>
         </div>
+
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
           {gallery.map((src, i) => (
             <div
@@ -337,11 +358,7 @@ function Home() {
         </div>
       </section>
 
-      {/* Contact */}
       <ContactSection packages={packages} contact={contact} />
-
-
-
 
       <ScrollToTopButton />
 
@@ -379,7 +396,6 @@ function ScrollToTopButton() {
 function Hero() {
   const imgRef = useRef<HTMLImageElement>(null);
 
-  // Subtle parallax on scroll
   useEffect(() => {
     const onScroll = () => {
       if (!imgRef.current) return;
@@ -390,7 +406,6 @@ function Hero() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // Pre-generated bokeh particles (deterministic so SSR matches client)
   const particles = Array.from({ length: 22 }, (_, i) => {
     const seed = (i * 9301 + 49297) % 233280;
     const left = (seed / 233280) * 100;
@@ -403,7 +418,6 @@ function Hero() {
 
   return (
     <section className="relative min-h-screen flex items-center pt-24 overflow-hidden bg-ink isolate">
-      {/* Background image with slow zoom + parallax */}
       <div className="absolute inset-0 overflow-hidden">
         <img
           ref={imgRef}
@@ -411,7 +425,6 @@ function Hero() {
           alt="Elegant photobooth at a luxury wedding reception"
           className="w-full h-[115%] object-cover animate-hero-zoom will-change-transform"
         />
-        {/* Strong cinematic dark overlays for text legibility */}
         <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/60 to-black/30" />
         <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-black/70" />
         <div
@@ -423,7 +436,6 @@ function Hero() {
         />
       </div>
 
-      {/* Floating bokeh particles */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
         {particles.map((p) => (
           <span
@@ -442,7 +454,6 @@ function Hero() {
       </div>
 
       <div className="relative max-w-7xl mx-auto px-6 py-20 grid lg:grid-cols-[1.15fr_1fr] gap-12 items-center w-full z-10">
-        {/* Left: text */}
         <div className="text-white" style={{ textShadow: "0 2px 24px rgba(0,0,0,0.55)" }}>
           <div
             className="inline-flex items-center gap-2 rounded-full bg-white/10 backdrop-blur-md ring-1 ring-white/20 px-4 py-1.5 text-xs uppercase tracking-[0.25em] text-gold mb-6 animate-fade-up"
@@ -480,16 +491,17 @@ function Hero() {
               <ArrowRight className="relative z-10 h-4 w-4 transition-transform group-hover:translate-x-1" />
               <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/40 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
             </a>
+
             <Link
-  to="/enquire"
-  search={{ package: "Elite" }}
-  className="group inline-flex items-center gap-2 rounded-full bg-white/10 backdrop-blur-md ring-1 ring-white/30 px-7 py-4 font-semibold text-white hover:text-ink hover:bg-gold transition"
->      Book Now
+              to="/enquire"
+              search={{ package: "Elite" }}
+              className="group inline-flex items-center gap-2 rounded-full bg-white/10 backdrop-blur-md ring-1 ring-white/30 px-7 py-4 font-semibold text-white hover:text-ink hover:bg-gold transition"
+            >
+              Book Now
               <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
             </Link>
           </div>
 
-          {/* Trust row */}
           <div
             className="mt-10 flex flex-wrap items-center gap-6 text-sm text-white/80 animate-fade-up"
             style={{ animationDelay: "0.6s" }}
@@ -507,7 +519,6 @@ function Hero() {
           </div>
         </div>
 
-        {/* Right: floating glass image card */}
         <div className="relative hidden lg:block animate-fade-up" style={{ animationDelay: "0.35s" }}>
           <div className="relative aspect-[4/5] rounded-[2rem] overflow-hidden shadow-luxe ring-1 ring-gold/30">
             <img
@@ -518,12 +529,10 @@ function Hero() {
             <div className="absolute inset-0 bg-gradient-to-t from-ink/40 via-transparent to-transparent" />
           </div>
 
-          {/* Floating logo badge */}
           <div className="absolute -top-6 -left-6 glass-card rounded-2xl p-3 shadow-luxe animate-float">
             <img src={logo} alt="Elite MagicBooth" className="h-14 w-14 rounded-full" />
           </div>
 
-          {/* Floating stat card */}
           <div
             className="absolute -bottom-6 -right-6 glass-card rounded-2xl px-5 py-4 shadow-luxe animate-float"
             style={{ animationDelay: "1.5s" }}
@@ -535,7 +544,6 @@ function Hero() {
         </div>
       </div>
 
-      {/* Curved wave transition */}
       <svg
         className="absolute bottom-0 left-0 w-full text-background z-10"
         viewBox="0 0 1440 120"
@@ -551,9 +559,9 @@ function Hero() {
   );
 }
 
-
 function ContactSection({ packages, contact }: { packages: Package[]; contact: ContactContent }) {
   const [submitting, setSubmitting] = useState(false);
+
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setSubmitting(true);
@@ -577,6 +585,7 @@ function ContactSection({ packages, contact }: { packages: Package[]; contact: C
           <p className="text-muted-foreground mb-8 md:mb-10 leading-relaxed">
             {contact.subtext}
           </p>
+
           <ul className="space-y-5">
             {contact.phone && (
               <li className="flex items-start gap-4">
@@ -584,12 +593,14 @@ function ContactSection({ packages, contact }: { packages: Package[]; contact: C
                 <div className="min-w-0"><p className="text-xs uppercase tracking-widest text-gold">Phone</p><a href={telHref} className="text-foreground hover:text-gold break-all">{contact.phone}</a></div>
               </li>
             )}
+
             {contact.email && (
               <li className="flex items-start gap-4">
                 <span className="h-10 w-10 inline-flex items-center justify-center rounded-full gradient-gold text-ink flex-shrink-0"><Mail className="h-4 w-4" /></span>
                 <div className="min-w-0"><p className="text-xs uppercase tracking-widest text-gold">Email</p><a href={`mailto:${contact.email}`} className="text-foreground hover:text-gold break-all">{contact.email}</a></div>
               </li>
             )}
+
             {contact.location && (
               <li className="flex items-start gap-4">
                 <span className="h-10 w-10 inline-flex items-center justify-center rounded-full gradient-gold text-ink flex-shrink-0"><MapPin className="h-4 w-4" /></span>
@@ -597,6 +608,7 @@ function ContactSection({ packages, contact }: { packages: Package[]; contact: C
               </li>
             )}
           </ul>
+
           {(contact.instagram || contact.facebook) && (
             <div className="flex gap-3 mt-6">
               {contact.instagram && (
@@ -604,6 +616,7 @@ function ContactSection({ packages, contact }: { packages: Package[]; contact: C
                   <Instagram className="h-4 w-4" />
                 </a>
               )}
+
               {contact.facebook && (
                 <a href={contact.facebook} target="_blank" rel="noreferrer" aria-label="Facebook" className="h-11 w-11 inline-flex items-center justify-center rounded-full border border-border bg-card hover:text-gold hover:border-gold transition">
                   <Facebook className="h-4 w-4" />
@@ -622,10 +635,12 @@ function ContactSection({ packages, contact }: { packages: Package[]; contact: C
             <SelectField label="Event Type" name="eventType" options={["Wedding", "Birthday", "Corporate", "Baby Shower", "Engagement", "Party", "Other"]} />
             <SelectField label="Preferred Package" name="package" options={packages.map((p) => p.name)} />
           </div>
+
           <div>
             <label className="block text-xs uppercase tracking-widest text-muted-foreground mb-2">Message</label>
             <textarea name="message" rows={4} className="w-full rounded-2xl border border-input bg-background px-4 py-3 text-base sm:text-sm focus:border-gold focus:ring-2 focus:ring-gold/20 outline-none transition" placeholder="Tell us about your event..." />
           </div>
+
           <button disabled={submitting} type="submit" className="w-full inline-flex items-center justify-center rounded-full gradient-gold px-6 py-4 font-semibold text-ink shadow-luxe hover:scale-[1.02] transition-transform disabled:opacity-60">
             {submitting ? "Sending..." : "Get a Quote"}
           </button>
@@ -634,7 +649,6 @@ function ContactSection({ packages, contact }: { packages: Package[]; contact: C
     </section>
   );
 }
-
 
 function Field({ label, name, type = "text", required }: { label: string; name: string; type?: string; required?: boolean }) {
   return (
@@ -664,4 +678,3 @@ function SelectField({ label, name, options }: { label: string; name: string; op
     </div>
   );
 }
-
