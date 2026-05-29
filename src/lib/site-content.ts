@@ -34,6 +34,14 @@ export type PastEventItem = {
   note: string;
 };
 
+export type EventVideoItem = {
+  id: string;
+  title: string;
+  description: string;
+  youtubeUrl: string;
+  featured?: boolean;
+};
+
 export type FAQItem = {
   id: string;
   question: string;
@@ -68,6 +76,7 @@ export type SiteContent = {
   contact: ContactContent;
   events: EventItem[];
   pastEvents: PastEventItem[];
+  eventVideos: EventVideoItem[];
   addOns: AddOnItem[];
   faqs: FAQItem[];
   terms: PolicyContent;
@@ -140,6 +149,31 @@ export const DEFAULT_PAST_EVENTS: PastEventItem[] = [
       "https://images.unsplash.com/photo-1519225421980-715cb0215aed?auto=format&fit=crop&w=900&q=80",
     galleryUrl: "https://your-cloud-gallery-link.com",
     note: "Password protected gallery. Please use the password shared with you.",
+  },
+];
+
+export const DEFAULT_EVENT_VIDEOS: EventVideoItem[] = [
+  {
+    id: "featured-event-highlight",
+    title: "Featured Event Highlight",
+    description:
+      "A short highlight video showing the photobooth experience, guest reactions and the fun atmosphere created at an event.",
+    youtubeUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+    featured: true,
+  },
+  {
+    id: "wedding-booth-moments",
+    title: "Wedding Booth Moments",
+    description:
+      "A glimpse of guests enjoying the booth, props, prints and instant memories at a wedding celebration.",
+    youtubeUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+  },
+  {
+    id: "party-photo-booth-fun",
+    title: "Party Photo Booth Fun",
+    description:
+      "Fun event moments captured through the photobooth experience.",
+    youtubeUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
   },
 ];
 
@@ -235,6 +269,7 @@ export const DEFAULT_CONTENT: SiteContent = {
   contact: DEFAULT_CONTACT,
   events: DEFAULT_EVENTS,
   pastEvents: DEFAULT_PAST_EVENTS,
+  eventVideos: DEFAULT_EVENT_VIDEOS,
   addOns: DEFAULT_ADDONS,
   faqs: DEFAULT_FAQS,
   terms: DEFAULT_TERMS,
@@ -250,6 +285,7 @@ export function mergeContent(partial: Partial<SiteContent> | null | undefined): 
     contact: { ...DEFAULT_CONTACT, ...(partial.contact || {}) },
     events: Array.isArray(partial.events) && partial.events.length ? partial.events : DEFAULT_EVENTS,
     pastEvents: Array.isArray(partial.pastEvents) && partial.pastEvents.length ? partial.pastEvents : DEFAULT_PAST_EVENTS,
+    eventVideos: Array.isArray(partial.eventVideos) && partial.eventVideos.length ? partial.eventVideos : DEFAULT_EVENT_VIDEOS,
     addOns: Array.isArray(partial.addOns) && partial.addOns.length ? partial.addOns : DEFAULT_ADDONS,
     faqs: Array.isArray(partial.faqs) && partial.faqs.length ? partial.faqs : DEFAULT_FAQS,
     terms: partial.terms
