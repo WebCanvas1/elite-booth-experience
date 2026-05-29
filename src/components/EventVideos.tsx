@@ -1,5 +1,6 @@
 import { PlayCircle } from "lucide-react";
 
+
 type EventVideoItem = {
   id: string;
   title: string;
