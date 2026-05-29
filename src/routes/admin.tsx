@@ -899,6 +899,8 @@ function EventVideosTab({
         title: "New Event Video",
         description: "",
         youtubeUrl: "",
+        videoUrl: "",
+        thumbnailUrl: "",
         featured: eventVideos.length === 0,
       },
     ]);
@@ -998,8 +1000,32 @@ function EventVideoEditor({
       </div>
 
       <div className="grid sm:grid-cols-2 gap-4">
-        <AdminField label="Video Title" value={item.title} onChange={(v) => onChange({ title: v })} />
-        <AdminField label="YouTube URL" value={item.youtubeUrl} placeholder="https://www.youtube.com/watch?v=..." onChange={(v) => onChange({ youtubeUrl: v })} />
+        <AdminField
+          label="Video Title"
+          value={item.title}
+          onChange={(v) => onChange({ title: v })}
+        />
+
+        <AdminField
+          label="YouTube URL"
+          value={item.youtubeUrl || ""}
+          placeholder="https://www.youtube.com/watch?v=..."
+          onChange={(v) => onChange({ youtubeUrl: v })}
+        />
+
+        <AdminField
+          label="Cloudflare R2 / Direct MP4 Video URL"
+          value={item.videoUrl || ""}
+          placeholder="https://pub-xxxx.r2.dev/videos/event-highlight.mp4"
+          onChange={(v) => onChange({ videoUrl: v })}
+        />
+
+        <AdminField
+          label="Thumbnail URL"
+          value={item.thumbnailUrl || ""}
+          placeholder="https://pub-xxxx.r2.dev/thumbnails/event-highlight.jpg"
+          onChange={(v) => onChange({ thumbnailUrl: v })}
+        />
       </div>
 
       <div>
