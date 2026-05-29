@@ -1,14 +1,50 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import { Plus, Trash2, Save, LogOut, ArrowLeft, Upload, ArrowUp, ArrowDown, Image as ImageIcon, Info, Phone, Package as PackageIcon, Sparkles, CalendarHeart, FileText, ShieldCheck } from "lucide-react";
+import {
+  Plus,
+  Trash2,
+  Save,
+  LogOut,
+  ArrowLeft,
+  Upload,
+  ArrowUp,
+  ArrowDown,
+  Image as ImageIcon,
+  Info,
+  Phone,
+  Package as PackageIcon,
+  Sparkles,
+  CalendarHeart,
+  FileText,
+  ShieldCheck,
+  Video,
+} from "lucide-react";
 import { DEFAULT_PACKAGES, type Package } from "@/lib/packages";
-import { DEFAULT_CONTENT, mergeContent, type SiteContent, type AboutContent, type ContactContent, type EventItem, type PastEventItem, type FAQItem, type AddOnItem, type PolicyContent, type PolicySection } from "@/lib/site-content";
+import {
+  DEFAULT_CONTENT,
+  mergeContent,
+  type SiteContent,
+  type AboutContent,
+  type ContactContent,
+  type EventItem,
+  type PastEventItem,
+  type EventVideoItem,
+  type FAQItem,
+  type AddOnItem,
+  type PolicyContent,
+  type PolicySection,
+} from "@/lib/site-content";
 import { Toaster } from "@/components/ui/sonner";
 import logo from "@/assets/logo.png";
 
 export const Route = createFileRoute("/admin")({
-  head: () => ({ meta: [{ title: "Admin — Elite MagicBooth" }, { name: "robots", content: "noindex" }] }),
+  head: () => ({
+    meta: [
+      { title: "Admin — Elite MagicBooth" },
+      { name: "robots", content: "noindex" },
+    ],
+  }),
   component: AdminPage,
 });
 
@@ -23,7 +59,6 @@ function AdminPage() {
       setCreds(null);
     };
 
-    // Clear auth if user refreshes, closes tab, or navigates away
     window.addEventListener("pagehide", clearAdminSession);
     window.addEventListener("beforeunload", clearAdminSession);
 
@@ -56,6 +91,7 @@ function AdminPage() {
     </div>
   );
 }
+
 function LoginCard({ onLogin }: { onLogin: (c: AdminCreds) => void }) {
   const [mode, setMode] = useState<"login" | "forgot">("login");
   const [email, setEmail] = useState("");
@@ -290,7 +326,6 @@ function LoginCard({ onLogin }: { onLogin: (c: AdminCreds) => void }) {
   );
 }
 
-// Convert a File to a compressed base64 data URL stored in Cloudflare KV.
 async function fileToCompressedDataUrl(file: File, maxDim = 1400, quality = 0.8): Promise<string> {
   const buf = await file.arrayBuffer();
   const blob = new Blob([buf], { type: file.type || "image/jpeg" });
@@ -306,7 +341,18 @@ async function fileToCompressedDataUrl(file: File, maxDim = 1400, quality = 0.8)
   return canvas.toDataURL("image/jpeg", quality);
 }
 
-type TabId = "packages" | "addons" | "events" | "pastEvents" | "gallery" | "about" | "contact" | "faqs" | "terms" | "privacy";
+type TabId =
+  | "packages"
+  | "addons"
+  | "events"
+  | "pastEvents"
+  | "eventVideos"
+  | "gallery"
+  | "about"
+  | "contact"
+  | "faqs"
+  | "terms"
+  | "privacy";
 
 function Dashboard({ creds, onLogout }: { creds: AdminCreds; onLogout: () => void }) {
   const [content, setContent] = useState<SiteContent>(DEFAULT_CONTENT);
@@ -345,6 +391,7 @@ function Dashboard({ creds, onLogout }: { creds: AdminCreds; onLogout: () => voi
     { id: "addons", label: "Add-Ons", icon: Sparkles },
     { id: "events", label: "Events", icon: CalendarHeart },
     { id: "pastEvents", label: "Event Galleries", icon: ImageIcon },
+    { id: "eventVideos", label: "Event Videos", icon: Video },
     { id: "gallery", label: "Gallery", icon: ImageIcon },
     { id: "about", label: "About", icon: Info },
     { id: "contact", label: "Contact", icon: Phone },
@@ -358,20 +405,28 @@ function Dashboard({ creds, onLogout }: { creds: AdminCreds; onLogout: () => voi
       <header className="sticky top-0 z-40 bg-card/95 backdrop-blur border-b border-border">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between gap-3">
           <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-            <Link to="/" className="text-muted-foreground hover:text-gold flex-shrink-0"><ArrowLeft className="h-5 w-5" /></Link>
+            <Link to="/" className="text-muted-foreground hover:text-gold flex-shrink-0">
+              <ArrowLeft className="h-5 w-5" />
+            </Link>
             <img src={logo} alt="Elite MagicBooth" className="h-8 w-8 sm:h-9 sm:w-9 rounded-full flex-shrink-0" />
-            <span className="hidden sm:inline text-xs uppercase tracking-widest text-muted-foreground border-l border-border pl-3">Admin</span>
+            <span className="hidden sm:inline text-xs uppercase tracking-widest text-muted-foreground border-l border-border pl-3">
+              Admin
+            </span>
           </div>
+
           <div className="flex items-center gap-2">
             <button onClick={save} disabled={saving} className="inline-flex items-center gap-2 rounded-full gradient-gold px-3 sm:px-5 py-2 sm:py-2.5 text-sm font-semibold text-ink shadow-luxe hover:scale-105 transition disabled:opacity-60">
-              <Save className="h-4 w-4" /> <span className="hidden sm:inline">{saving ? "Saving..." : "Save Changes"}</span><span className="sm:hidden">{saving ? "..." : "Save"}</span>
+              <Save className="h-4 w-4" />
+              <span className="hidden sm:inline">{saving ? "Saving..." : "Save Changes"}</span>
+              <span className="sm:hidden">{saving ? "..." : "Save"}</span>
             </button>
             <button onClick={onLogout} className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 sm:px-4 py-2 sm:py-2.5 text-sm font-medium hover:bg-muted hover:text-destructive transition">
-              <LogOut className="h-4 w-4" /> <span className="hidden sm:inline">Logout</span>
+              <LogOut className="h-4 w-4" />
+              <span className="hidden sm:inline">Logout</span>
             </button>
           </div>
         </div>
-        {/* Tabs */}
+
         <div className="max-w-6xl mx-auto px-4 sm:px-6 pb-3 flex gap-2 overflow-x-auto -mx-1 px-1 scrollbar-thin">
           {tabs.map((t) => {
             const Icon = t.icon;
@@ -398,41 +453,67 @@ function Dashboard({ creds, onLogout }: { creds: AdminCreds; onLogout: () => voi
             onChange={(packages) => setContent((c) => ({ ...c, packages }))}
           />
         )}
+
         {tab === "gallery" && (
           <GalleryTab
             gallery={content.gallery}
             onChange={(gallery) => setContent((c) => ({ ...c, gallery }))}
           />
         )}
+
         {tab === "about" && (
           <AboutTab about={content.about} onChange={(about) => setContent((c) => ({ ...c, about }))} />
         )}
+
         {tab === "contact" && (
           <ContactTab contact={content.contact} onChange={(contact) => setContent((c) => ({ ...c, contact }))} />
         )}
+
         {tab === "addons" && (
           <AddOnsTab addOns={content.addOns} onChange={(addOns) => setContent((c) => ({ ...c, addOns }))} />
         )}
+
         {tab === "events" && (
           <EventsTab events={content.events} onChange={(events) => setContent((c) => ({ ...c, events }))} />
         )}
+
         {tab === "pastEvents" && (
           <PastEventsTab
             pastEvents={content.pastEvents}
             onChange={(pastEvents) => setContent((c) => ({ ...c, pastEvents }))}
           />
         )}
+
+        {tab === "eventVideos" && (
+          <EventVideosTab
+            eventVideos={content.eventVideos || []}
+            onChange={(eventVideos) => setContent((c) => ({ ...c, eventVideos }))}
+          />
+        )}
+
         {tab === "faqs" && (
           <FaqTab
             faqs={content.faqs}
             onChange={(faqs) => setContent((c) => ({ ...c, faqs }))}
           />
         )}
+
         {tab === "terms" && (
-          <PolicyTab title="Terms & Conditions" subtitle="Edit the Terms & Conditions content shown on /terms." policy={content.terms} onChange={(terms) => setContent((c) => ({ ...c, terms }))} />
+          <PolicyTab
+            title="Terms & Conditions"
+            subtitle="Edit the Terms & Conditions content shown on /terms."
+            policy={content.terms}
+            onChange={(terms) => setContent((c) => ({ ...c, terms }))}
+          />
         )}
+
         {tab === "privacy" && (
-          <PolicyTab title="Privacy Policy" subtitle="Edit the Privacy Policy content shown on /privacy." policy={content.privacy} onChange={(privacy) => setContent((c) => ({ ...c, privacy }))} />
+          <PolicyTab
+            title="Privacy Policy"
+            subtitle="Edit the Privacy Policy content shown on /privacy."
+            policy={content.privacy}
+            onChange={(privacy) => setContent((c) => ({ ...c, privacy }))}
+          />
         )}
 
         <div className="mt-10 flex justify-end">
@@ -498,7 +579,12 @@ function PackagesTab({ packages, onChange }: { packages: Package[]; onChange: (p
 }
 
 function PackageEditor({
-  pkg, onChange, onRemove, onAddFeature, onUpdateFeature, onRemoveFeature,
+  pkg,
+  onChange,
+  onRemove,
+  onAddFeature,
+  onUpdateFeature,
+  onRemoveFeature,
 }: {
   pkg: Package;
   onChange: (patch: Partial<Package>) => void;
@@ -513,7 +599,10 @@ function PackageEditor({
   const onPickFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    if (!file.type.startsWith("image/")) { toast.error("Please select an image file"); return; }
+    if (!file.type.startsWith("image/")) {
+      toast.error("Please select an image file");
+      return;
+    }
     setUploading(true);
     try {
       const dataUrl = await fileToCompressedDataUrl(file);
@@ -532,9 +621,13 @@ function PackageEditor({
       <div className="grid sm:grid-cols-[200px_1fr] md:grid-cols-[220px_1fr] gap-5 md:gap-6">
         <div>
           <div className="aspect-[4/3] rounded-2xl overflow-hidden bg-muted mb-3 border border-border">
-            {pkg.image
-              ? <img src={pkg.image} alt={pkg.name} className="w-full h-full object-cover" />
-              : <div className="w-full h-full flex items-center justify-center text-xs text-muted-foreground">No image</div>}
+            {pkg.image ? (
+              <img src={pkg.image} alt={pkg.name} className="w-full h-full object-cover" />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center text-xs text-muted-foreground">
+                No image
+              </div>
+            )}
           </div>
           <input ref={fileRef} type="file" accept="image/*" onChange={onPickFile} className="hidden" />
           <button
@@ -554,6 +647,7 @@ function PackageEditor({
             <AdminField label="Name" value={pkg.name} onChange={(v) => onChange({ name: v })} />
             <AdminField label="Price ($)" type="number" value={String(pkg.price)} onChange={(v) => onChange({ price: Number(v) || 0 })} />
           </div>
+
           <p className="text-xs text-muted-foreground">
             Package image is uploaded from your device. Click <span className="text-gold font-semibold">Upload Image</span> to replace it.
           </p>
@@ -561,13 +655,17 @@ function PackageEditor({
           <div>
             <div className="flex items-center justify-between mb-2">
               <label className="block text-xs uppercase tracking-widest text-muted-foreground">Features</label>
-              <button onClick={onAddFeature} className="text-xs text-gold hover:underline inline-flex items-center gap-1"><Plus className="h-3 w-3" />Add</button>
+              <button onClick={onAddFeature} className="text-xs text-gold hover:underline inline-flex items-center gap-1">
+                <Plus className="h-3 w-3" /> Add
+              </button>
             </div>
             <div className="space-y-2">
               {pkg.features.map((f, fIdx) => (
                 <div key={fIdx} className="flex gap-2">
                   <input value={f} onChange={(e) => onUpdateFeature(fIdx, e.target.value)} className="flex-1 rounded-xl border border-input bg-background px-3 py-2 text-base sm:text-sm focus:border-gold focus:ring-2 focus:ring-gold/20 outline-none" />
-                  <button onClick={() => onRemoveFeature(fIdx)} className="px-3 rounded-xl border border-border text-muted-foreground hover:text-destructive hover:border-destructive flex-shrink-0"><Trash2 className="h-4 w-4" /></button>
+                  <button onClick={() => onRemoveFeature(fIdx)} className="px-3 rounded-xl border border-border text-muted-foreground hover:text-destructive hover:border-destructive flex-shrink-0">
+                    <Trash2 className="h-4 w-4" />
+                  </button>
                 </div>
               ))}
             </div>
@@ -583,7 +681,6 @@ function PackageEditor({
 function GalleryTab({ gallery, onChange }: { gallery: string[]; onChange: (g: string[]) => void }) {
   const fileRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
-
 
   const onPickFiles = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
@@ -605,9 +702,6 @@ function GalleryTab({ gallery, onChange }: { gallery: string[]; onChange: (g: st
       if (fileRef.current) fileRef.current.value = "";
     }
   };
-
-
-
 
   const remove = (idx: number) => onChange(gallery.filter((_, i) => i !== idx));
   const move = (idx: number, dir: -1 | 1) => {
@@ -637,9 +731,6 @@ function GalleryTab({ gallery, onChange }: { gallery: string[]; onChange: (g: st
         }
       />
 
-
-
-
       {gallery.length === 0 ? (
         <div className="text-center py-16 text-muted-foreground bg-card rounded-3xl border border-border border-dashed">
           No gallery images yet. Upload some to get started.
@@ -651,28 +742,14 @@ function GalleryTab({ gallery, onChange }: { gallery: string[]; onChange: (g: st
               <img src={src} alt={`Gallery ${idx + 1}`} className="w-full h-full object-cover" />
               <div className="absolute inset-x-0 bottom-0 p-2 flex justify-between gap-1 bg-gradient-to-t from-black/70 to-transparent opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition">
                 <div className="flex gap-1">
-                  <button
-                    onClick={() => move(idx, -1)}
-                    disabled={idx === 0}
-                    aria-label="Move up"
-                    className="h-8 w-8 inline-flex items-center justify-center rounded-full bg-white/90 text-ink hover:bg-gold disabled:opacity-40"
-                  >
+                  <button onClick={() => move(idx, -1)} disabled={idx === 0} aria-label="Move up" className="h-8 w-8 inline-flex items-center justify-center rounded-full bg-white/90 text-ink hover:bg-gold disabled:opacity-40">
                     <ArrowUp className="h-4 w-4" />
                   </button>
-                  <button
-                    onClick={() => move(idx, 1)}
-                    disabled={idx === gallery.length - 1}
-                    aria-label="Move down"
-                    className="h-8 w-8 inline-flex items-center justify-center rounded-full bg-white/90 text-ink hover:bg-gold disabled:opacity-40"
-                  >
+                  <button onClick={() => move(idx, 1)} disabled={idx === gallery.length - 1} aria-label="Move down" className="h-8 w-8 inline-flex items-center justify-center rounded-full bg-white/90 text-ink hover:bg-gold disabled:opacity-40">
                     <ArrowDown className="h-4 w-4" />
                   </button>
                 </div>
-                <button
-                  onClick={() => remove(idx)}
-                  aria-label="Delete image"
-                  className="h-8 w-8 inline-flex items-center justify-center rounded-full bg-destructive text-destructive-foreground hover:scale-110 transition"
-                >
+                <button onClick={() => remove(idx)} aria-label="Delete image" className="h-8 w-8 inline-flex items-center justify-center rounded-full bg-destructive text-destructive-foreground hover:scale-110 transition">
                   <Trash2 className="h-4 w-4" />
                 </button>
               </div>
@@ -698,13 +775,19 @@ function AboutTab({ about, onChange }: { about: AboutContent; onChange: (a: Abou
       const dataUrl = await fileToCompressedDataUrl(file);
       onChange({ ...about, image: dataUrl });
       toast.success("Image ready — click Save Changes to publish");
-    } catch { toast.error("Could not process image"); }
-    finally { setUploading(false); if (fileRef.current) fileRef.current.value = ""; }
+    } catch {
+      toast.error("Could not process image");
+    } finally {
+      setUploading(false);
+      if (fileRef.current) fileRef.current.value = "";
+    }
   };
 
   const updateHighlight = (idx: number, v: string) =>
     onChange({ ...about, highlights: about.highlights.map((h, i) => (i === idx ? v : h)) });
+
   const addHighlight = () => onChange({ ...about, highlights: [...about.highlights, "New highlight"] });
+
   const removeHighlight = (idx: number) =>
     onChange({ ...about, highlights: about.highlights.filter((_, i) => i !== idx) });
 
@@ -714,9 +797,11 @@ function AboutTab({ about, onChange }: { about: AboutContent; onChange: (a: Abou
       <div className="grid lg:grid-cols-[260px_1fr] gap-6">
         <div>
           <div className="aspect-[4/5] rounded-2xl overflow-hidden bg-muted mb-3 border border-border">
-            {about.image
-              ? <img src={about.image} alt="About" className="w-full h-full object-cover" />
-              : <div className="w-full h-full flex items-center justify-center text-xs text-muted-foreground">No image</div>}
+            {about.image ? (
+              <img src={about.image} alt="About" className="w-full h-full object-cover" />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center text-xs text-muted-foreground">No image</div>
+            )}
           </div>
           <input ref={fileRef} type="file" accept="image/*" onChange={onPickFile} className="hidden" />
           <button
@@ -728,6 +813,7 @@ function AboutTab({ about, onChange }: { about: AboutContent; onChange: (a: Abou
             <Upload className="h-3.5 w-3.5" /> {uploading ? "Processing..." : "Upload About Image"}
           </button>
         </div>
+
         <div className="space-y-4 bg-card border border-border rounded-3xl p-5 sm:p-6 shadow-luxe/30">
           <AdminField label="Eyebrow (small label)" value={about.eyebrow} onChange={(v) => onChange({ ...about, eyebrow: v })} />
           <AdminField label="Heading" value={about.heading} onChange={(v) => onChange({ ...about, heading: v })} />
@@ -740,16 +826,21 @@ function AboutTab({ about, onChange }: { about: AboutContent; onChange: (a: Abou
               className="w-full rounded-2xl border border-input bg-background px-4 py-3 text-base sm:text-sm focus:border-gold focus:ring-2 focus:ring-gold/20 outline-none"
             />
           </div>
+
           <div>
             <div className="flex items-center justify-between mb-2">
               <label className="block text-xs uppercase tracking-widest text-muted-foreground">Highlights</label>
-              <button onClick={addHighlight} className="text-xs text-gold hover:underline inline-flex items-center gap-1"><Plus className="h-3 w-3" />Add</button>
+              <button onClick={addHighlight} className="text-xs text-gold hover:underline inline-flex items-center gap-1">
+                <Plus className="h-3 w-3" /> Add
+              </button>
             </div>
             <div className="space-y-2">
               {about.highlights.map((h, i) => (
                 <div key={i} className="flex gap-2">
                   <input value={h} onChange={(e) => updateHighlight(i, e.target.value)} className="flex-1 rounded-xl border border-input bg-background px-3 py-2 text-base sm:text-sm focus:border-gold focus:ring-2 focus:ring-gold/20 outline-none" />
-                  <button onClick={() => removeHighlight(i)} className="px-3 rounded-xl border border-border text-muted-foreground hover:text-destructive hover:border-destructive flex-shrink-0"><Trash2 className="h-4 w-4" /></button>
+                  <button onClick={() => removeHighlight(i)} className="px-3 rounded-xl border border-border text-muted-foreground hover:text-destructive hover:border-destructive flex-shrink-0">
+                    <Trash2 className="h-4 w-4" />
+                  </button>
                 </div>
               ))}
             </div>
@@ -764,6 +855,7 @@ function AboutTab({ about, onChange }: { about: AboutContent; onChange: (a: Abou
 
 function ContactTab({ contact, onChange }: { contact: ContactContent; onChange: (c: ContactContent) => void }) {
   const u = (patch: Partial<ContactContent>) => onChange({ ...contact, ...patch });
+
   return (
     <div>
       <SectionHeader title="Contact Details" subtitle="Update contact info shown on the website and footer." />
@@ -790,6 +882,152 @@ function ContactTab({ contact, onChange }: { contact: ContactContent; onChange: 
   );
 }
 
+/* ======================== EVENT VIDEOS TAB ======================== */
+
+function EventVideosTab({
+  eventVideos,
+  onChange,
+}: {
+  eventVideos: EventVideoItem[];
+  onChange: (videos: EventVideoItem[]) => void;
+}) {
+  const add = () =>
+    onChange([
+      ...eventVideos,
+      {
+        id: crypto.randomUUID(),
+        title: "New Event Video",
+        description: "",
+        youtubeUrl: "",
+        featured: eventVideos.length === 0,
+      },
+    ]);
+
+  const remove = (idx: number) => onChange(eventVideos.filter((_, i) => i !== idx));
+
+  const update = (idx: number, patch: Partial<EventVideoItem>) => {
+    const next = eventVideos.map((video, i) =>
+      i === idx ? { ...video, ...patch } : video
+    );
+
+    if (patch.featured === true) {
+      next.forEach((video, i) => {
+        video.featured = i === idx;
+      });
+    }
+
+    onChange(next);
+  };
+
+  const move = (idx: number, dir: -1 | 1) => {
+    const j = idx + dir;
+    if (j < 0 || j >= eventVideos.length) return;
+    const next = [...eventVideos];
+    [next[idx], next[j]] = [next[j], next[idx]];
+    onChange(next);
+  };
+
+  return (
+    <div>
+      <SectionHeader
+        title="Event Videos"
+        subtitle="Add YouTube video links for the homepage Event Videos section. One video can be marked as featured."
+        action={
+          <button onClick={add} className="inline-flex items-center justify-center gap-2 rounded-full border border-gold text-gold px-4 py-2.5 text-sm font-semibold hover:bg-gold hover:text-ink transition">
+            <Plus className="h-4 w-4" /> Add Video
+          </button>
+        }
+      />
+
+      {eventVideos.length === 0 ? (
+        <div className="text-center py-16 text-muted-foreground bg-card rounded-3xl border border-border border-dashed">
+          No event videos yet. Add a YouTube link to get started.
+        </div>
+      ) : (
+        <div className="space-y-5">
+          {eventVideos.map((video, idx) => (
+            <EventVideoEditor
+              key={video.id}
+              item={video}
+              onChange={(patch) => update(idx, patch)}
+              onRemove={() => remove(idx)}
+              onMoveUp={() => move(idx, -1)}
+              onMoveDown={() => move(idx, 1)}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function EventVideoEditor({
+  item,
+  onChange,
+  onRemove,
+  onMoveUp,
+  onMoveDown,
+}: {
+  item: EventVideoItem;
+  onChange: (patch: Partial<EventVideoItem>) => void;
+  onRemove: () => void;
+  onMoveUp: () => void;
+  onMoveDown: () => void;
+}) {
+  return (
+    <div className="bg-card rounded-3xl border border-border p-5 sm:p-6 shadow-luxe/30 space-y-4">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div>
+          <h3 className="font-serif text-xl text-foreground">{item.title || "Untitled Video"}</h3>
+          <p className="text-xs text-muted-foreground mt-1">
+            Paste a public YouTube video URL. Example: https://www.youtube.com/watch?v=VIDEO_ID
+          </p>
+        </div>
+
+        <div className="flex gap-2">
+          <button onClick={onMoveUp} className="inline-flex items-center justify-center rounded-full border border-border px-3 py-2 text-xs hover:text-gold">
+            <ArrowUp className="h-3.5 w-3.5" />
+          </button>
+          <button onClick={onMoveDown} className="inline-flex items-center justify-center rounded-full border border-border px-3 py-2 text-xs hover:text-gold">
+            <ArrowDown className="h-3.5 w-3.5" />
+          </button>
+          <button onClick={onRemove} className="inline-flex items-center justify-center gap-1 rounded-full border border-destructive/40 text-destructive px-3 py-2 text-xs hover:bg-destructive hover:text-destructive-foreground transition">
+            <Trash2 className="h-3.5 w-3.5" /> Delete
+          </button>
+        </div>
+      </div>
+
+      <div className="grid sm:grid-cols-2 gap-4">
+        <AdminField label="Video Title" value={item.title} onChange={(v) => onChange({ title: v })} />
+        <AdminField label="YouTube URL" value={item.youtubeUrl} placeholder="https://www.youtube.com/watch?v=..." onChange={(v) => onChange({ youtubeUrl: v })} />
+      </div>
+
+      <div>
+        <label className="block text-xs uppercase tracking-widest text-muted-foreground mb-2">
+          Description
+        </label>
+        <textarea
+          value={item.description}
+          onChange={(e) => onChange({ description: e.target.value })}
+          rows={3}
+          placeholder="Short description shown below the video..."
+          className="w-full rounded-2xl border border-input bg-background px-4 py-3 text-base sm:text-sm focus:border-gold focus:ring-2 focus:ring-gold/20 outline-none"
+        />
+      </div>
+
+      <label className="inline-flex items-center gap-2 text-sm">
+        <input
+          type="checkbox"
+          checked={Boolean(item.featured)}
+          onChange={(e) => onChange({ featured: e.target.checked })}
+          className="h-4 w-4 accent-[oklch(0.78_0.11_80)]"
+        />
+        Show as featured video
+      </label>
+    </div>
+  );
+}
+
 /* ======================== SHARED ======================== */
 
 function SectionHeader({ title, subtitle, action }: { title: string; subtitle: string; action?: React.ReactNode }) {
@@ -805,7 +1043,11 @@ function SectionHeader({ title, subtitle, action }: { title: string; subtitle: s
 }
 
 function AdminField({
-  label, value, onChange, type = "text", placeholder,
+  label,
+  value,
+  onChange,
+  type = "text",
+  placeholder,
 }: {
   label: string;
   value: string;
@@ -816,7 +1058,13 @@ function AdminField({
   return (
     <div>
       <label className="block text-xs uppercase tracking-widest text-muted-foreground mb-2">{label}</label>
-      <input type={type} value={value} placeholder={placeholder} onChange={(e) => onChange(e.target.value)} className="w-full rounded-xl border border-input bg-background px-3 py-2.5 text-base sm:text-sm focus:border-gold focus:ring-2 focus:ring-gold/20 outline-none" />
+      <input
+        type={type}
+        value={value}
+        placeholder={placeholder}
+        onChange={(e) => onChange(e.target.value)}
+        className="w-full rounded-xl border border-input bg-background px-3 py-2.5 text-base sm:text-sm focus:border-gold focus:ring-2 focus:ring-gold/20 outline-none"
+      />
     </div>
   );
 }
@@ -829,9 +1077,12 @@ function AddOnsTab({ addOns, onChange }: { addOns: AddOnItem[]; onChange: (a: Ad
       ...addOns,
       { id: crypto.randomUUID(), title: "New Add-On", description: "", price: "", image: "", popular: false },
     ]);
+
   const remove = (idx: number) => onChange(addOns.filter((_, i) => i !== idx));
+
   const update = (idx: number, patch: Partial<AddOnItem>) =>
     onChange(addOns.map((a, i) => (i === idx ? { ...a, ...patch } : a)));
+
   const move = (idx: number, dir: -1 | 1) => {
     const j = idx + dir;
     if (j < 0 || j >= addOns.length) return;
@@ -868,7 +1119,11 @@ function AddOnsTab({ addOns, onChange }: { addOns: AddOnItem[]; onChange: (a: Ad
 }
 
 function AddOnEditor({
-  item, onChange, onRemove, onMoveUp, onMoveDown,
+  item,
+  onChange,
+  onRemove,
+  onMoveUp,
+  onMoveDown,
 }: {
   item: AddOnItem;
   onChange: (patch: Partial<AddOnItem>) => void;
@@ -878,6 +1133,7 @@ function AddOnEditor({
 }) {
   const fileRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
+
   const pickFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0];
     if (!f) return;
@@ -886,30 +1142,42 @@ function AddOnEditor({
       const url = await fileToCompressedDataUrl(f);
       onChange({ image: url });
       toast.success("Image ready — click Save");
-    } catch { toast.error("Could not process image"); }
-    finally { setUploading(false); if (fileRef.current) fileRef.current.value = ""; }
+    } catch {
+      toast.error("Could not process image");
+    } finally {
+      setUploading(false);
+      if (fileRef.current) fileRef.current.value = "";
+    }
   };
+
   return (
     <div className="bg-card rounded-3xl border border-border p-5 sm:p-6 shadow-luxe/30">
       <div className="grid sm:grid-cols-[200px_1fr] gap-5">
         <div>
           <div className="aspect-[4/3] rounded-2xl overflow-hidden bg-muted mb-3 border border-border">
-            {item.image
-              ? <img src={item.image} alt={item.title} className="w-full h-full object-cover" />
-              : <div className="w-full h-full flex items-center justify-center text-xs text-muted-foreground">No image</div>}
+            {item.image ? (
+              <img src={item.image} alt={item.title} className="w-full h-full object-cover" />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center text-xs text-muted-foreground">No image</div>
+            )}
           </div>
           <input ref={fileRef} type="file" accept="image/*" onChange={pickFile} className="hidden" />
           <button onClick={() => fileRef.current?.click()} disabled={uploading} className="w-full inline-flex items-center justify-center gap-2 rounded-full border border-gold text-gold text-xs font-semibold py-2.5 hover:bg-gold hover:text-ink transition disabled:opacity-60 mb-2">
             <Upload className="h-3.5 w-3.5" /> {uploading ? "Processing..." : "Upload Image"}
           </button>
           <div className="grid grid-cols-2 gap-2">
-            <button onClick={onMoveUp} className="inline-flex items-center justify-center rounded-full border border-border text-xs py-2 hover:text-gold"><ArrowUp className="h-3 w-3" /></button>
-            <button onClick={onMoveDown} className="inline-flex items-center justify-center rounded-full border border-border text-xs py-2 hover:text-gold"><ArrowDown className="h-3 w-3" /></button>
+            <button onClick={onMoveUp} className="inline-flex items-center justify-center rounded-full border border-border text-xs py-2 hover:text-gold">
+              <ArrowUp className="h-3 w-3" />
+            </button>
+            <button onClick={onMoveDown} className="inline-flex items-center justify-center rounded-full border border-border text-xs py-2 hover:text-gold">
+              <ArrowDown className="h-3 w-3" />
+            </button>
           </div>
           <button onClick={onRemove} className="mt-2 w-full inline-flex items-center justify-center gap-1 rounded-full border border-destructive/40 text-destructive text-xs py-2 hover:bg-destructive hover:text-destructive-foreground transition">
             <Trash2 className="h-3 w-3" /> Delete
           </button>
         </div>
+
         <div className="space-y-3">
           <div className="grid sm:grid-cols-2 gap-3">
             <AdminField label="Title" value={item.title} onChange={(v) => onChange({ title: v })} />
@@ -972,7 +1240,11 @@ function EventsTab({ events, onChange }: { events: EventItem[]; onChange: (e: Ev
 }
 
 function EventEditor({
-  item, onChange, onRemove, onMoveUp, onMoveDown,
+  item,
+  onChange,
+  onRemove,
+  onMoveUp,
+  onMoveDown,
 }: {
   item: EventItem;
   onChange: (patch: Partial<EventItem>) => void;
@@ -982,6 +1254,7 @@ function EventEditor({
 }) {
   const fileRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
+
   const pickFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0];
     if (!f) return;
@@ -990,15 +1263,22 @@ function EventEditor({
       const url = await fileToCompressedDataUrl(f);
       onChange({ image: url });
       toast.success("Image ready — click Save");
-    } catch { toast.error("Could not process image"); }
-    finally { setUploading(false); if (fileRef.current) fileRef.current.value = ""; }
+    } catch {
+      toast.error("Could not process image");
+    } finally {
+      setUploading(false);
+      if (fileRef.current) fileRef.current.value = "";
+    }
   };
+
   return (
     <div className="bg-card rounded-3xl border border-border p-4 shadow-luxe/30">
       <div className="aspect-[3/4] rounded-2xl overflow-hidden bg-muted mb-3 border border-border">
-        {item.image
-          ? <img src={item.image} alt={item.title} className="w-full h-full object-cover" />
-          : <div className="w-full h-full flex items-center justify-center text-xs text-muted-foreground">No image</div>}
+        {item.image ? (
+          <img src={item.image} alt={item.title} className="w-full h-full object-cover" />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center text-xs text-muted-foreground">No image</div>
+        )}
       </div>
       <input ref={fileRef} type="file" accept="image/*" onChange={pickFile} className="hidden" />
       <button onClick={() => fileRef.current?.click()} disabled={uploading} className="w-full inline-flex items-center justify-center gap-2 rounded-full border border-gold text-gold text-xs font-semibold py-2 hover:bg-gold hover:text-ink transition disabled:opacity-60 mb-3">
@@ -1010,14 +1290,19 @@ function EventEditor({
         <textarea value={item.description} onChange={(e) => onChange({ description: e.target.value })} rows={2} className="w-full rounded-xl border border-input bg-background px-3 py-2 text-base sm:text-sm focus:border-gold focus:ring-2 focus:ring-gold/20 outline-none" />
       </div>
       <div className="mt-3 grid grid-cols-3 gap-2">
-        <button onClick={onMoveUp} className="inline-flex items-center justify-center rounded-full border border-border text-xs py-2 hover:text-gold"><ArrowUp className="h-3 w-3" /></button>
-        <button onClick={onMoveDown} className="inline-flex items-center justify-center rounded-full border border-border text-xs py-2 hover:text-gold"><ArrowDown className="h-3 w-3" /></button>
-        <button onClick={onRemove} className="inline-flex items-center justify-center gap-1 rounded-full border border-destructive/40 text-destructive text-xs py-2 hover:bg-destructive hover:text-destructive-foreground transition"><Trash2 className="h-3 w-3" /></button>
+        <button onClick={onMoveUp} className="inline-flex items-center justify-center rounded-full border border-border text-xs py-2 hover:text-gold">
+          <ArrowUp className="h-3 w-3" />
+        </button>
+        <button onClick={onMoveDown} className="inline-flex items-center justify-center rounded-full border border-border text-xs py-2 hover:text-gold">
+          <ArrowDown className="h-3 w-3" />
+        </button>
+        <button onClick={onRemove} className="inline-flex items-center justify-center gap-1 rounded-full border border-destructive/40 text-destructive text-xs py-2 hover:bg-destructive hover:text-destructive-foreground transition">
+          <Trash2 className="h-3 w-3" />
+        </button>
       </div>
     </div>
   );
 }
-
 
 /* ======================== PAST EVENTS TAB ======================== */
 
@@ -1107,7 +1392,10 @@ function PastEventEditor({
   const pickFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0];
     if (!f) return;
-    if (!f.type.startsWith("image/")) { toast.error("Please select an image file"); return; }
+    if (!f.type.startsWith("image/")) {
+      toast.error("Please select an image file");
+      return;
+    }
 
     setUploading(true);
     try {
@@ -1168,7 +1456,6 @@ function PastEventEditor({
     </div>
   );
 }
-
 
 /* ======================== FAQ TAB ======================== */
 
@@ -1260,10 +1547,13 @@ function FaqTab({
   );
 }
 
-/* ======================== POLICY TAB (Terms & Privacy) ======================== */
+/* ======================== POLICY TAB ======================== */
 
 function PolicyTab({
-  title, subtitle, policy, onChange,
+  title,
+  subtitle,
+  policy,
+  onChange,
 }: {
   title: string;
   subtitle: string;
@@ -1272,10 +1562,13 @@ function PolicyTab({
 }) {
   const addSection = () =>
     onChange({ ...policy, sections: [...policy.sections, { id: crypto.randomUUID(), heading: "New Section", body: "" }] });
+
   const removeSection = (idx: number) =>
     onChange({ ...policy, sections: policy.sections.filter((_, i) => i !== idx) });
+
   const updateSection = (idx: number, patch: Partial<PolicySection>) =>
     onChange({ ...policy, sections: policy.sections.map((s, i) => (i === idx ? { ...s, ...patch } : s)) });
+
   const move = (idx: number, dir: -1 | 1) => {
     const j = idx + dir;
     if (j < 0 || j >= policy.sections.length) return;
@@ -1295,6 +1588,7 @@ function PolicyTab({
           </button>
         }
       />
+
       <div className="bg-card border border-border rounded-3xl p-5 sm:p-6 shadow-luxe/30 space-y-4 mb-6">
         <AdminField label="Page heading" value={policy.heading} onChange={(v) => onChange({ ...policy, heading: v })} />
         <div>
@@ -1314,9 +1608,15 @@ function PolicyTab({
                 className="flex-1 rounded-xl border border-input bg-background px-3 py-2.5 text-base sm:text-sm font-serif text-lg focus:border-gold focus:ring-2 focus:ring-gold/20 outline-none"
               />
               <div className="flex gap-2">
-                <button onClick={() => move(idx, -1)} className="px-3 rounded-full border border-border text-muted-foreground hover:text-gold"><ArrowUp className="h-4 w-4" /></button>
-                <button onClick={() => move(idx, 1)} className="px-3 rounded-full border border-border text-muted-foreground hover:text-gold"><ArrowDown className="h-4 w-4" /></button>
-                <button onClick={() => removeSection(idx)} className="px-3 rounded-full border border-destructive/40 text-destructive hover:bg-destructive hover:text-destructive-foreground transition"><Trash2 className="h-4 w-4" /></button>
+                <button onClick={() => move(idx, -1)} className="px-3 rounded-full border border-border text-muted-foreground hover:text-gold">
+                  <ArrowUp className="h-4 w-4" />
+                </button>
+                <button onClick={() => move(idx, 1)} className="px-3 rounded-full border border-border text-muted-foreground hover:text-gold">
+                  <ArrowDown className="h-4 w-4" />
+                </button>
+                <button onClick={() => removeSection(idx)} className="px-3 rounded-full border border-destructive/40 text-destructive hover:bg-destructive hover:text-destructive-foreground transition">
+                  <Trash2 className="h-4 w-4" />
+                </button>
               </div>
             </div>
             <textarea
@@ -1332,4 +1632,3 @@ function PolicyTab({
     </div>
   );
 }
-
