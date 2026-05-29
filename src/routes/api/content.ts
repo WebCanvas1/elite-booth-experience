@@ -26,6 +26,16 @@ type KVLike = {
   put: (key: string, value: string) => Promise<void>;
 };
 
+const NO_CACHE_HEADERS = {
+  "content-type": "application/json",
+  "cache-control":
+    "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0",
+  pragma: "no-cache",
+  expires: "0",
+  "surrogate-control": "no-store",
+  "cdn-cache-control": "no-store",
+};
+
 async function getKV(): Promise<KVLike | null> {
   try {
     // @ts-expect-error - cloudflare:workers is provided at runtime by @cloudflare/vite-plugin
@@ -41,8 +51,10 @@ async function getKV(): Promise<KVLike | null> {
 
 async function readContent(): Promise<SiteContent> {
   const kv = await getKV();
+
   if (kv) {
     const raw = await kv.get(KV_KEY);
+
     if (raw) {
       try {
         return mergeContent(JSON.parse(raw) as Partial<SiteContent>);
@@ -52,6 +64,7 @@ async function readContent(): Promise<SiteContent> {
     }
 
     const legacy = await kv.get(LEGACY_PACKAGES_KEY);
+
     if (legacy) {
       try {
         const pkgs = JSON.parse(legacy) as Package[];
@@ -69,6 +82,7 @@ async function readContent(): Promise<SiteContent> {
 
 async function writeContent(content: SiteContent): Promise<void> {
   const kv = await getKV();
+
   if (kv) {
     await kv.put(KV_KEY, JSON.stringify(content));
   } else {
@@ -241,7 +255,7 @@ export const Route = createFileRoute("/api/content")({
         const content = await readContent();
 
         return new Response(JSON.stringify(content), {
-          headers: { "content-type": "application/json" },
+          headers: NO_CACHE_HEADERS,
         });
       },
 
@@ -257,7 +271,7 @@ export const Route = createFileRoute("/api/content")({
         if (!authed) {
           return new Response(JSON.stringify({ error: "Unauthorized" }), {
             status: 401,
-            headers: { "content-type": "application/json" },
+            headers: NO_CACHE_HEADERS,
           });
         }
 
@@ -322,14 +336,9 @@ export const Route = createFileRoute("/api/content")({
 
         await writeContent(clean);
 
-        return new Response(JSON.stringify(content), {
-  headers: {
-    "content-type": "application/json",
-    "cache-control": "no-store, no-cache, must-revalidate, proxy-revalidate",
-    pragma: "no-cache",
-    expires: "0",
-  },
-});
+        return new Response(JSON.stringify({ ok: true, content: clean }), {
+          headers: NO_CACHE_HEADERS,
+        });
       },
     },
   },
