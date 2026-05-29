@@ -190,6 +190,8 @@ function sanitizeEventVideos(input: unknown): EventVideoItem[] {
       title: String(x.title || "").slice(0, 120),
       description: String(x.description || "").slice(0, 500),
       youtubeUrl: String(x.youtubeUrl || "").slice(0, 500),
+      videoUrl: String(x.videoUrl || "").slice(0, 500),
+      thumbnailUrl: String(x.thumbnailUrl || "").slice(0, 500),
       featured: Boolean(x.featured),
     };
   });
