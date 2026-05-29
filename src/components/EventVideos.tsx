@@ -145,7 +145,7 @@ export function EventVideos({ videos }: { videos: EventVideoItem[] }) {
 
           <div className="mt-12 max-w-4xl mx-auto">
   <VideoCard video={featured} featuredCard />
-</div>>
+</div>
 
           {others.length > 0 && (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
