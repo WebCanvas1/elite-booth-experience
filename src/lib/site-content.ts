@@ -158,7 +158,7 @@ export const DEFAULT_EVENT_VIDEOS: EventVideoItem[] = [
     title: "Featured Event Highlight",
     description:
       "A short highlight video showing the photobooth experience, guest reactions and the fun atmosphere created at an event.",
-    youtubeUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+    youtubeUrl: "",
     featured: true,
   },
   {
@@ -166,14 +166,14 @@ export const DEFAULT_EVENT_VIDEOS: EventVideoItem[] = [
     title: "Wedding Booth Moments",
     description:
       "A glimpse of guests enjoying the booth, props, prints and instant memories at a wedding celebration.",
-    youtubeUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+    youtubeUrl: "",
   },
   {
     id: "party-photo-booth-fun",
     title: "Party Photo Booth Fun",
     description:
       "Fun event moments captured through the photobooth experience.",
-    youtubeUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+    youtubeUrl: "",
   },
 ];
 
