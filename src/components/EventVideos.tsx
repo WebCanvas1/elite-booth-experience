@@ -1,4 +1,5 @@
-import { PlayCircle } from "lucide-react";
+import { useState } from "react";
+import { Play, X } from "lucide-react";
 
 type EventVideoItem = {
   id: string;
@@ -8,99 +9,154 @@ type EventVideoItem = {
   featured?: boolean;
 };
 
-function getYouTubeEmbedUrl(url: string) {
+function getYouTubeId(url: string) {
   const regExp =
     /^.*(?:youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=|shorts\/)([^#&?]*).*/;
 
   const match = url.match(regExp);
-  const videoId = match && match[1].length === 11 ? match[1] : null;
+  return match && match[1].length === 11 ? match[1] : "";
+}
 
-  return videoId ? `https://www.youtube.com/embed/${videoId}?rel=0` : "";
+function getYouTubeThumbnail(url: string) {
+  const id = getYouTubeId(url);
+  return id ? `https://img.youtube.com/vi/${id}/hqdefault.jpg` : "";
+}
+
+function getYouTubeEmbedUrl(url: string) {
+  const id = getYouTubeId(url);
+  return id ? `https://www.youtube.com/embed/${id}?autoplay=1&rel=0` : "";
 }
 
 export function EventVideos({ videos }: { videos: EventVideoItem[] }) {
-  if (!videos?.length) return null;
+  const [activeVideo, setActiveVideo] = useState<EventVideoItem | null>(null);
 
-  const featured = videos.find((v) => v.featured) || videos[0];
-  const others = videos.filter((v) => v.id !== featured.id);
+  const validVideos = videos.filter((video) => getYouTubeId(video.youtubeUrl));
+
+  if (!validVideos.length) return null;
+
+  const featured = validVideos.find((v) => v.featured) || validVideos[0];
+  const others = validVideos.filter((v) => v.id !== featured.id);
+
+  const VideoCard = ({
+    video,
+    featuredCard = false,
+  }: {
+    video: EventVideoItem;
+    featuredCard?: boolean;
+  }) => (
+    <button
+      type="button"
+      onClick={() => setActiveVideo(video)}
+      className="group w-full text-left rounded-[2rem] overflow-hidden bg-card border border-border shadow-luxe hover:-translate-y-1 transition-transform duration-500"
+    >
+      <div className="relative aspect-video bg-black overflow-hidden">
+        <img
+          src={getYouTubeThumbnail(video.youtubeUrl)}
+          alt={video.title}
+          loading="lazy"
+          className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-700"
+        />
+
+        <div className="absolute inset-0 bg-black/35 group-hover:bg-black/20 transition-colors" />
+
+        <div className="absolute inset-0 flex items-center justify-center">
+          <span className="h-16 w-16 md:h-20 md:w-20 rounded-full gradient-gold text-ink flex items-center justify-center shadow-luxe group-hover:scale-110 transition-transform">
+            <Play className="h-7 w-7 md:h-9 md:w-9 fill-current ml-1" />
+          </span>
+        </div>
+      </div>
+
+      <div className={featuredCard ? "p-6 md:p-8" : "p-5"}>
+        {featuredCard && (
+          <div className="inline-flex items-center gap-2 rounded-full bg-gold/15 px-4 py-1.5 text-sm font-medium text-gold mb-4">
+            <Play className="h-4 w-4 fill-current" />
+            Featured Video
+          </div>
+        )}
+
+        <h3
+          className={
+            featuredCard
+              ? "font-display text-3xl text-primary"
+              : "font-display text-2xl text-primary"
+          }
+        >
+          {video.title}
+        </h3>
+
+        {video.description && (
+          <p className="mt-2 text-sm text-muted-foreground">
+            {video.description}
+          </p>
+        )}
+      </div>
+    </button>
+  );
 
   return (
-    <section id="videos" className="py-20 bg-gradient-to-b from-background to-muted/40">
-      <div className="container mx-auto px-6">
-        <div className="text-center max-w-2xl mx-auto">
-          <p className="text-sm uppercase tracking-[0.3em] text-muted-foreground">
-            Event Highlights
-          </p>
+    <>
+      <section
+        id="videos"
+        className="py-20 bg-gradient-to-b from-background to-muted/40"
+      >
+        <div className="container mx-auto px-6">
+          <div className="text-center max-w-2xl mx-auto">
+            <p className="text-sm uppercase tracking-[0.3em] text-muted-foreground">
+              Event Highlights
+            </p>
 
-          <h2 className="font-display text-4xl md:text-6xl text-primary mt-3">
-            Watch the Magic
-          </h2>
+            <h2 className="font-display text-4xl md:text-6xl text-primary mt-3">
+              Watch the Magic
+            </h2>
 
-          <p className="mt-4 text-muted-foreground">
-            See real event moments, guest reactions and photobooth memories in action.
-          </p>
+            <p className="mt-4 text-muted-foreground">
+              See real event moments, guest reactions and photobooth memories in
+              action.
+            </p>
+          </div>
+
+          <div className="mt-12">
+            <VideoCard video={featured} featuredCard />
+          </div>
+
+          {others.length > 0 && (
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+              {others.map((video) => (
+                <VideoCard key={video.id} video={video} />
+              ))}
+            </div>
+          )}
         </div>
+      </section>
 
-        <div className="mt-12 rounded-[2rem] overflow-hidden shadow-luxe border border-gold/20 bg-card">
-          <div className="aspect-video bg-black">
+      {activeVideo && (
+        <div
+          className="fixed inset-0 z-[100] bg-black/85 backdrop-blur-sm flex items-center justify-center p-4"
+          onClick={() => setActiveVideo(null)}
+        >
+          <div
+            className="relative w-full max-w-5xl aspect-video bg-black rounded-2xl overflow-hidden shadow-luxe"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              type="button"
+              onClick={() => setActiveVideo(null)}
+              className="absolute -top-12 right-0 text-white hover:text-gold transition"
+              aria-label="Close video"
+            >
+              <X className="h-8 w-8" />
+            </button>
+
             <iframe
-              src={getYouTubeEmbedUrl(featured.youtubeUrl)}
-              title={featured.title}
+              src={getYouTubeEmbedUrl(activeVideo.youtubeUrl)}
+              title={activeVideo.title}
               className="h-full w-full"
-              loading="lazy"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
               allowFullScreen
             />
           </div>
-
-          <div className="p-6 md:p-8">
-            <div className="inline-flex items-center gap-2 rounded-full bg-gold/15 px-4 py-1.5 text-sm font-medium text-gold">
-              <PlayCircle size={16} />
-              Featured Video
-            </div>
-
-            <h3 className="font-display text-3xl text-primary mt-4">
-              {featured.title}
-            </h3>
-
-            <p className="mt-2 text-muted-foreground">
-              {featured.description}
-            </p>
-          </div>
         </div>
-
-        {others.length > 0 && (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
-            {others.map((video) => (
-              <article
-                key={video.id}
-                className="rounded-3xl overflow-hidden bg-card border border-border shadow-soft hover:shadow-luxe transition"
-              >
-                <div className="aspect-video bg-black">
-                  <iframe
-                    src={getYouTubeEmbedUrl(video.youtubeUrl)}
-                    title={video.title}
-                    className="h-full w-full"
-                    loading="lazy"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                    allowFullScreen
-                  />
-                </div>
-
-                <div className="p-5">
-                  <h3 className="font-display text-2xl text-primary">
-                    {video.title}
-                  </h3>
-
-                  <p className="mt-2 text-sm text-muted-foreground">
-                    {video.description}
-                  </p>
-                </div>
-              </article>
-            ))}
-          </div>
-        )}
-      </div>
-    </section>
+      )}
+    </>
   );
 }
