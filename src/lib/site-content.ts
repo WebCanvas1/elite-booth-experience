@@ -39,6 +39,8 @@ export type EventVideoItem = {
   title: string;
   description: string;
   youtubeUrl: string;
+  videoUrl?: string;
+  thumbnailUrl?: string;
   featured?: boolean;
 };
 
@@ -159,6 +161,8 @@ export const DEFAULT_EVENT_VIDEOS: EventVideoItem[] = [
     description:
       "A short highlight video showing the photobooth experience, guest reactions and the fun atmosphere created at an event.",
     youtubeUrl: "",
+    videoUrl: "",
+    thumbnailUrl: "",
     featured: true,
   },
   {
@@ -167,6 +171,8 @@ export const DEFAULT_EVENT_VIDEOS: EventVideoItem[] = [
     description:
       "A glimpse of guests enjoying the booth, props, prints and instant memories at a wedding celebration.",
     youtubeUrl: "",
+    videoUrl: "",
+    thumbnailUrl: "",
   },
   {
     id: "party-photo-booth-fun",
@@ -174,6 +180,8 @@ export const DEFAULT_EVENT_VIDEOS: EventVideoItem[] = [
     description:
       "Fun event moments captured through the photobooth experience.",
     youtubeUrl: "",
+    videoUrl: "",
+    thumbnailUrl: "",
   },
 ];
 
@@ -278,6 +286,7 @@ export const DEFAULT_CONTENT: SiteContent = {
 
 export function mergeContent(partial: Partial<SiteContent> | null | undefined): SiteContent {
   if (!partial) return DEFAULT_CONTENT;
+
   return {
     packages: Array.isArray(partial.packages) && partial.packages.length ? partial.packages : DEFAULT_PACKAGES,
     gallery: Array.isArray(partial.gallery) && partial.gallery.length ? partial.gallery : DEFAULT_GALLERY,
