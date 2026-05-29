@@ -322,9 +322,14 @@ export const Route = createFileRoute("/api/content")({
 
         await writeContent(clean);
 
-        return new Response(JSON.stringify({ ok: true, content: clean }), {
-          headers: { "content-type": "application/json" },
-        });
+        return new Response(JSON.stringify(content), {
+  headers: {
+    "content-type": "application/json",
+    "cache-control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+    pragma: "no-cache",
+    expires: "0",
+  },
+});
       },
     },
   },
