@@ -1348,6 +1348,7 @@ function PastEventsTab({
         date: "",
         coverImage: "",
         galleryUrl: "",
+        passcode: "",
         note: "Password protected gallery. Please use the password shared with you.",
       },
     ]);
@@ -1455,6 +1456,7 @@ function PastEventEditor({
         <AdminField label="Event Title" value={item.title} onChange={(v) => onChange({ title: v })} />
         <AdminField label="Event Date" value={item.date} placeholder="e.g. 12 April 2026" onChange={(v) => onChange({ date: v })} />
         <AdminField label="Cloud Gallery URL" value={item.galleryUrl} placeholder="https://..." onChange={(v) => onChange({ galleryUrl: v })} />
+        <AdminField label="Gallery Passcode" value={item.passcode || ""} placeholder="e.g. BDAY2026" onChange={(v) => onChange({ passcode: v })} />
 
         <div>
           <label className="block text-xs uppercase tracking-widest text-muted-foreground mb-2">Password Note / Instructions</label>
