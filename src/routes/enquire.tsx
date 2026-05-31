@@ -58,18 +58,55 @@ function EnquirePage() {
   }, []);
 
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const form = e.currentTarget;
-    setSubmitting(true);
+  e.preventDefault();
 
-    setTimeout(() => {
-      setSubmitting(false);
-      setSubmitted(true);
-      form.reset();
+  const form = e.currentTarget;
+  const data = new FormData(form);
 
-      toast.success("Enquiry sent! We'll be in touch within 24 hours.");
-    }, 700);
-  };
+  const name = data.get("name") || "";
+  const email = data.get("email") || "";
+  const phone = data.get("phone") || "";
+  const eventType = data.get("eventType") || "";
+  const date = data.get("date") || "";
+  const location = data.get("location") || "";
+  const packageName = data.get("package") || "";
+  const addOn = data.get("addOn") || "";
+  const message = data.get("message") || "";
+
+  const whatsappMessage = `
+🎉 New Photobooth Enquiry
+
+Name: ${name}
+Email: ${email}
+Phone: ${phone}
+
+Event Type: ${eventType}
+Event Date: ${date}
+Location: ${location}
+
+Package: ${packageName}
+Add-On: ${addOn}
+
+Message:
+${message}
+`;
+
+  const whatsappUrl =
+    `https://wa.me/61419678189?text=${encodeURIComponent(whatsappMessage)}`;
+
+  setSubmitting(true);
+
+  setTimeout(() => {
+    setSubmitting(false);
+
+    window.open(whatsappUrl, "_blank");
+
+    setSubmitted(true);
+    form.reset();
+
+    toast.success("Opening WhatsApp...");
+  }, 300);
+};
 
   return (
     <div className="min-h-screen bg-background">
