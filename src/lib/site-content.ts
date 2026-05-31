@@ -31,6 +31,7 @@ export type PastEventItem = {
   date: string;
   coverImage: string;
   galleryUrl: string;
+  passcode?: string;
   note: string;
 };
 
@@ -150,6 +151,7 @@ export const DEFAULT_PAST_EVENTS: PastEventItem[] = [
     coverImage:
       "https://images.unsplash.com/photo-1519225421980-715cb0215aed?auto=format&fit=crop&w=900&q=80",
     galleryUrl: "https://your-cloud-gallery-link.com",
+    passcode: "",
     note: "Password protected gallery. Please use the password shared with you.",
   },
 ];
