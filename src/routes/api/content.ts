@@ -169,13 +169,14 @@ function sanitizePastEvents(input: unknown): PastEventItem[] {
     const x = e as Partial<PastEventItem>;
 
     return {
-      id: String(x.id || crypto.randomUUID()).slice(0, 80),
-      title: String(x.title || "").slice(0, 120),
-      date: String(x.date || "").slice(0, 80),
-      coverImage: String(x.coverImage || "").slice(0, MAX_IMG),
-      galleryUrl: String(x.galleryUrl || "").slice(0, 500),
-      note: String(x.note || "").slice(0, 500),
-    };
+  id: String(x.id || crypto.randomUUID()).slice(0, 80),
+  title: String(x.title || "").slice(0, 120),
+  date: String(x.date || "").slice(0, 80),
+  coverImage: String(x.coverImage || "").slice(0, MAX_IMG),
+  galleryUrl: String(x.galleryUrl || "").slice(0, 500),
+  passcode: String(x.passcode || "").slice(0, 80),
+  note: String(x.note || "").slice(0, 500),
+};
   });
 }
 
