@@ -8,7 +8,7 @@ import { type Package } from "@/lib/packages";
 import { SiteHeader, SiteFooter } from "@/components/SiteChrome";
 import { Toaster } from "@/components/ui/sonner";
 import { useSiteContent } from "@/hooks/use-site-content";
-import type { ContactContent } from "@/lib/site-content";
+import type { ContactContent, PastEventItem } from "@/lib/site-content";
 import { EventVideos } from "@/components/EventVideos";
 
 export const Route = createFileRoute("/")({
@@ -31,6 +31,10 @@ export const Route = createFileRoute("/")({
 function Home() {
   const content = useSiteContent();
   const { packages, gallery, about, contact, events, addOns, pastEvents, faqs, eventVideos } = content;
+
+  const [selectedGallery, setSelectedGallery] = useState<PastEventItem | null>(null);
+  const [galleryPasscode, setGalleryPasscode] = useState("");
+  const [galleryError, setGalleryError] = useState("");
 
   return (
     <div className="min-h-screen bg-background">
@@ -220,15 +224,18 @@ function Home() {
                   )}
 
                   {event.galleryUrl && (
-                    <a
-                      href={event.galleryUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSelectedGallery(event);
+                        setGalleryPasscode("");
+                        setGalleryError("");
+                      }}
                       className="inline-flex items-center gap-2 rounded-full gradient-gold px-5 py-3 text-sm font-bold text-ink shadow-luxe hover:scale-105 transition-transform"
                     >
                       View Gallery
                       <ExternalLink className="h-4 w-4" />
-                    </a>
+                    </button>
                   )}
                 </div>
               </div>
@@ -357,6 +364,94 @@ function Home() {
           </div>
         </div>
       </section>
+
+      {selectedGallery && (
+        <div
+          className="fixed inset-0 z-[100] bg-black/70 backdrop-blur-sm flex items-center justify-center px-4"
+          onClick={() => {
+            setSelectedGallery(null);
+            setGalleryPasscode("");
+            setGalleryError("");
+          }}
+        >
+          <div
+            className="bg-card rounded-3xl shadow-luxe border border-border w-full max-w-md p-6 sm:p-8"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 className="font-serif text-2xl text-foreground mb-2">
+              Enter Gallery Passcode
+            </h3>
+
+            <p className="text-sm text-muted-foreground mb-5">
+              Please enter the passcode provided for this event gallery.
+            </p>
+
+            {!selectedGallery.passcode ? (
+              <p className="rounded-2xl bg-destructive/10 text-destructive px-4 py-3 text-sm">
+                Passcode not set. Please contact the event organiser.
+              </p>
+            ) : (
+              <>
+                <input
+                  value={galleryPasscode}
+                  onChange={(e) => {
+                    setGalleryPasscode(e.target.value);
+                    setGalleryError("");
+                  }}
+                  placeholder="Enter passcode"
+                  className="w-full rounded-2xl border border-input bg-background px-4 py-3 text-base focus:border-gold focus:ring-2 focus:ring-gold/20 outline-none"
+                />
+
+                {galleryError && (
+                  <p className="text-sm text-destructive mt-3">
+                    {galleryError}
+                  </p>
+                )}
+              </>
+            )}
+
+            <div className="flex gap-3 mt-6">
+              <button
+                type="button"
+                onClick={() => {
+                  setSelectedGallery(null);
+                  setGalleryPasscode("");
+                  setGalleryError("");
+                }}
+                className="flex-1 rounded-full border border-border px-5 py-3 text-sm font-semibold hover:bg-muted transition"
+              >
+                Cancel
+              </button>
+
+              {selectedGallery.passcode && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    const entered = galleryPasscode.trim().toLowerCase();
+                    const expected = selectedGallery.passcode?.trim().toLowerCase();
+
+                    if (entered && expected && entered === expected) {
+                      window.open(
+                        selectedGallery.galleryUrl,
+                        "_blank",
+                        "noopener,noreferrer"
+                      );
+                      setSelectedGallery(null);
+                      setGalleryPasscode("");
+                      setGalleryError("");
+                    } else {
+                      setGalleryError("Incorrect passcode. Please try again.");
+                    }
+                  }}
+                  className="flex-1 rounded-full gradient-gold px-5 py-3 text-sm font-bold text-ink shadow-luxe hover:scale-105 transition-transform"
+                >
+                  Access Gallery
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       <ContactSection packages={packages} contact={contact} />
 
