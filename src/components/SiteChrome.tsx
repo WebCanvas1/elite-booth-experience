@@ -119,7 +119,7 @@ export function SiteHeader() {
 }
 
 export function SiteFooter() {
-  const { contact } = useSiteContent();
+  const { contact, googleReviewLink } = useSiteContent();
   const telHref = `tel:${contact.phone.replace(/\s+/g, "")}`;
 
   return (
@@ -135,8 +135,8 @@ export function SiteFooter() {
             {contact.location || "Melbourne"}.
           </p>
 
-          {(contact.instagram || contact.facebook) && (
-            <div className="flex gap-3 mt-4">
+          {(contact.instagram || contact.facebook || googleReviewLink) && (
+            <div className="flex flex-wrap gap-3 mt-4">
               {contact.instagram && (
                 <a
                   href={contact.instagram}
@@ -158,6 +158,19 @@ export function SiteFooter() {
                   className="h-10 w-10 inline-flex items-center justify-center rounded-full border border-border bg-card hover:text-gold hover:border-gold transition"
                 >
                   <Facebook className="h-4 w-4" />
+                </a>
+              )}
+
+              {googleReviewLink && (
+                <a
+                  href={googleReviewLink}
+                  target="_blank"
+                  rel="noreferrer"
+                  aria-label="Leave a Google Review"
+                  className="inline-flex items-center gap-2 rounded-full gradient-gold px-4 py-2 text-sm font-semibold text-ink shadow-luxe hover:scale-105 transition"
+                >
+                  <Star className="h-4 w-4 fill-ink" />
+                  Leave a Google Review
                 </a>
               )}
             </div>
