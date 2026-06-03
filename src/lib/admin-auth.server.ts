@@ -21,11 +21,9 @@ type KVLike = {
 
 export async function getKV(): Promise<KVLike | null> {
   try {
-    const env = globalThis as unknown as {
-      PHOTOBOOTH_KV?: KVLike;
-    };
+    const { env } = await import("cloudflare:workers");
 
-    return env.PHOTOBOOTH_KV ?? null;
+    return (env.PHOTOBOOTH_KV as KVLike | undefined) ?? null;
   } catch {
     return null;
   }
@@ -300,14 +298,12 @@ export async function sendResetEmail(
   toEmail: string,
   resetUrl: string
 ): Promise<void> {
-  const env = globalThis as unknown as {
-    RESEND_API_KEY?: string;
-    RESET_FROM_EMAIL?: string;
-  };
+  const { env } = await import("cloudflare:workers");
 
-  const apiKey = env.RESEND_API_KEY;
+  const apiKey = env.RESEND_API_KEY as string | undefined;
+
   const from =
-    env.RESET_FROM_EMAIL ||
+    (env.RESET_FROM_EMAIL as string | undefined) ||
     "Elite MagicBooth <onboarding@resend.dev>";
 
   if (!apiKey) {
