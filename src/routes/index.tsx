@@ -357,6 +357,21 @@ function Home() {
               </details>
             ))}
           </div>
+
+          {content.googleReviewLink && (
+            <div className="mt-12 text-center">
+              <p className="text-sm text-muted-foreground mb-4">Loved your experience with us?</p>
+              <a
+                href={content.googleReviewLink}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-2 rounded-full gradient-gold px-7 py-3.5 font-semibold text-ink shadow-luxe hover:scale-105 transition"
+              >
+                <Star className="h-4 w-4 fill-ink" />
+                Leave a Google Review
+              </a>
+            </div>
+          )}
         </div>
       </section>
 
@@ -688,8 +703,8 @@ function ContactSection({ packages, contact }: { packages: Package[]; contact: C
             )}
           </ul>
 
-          {(contact.instagram || contact.facebook) && (
-            <div className="flex gap-3 mt-6">
+          {(contact.instagram || contact.facebook || content.googleReviewLink) && (
+            <div className="flex flex-wrap gap-3 mt-6">
               {contact.instagram && (
                 <a href={contact.instagram} target="_blank" rel="noreferrer" aria-label="Instagram" className="h-11 w-11 inline-flex items-center justify-center rounded-full border border-border bg-card hover:text-gold hover:border-gold transition">
                   <Instagram className="h-4 w-4" />
@@ -699,6 +714,19 @@ function ContactSection({ packages, contact }: { packages: Package[]; contact: C
               {contact.facebook && (
                 <a href={contact.facebook} target="_blank" rel="noreferrer" aria-label="Facebook" className="h-11 w-11 inline-flex items-center justify-center rounded-full border border-border bg-card hover:text-gold hover:border-gold transition">
                   <Facebook className="h-4 w-4" />
+                </a>
+              )}
+
+              {content.googleReviewLink && (
+                <a
+                  href={content.googleReviewLink}
+                  target="_blank"
+                  rel="noreferrer"
+                  aria-label="Leave a Google Review"
+                  className="inline-flex items-center gap-2 rounded-full gradient-gold px-5 py-2.5 text-sm font-semibold text-ink shadow-luxe hover:scale-105 transition"
+                >
+                  <Star className="h-4 w-4 fill-ink" />
+                  Leave a Google Review
                 </a>
               )}
             </div>
