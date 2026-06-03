@@ -57,56 +57,54 @@ function EnquirePage() {
       .catch(() => {});
   }, []);
 
-  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-  e.preventDefault();
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
 
-  const form = e.currentTarget;
-  const data = new FormData(form);
+    const form = e.currentTarget;
+    const data = new FormData(form);
 
-  const name = data.get("name") || "";
-  const email = data.get("email") || "";
-  const phone = data.get("phone") || "";
-  const eventType = data.get("eventType") || "";
-  const date = data.get("date") || "";
-  const location = data.get("location") || "";
-  const packageName = data.get("package") || "";
-  const addOn = data.get("addOn") || "";
-  const message = data.get("message") || "";
+    setSubmitting(true);
 
-  const whatsappMessage = `
-🎉 New Photobooth Enquiry
+    try {
+      const response = await fetch("/api/enquiry", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: data.get("name"),
+          email: data.get("email"),
+          phone: data.get("phone"),
+          eventType: data.get("eventType"),
+          date: data.get("date"),
+          location: data.get("location"),
+          packageName: data.get("package"),
+          addOn: data.get("addOn"),
+          message: data.get("message"),
+          termsAccepted: data.get("termsAccepted") === "on",
+        }),
+      });
 
-Name: ${name}
-Email: ${email}
-Phone: ${phone}
+      const result = (await response.json().catch(() => ({}))) as {
+        ok?: boolean;
+        error?: string;
+      };
 
-Event Type: ${eventType}
-Event Date: ${date}
-Location: ${location}
+      if (!response.ok || !result.ok) {
+        throw new Error(result.error || "Failed to send enquiry");
+      }
 
-Package: ${packageName}
-Add-On: ${addOn}
+      setSubmitted(true);
+      form.reset();
 
-Message:
-${message}
-`;
-
-  const whatsappUrl =
-    `https://wa.me/61419678189?text=${encodeURIComponent(whatsappMessage)}`;
-
-  setSubmitting(true);
-
-  setTimeout(() => {
-    setSubmitting(false);
-
-    window.open(whatsappUrl, "_blank");
-
-    setSubmitted(true);
-    form.reset();
-
-    toast.success("Opening WhatsApp...");
-  }, 300);
-};
+      toast.success("Thank you! Your enquiry has been sent successfully.");
+    } catch (error) {
+      console.error(error);
+      toast.error("Unable to send enquiry. Please try again later.");
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background">
