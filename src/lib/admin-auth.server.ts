@@ -11,18 +11,21 @@ const RESET_TTL_SECONDS = 60 * 30;
 
 type KVLike = {
   get: (key: string) => Promise<string | null>;
-  put: (key: string, value: string, opts?: { expirationTtl?: number }) => Promise<void>;
+  put: (
+    key: string,
+    value: string,
+    opts?: { expirationTtl?: number }
+  ) => Promise<void>;
   delete: (key: string) => Promise<void>;
 };
 
 export async function getKV(): Promise<KVLike | null> {
   try {
-    // @ts-expect-error - cloudflare:workers is provided at runtime
-    const mod = (await import(/* @vite-ignore */ "cloudflare:workers").catch(() => null)) as
-      | { env?: Record<string, unknown> }
-      | null;
+    const env = globalThis as unknown as {
+      PHOTOBOOTH_KV?: KVLike;
+    };
 
-    return (mod?.env?.PHOTOBOOTH_KV as KVLike | undefined) ?? null;
+    return env.PHOTOBOOTH_KV ?? null;
   } catch {
     return null;
   }
@@ -41,7 +44,11 @@ function fromB64(b64: string): Uint8Array {
   return out;
 }
 
-async function pbkdf2(password: string, salt: Uint8Array, iterations: number): Promise<Uint8Array> {
+async function pbkdf2(
+  password: string,
+  salt: Uint8Array,
+  iterations: number
+): Promise<Uint8Array> {
   const enc = new TextEncoder();
 
   const key = await crypto.subtle.importKey(
@@ -89,7 +96,10 @@ function resetKey(token: string) {
   return `admin:reset:${token}`;
 }
 
-export async function setAdminPassword(email: string, password: string): Promise<void> {
+export async function setAdminPassword(
+  email: string,
+  password: string
+): Promise<void> {
   const normalisedEmail = email.trim().toLowerCase();
 
   if (!isAllowedAdminEmail(normalisedEmail)) {
@@ -114,7 +124,10 @@ export async function setAdminPassword(email: string, password: string): Promise
   await kv.put(pwKey(normalisedEmail), JSON.stringify(rec));
 }
 
-export async function verifyAdminCredentials(email: string, password: string): Promise<boolean> {
+export async function verifyAdminCredentials(
+  email: string,
+  password: string
+): Promise<boolean> {
   const normalisedEmail = email.trim().toLowerCase();
 
   if (!isAllowedAdminEmail(normalisedEmail)) return false;
@@ -140,7 +153,11 @@ export async function verifyAdminCredentials(email: string, password: string): P
     const rec = JSON.parse(raw) as PwRecord;
     const salt = fromB64(rec.salt);
     const expected = fromB64(rec.hash);
-    const actual = await pbkdf2(password, salt, rec.iterations || PBKDF2_ITERATIONS);
+    const actual = await pbkdf2(
+      password,
+      salt,
+      rec.iterations || PBKDF2_ITERATIONS
+    );
 
     return timingSafeEqual(actual, expected);
   } catch {
@@ -162,7 +179,9 @@ export async function issueResetToken(email: string): Promise<string> {
   });
 
   if (kv) {
-    await kv.put(resetKey(token), record, { expirationTtl: RESET_TTL_SECONDS });
+    await kv.put(resetKey(token), record, {
+      expirationTtl: RESET_TTL_SECONDS,
+    });
   }
 
   return token;
@@ -175,40 +194,64 @@ export async function consumeResetToken(
   if (!token) return { ok: false, reason: "Invalid token" };
 
   if (!newPassword || newPassword.length < 8) {
-    return { ok: false, reason: "Password must be at least 8 characters" };
+    return {
+      ok: false,
+      reason: "Password must be at least 8 characters",
+    };
   }
 
   const kv = await getKV();
 
   if (!kv) {
-    return { ok: false, reason: "Reset is not available without KV storage" };
+    return {
+      ok: false,
+      reason: "Reset is not available without KV storage",
+    };
   }
 
   const raw = await kv.get(resetKey(token));
 
   if (!raw) {
-    return { ok: false, reason: "Reset link is invalid or has expired" };
+    return {
+      ok: false,
+      reason: "Reset link is invalid or has expired",
+    };
   }
 
   try {
-    const rec = JSON.parse(raw) as { email: string; expiresAt: number };
+    const rec = JSON.parse(raw) as {
+      email: string;
+      expiresAt: number;
+    };
 
     if (Date.now() > rec.expiresAt) {
       await kv.delete(resetKey(token));
-      return { ok: false, reason: "Reset link has expired" };
+      return {
+        ok: false,
+        reason: "Reset link has expired",
+      };
     }
 
     if (!isAllowedAdminEmail(rec.email)) {
       await kv.delete(resetKey(token));
-      return { ok: false, reason: "Email no longer authorised" };
+      return {
+        ok: false,
+        reason: "Email no longer authorised",
+      };
     }
 
     await setAdminPassword(rec.email, newPassword);
     await kv.delete(resetKey(token));
 
-    return { ok: true, email: rec.email };
+    return {
+      ok: true,
+      email: rec.email,
+    };
   } catch {
-    return { ok: false, reason: "Reset link is invalid" };
+    return {
+      ok: false,
+      reason: "Reset link is invalid",
+    };
   }
 }
 
@@ -220,33 +263,52 @@ export async function resetPasswordWithMasterCode(
   const normalisedEmail = email.trim().toLowerCase();
 
   if (!isAllowedAdminEmail(normalisedEmail)) {
-    return { ok: false, reason: "Unauthorised email" };
+    return {
+      ok: false,
+      reason: "Unauthorised email",
+    };
   }
 
   if (resetCode !== MASTER_RESET_CODE) {
-    return { ok: false, reason: "Invalid reset code" };
+    return {
+      ok: false,
+      reason: "Invalid reset code",
+    };
   }
 
   if (!password || password.length < 8) {
-    return { ok: false, reason: "Password must be at least 8 characters" };
+    return {
+      ok: false,
+      reason: "Password must be at least 8 characters",
+    };
   }
 
   try {
     await setAdminPassword(normalisedEmail, password);
-    return { ok: true };
+    return {
+      ok: true,
+    };
   } catch {
-    return { ok: false, reason: "Unable to update password" };
+    return {
+      ok: false,
+      reason: "Unable to update password",
+    };
   }
 }
 
-export async function sendResetEmail(toEmail: string, resetUrl: string): Promise<void> {
-  // @ts-expect-error - cloudflare:workers is provided at runtime
-  const mod = (await import(/* @vite-ignore */ "cloudflare:workers").catch(() => null)) as
-    | { env?: Record<string, string> }
-    | null;
+export async function sendResetEmail(
+  toEmail: string,
+  resetUrl: string
+): Promise<void> {
+  const env = globalThis as unknown as {
+    RESEND_API_KEY?: string;
+    RESET_FROM_EMAIL?: string;
+  };
 
-  const apiKey = mod?.env?.RESEND_API_KEY;
-  const from = mod?.env?.RESET_FROM_EMAIL || "Elite MagicBooth <onboarding@resend.dev>";
+  const apiKey = env.RESEND_API_KEY;
+  const from =
+    env.RESET_FROM_EMAIL ||
+    "Elite MagicBooth <onboarding@resend.dev>";
 
   if (!apiKey) {
     console.log(`[admin-reset] reset link for ${toEmail}: ${resetUrl}`);
