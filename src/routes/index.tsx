@@ -620,15 +620,6 @@ function Hero() {
           <div className="absolute -top-6 -left-6 glass-card rounded-2xl p-3 shadow-luxe animate-float">
             <img src={logo} alt="Elite MagicBooth" className="h-14 w-14 rounded-full" />
           </div>
-
-          <div
-            className="absolute -bottom-6 -right-6 glass-card rounded-2xl px-5 py-4 shadow-luxe animate-float"
-            style={{ animationDelay: "1.5s" }}
-          >
-            <p className="text-xs uppercase tracking-widest text-gold mb-1">Loved by</p>
-            <p className="font-serif text-2xl text-foreground">500+ Events</p>
-            <p className="text-xs text-muted-foreground">across Melbourne</p>
-          </div>
         </div>
       </div>
 
