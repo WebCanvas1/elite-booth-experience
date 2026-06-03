@@ -341,6 +341,11 @@ export const Route = createFileRoute("/api/content")({
             body!.googleReviewLink !== undefined
               ? String(body!.googleReviewLink || "").slice(0, 500)
               : current.googleReviewLink,
+
+          googleReviewsEmbedCode:
+            body!.googleReviewsEmbedCode !== undefined
+              ? String(body!.googleReviewsEmbedCode || "").slice(0, 10000)
+              : current.googleReviewsEmbedCode,
         };
 
         await writeContent(clean);
