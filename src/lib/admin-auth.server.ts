@@ -17,6 +17,7 @@ type KVLike = {
 
 export async function getKV(): Promise<KVLike | null> {
   try {
+    // @ts-expect-error - cloudflare:workers is provided at runtime
     const mod = (await import(/* @vite-ignore */ "cloudflare:workers").catch(() => null)) as
       | { env?: Record<string, unknown> }
       | null;
@@ -239,6 +240,7 @@ export async function resetPasswordWithMasterCode(
 }
 
 export async function sendResetEmail(toEmail: string, resetUrl: string): Promise<void> {
+  // @ts-expect-error - cloudflare:workers is provided at runtime
   const mod = (await import(/* @vite-ignore */ "cloudflare:workers").catch(() => null)) as
     | { env?: Record<string, string> }
     | null;

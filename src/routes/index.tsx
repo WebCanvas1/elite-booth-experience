@@ -256,11 +256,6 @@ function Home() {
               loading="lazy"
               className="rounded-3xl shadow-luxe w-full aspect-[4/5] object-cover"
             />
-
-            <div className="absolute -bottom-6 -right-6 hidden md:block bg-card rounded-2xl p-6 shadow-luxe border border-border max-w-[220px]">
-              <p className="text-3xl font-serif text-gradient-gold">500+</p>
-              <p className="text-sm text-muted-foreground">events styled across {contact.location || "Melbourne"}</p>
-            </div>
           </div>
 
           <div>
@@ -607,8 +602,6 @@ function Hero() {
               ))}
               <span className="ml-1 font-medium text-white">5.0</span>
             </div>
-            <span className="h-4 w-px bg-white/30" />
-            <span><strong className="text-white">500+</strong> events styled</span>
             <span className="h-4 w-px bg-white/30 hidden sm:inline-block" />
             <span className="hidden sm:inline">Unlimited prints · QR sharing</span>
           </div>
