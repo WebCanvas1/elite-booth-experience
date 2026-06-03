@@ -84,6 +84,7 @@ export type SiteContent = {
   faqs: FAQItem[];
   terms: PolicyContent;
   privacy: PolicyContent;
+  googleReviewLink: string;
 };
 
 export const DEFAULT_GALLERY: string[] = [
@@ -284,6 +285,7 @@ export const DEFAULT_CONTENT: SiteContent = {
   faqs: DEFAULT_FAQS,
   terms: DEFAULT_TERMS,
   privacy: DEFAULT_PRIVACY,
+  googleReviewLink: "",
 };
 
 export function mergeContent(partial: Partial<SiteContent> | null | undefined): SiteContent {
@@ -305,5 +307,6 @@ export function mergeContent(partial: Partial<SiteContent> | null | undefined): 
     privacy: partial.privacy
       ? { ...DEFAULT_PRIVACY, ...partial.privacy, sections: Array.isArray(partial.privacy.sections) && partial.privacy.sections.length ? partial.privacy.sections : DEFAULT_PRIVACY.sections }
       : DEFAULT_PRIVACY,
+    googleReviewLink: typeof partial.googleReviewLink === "string" ? partial.googleReviewLink : DEFAULT_CONTENT.googleReviewLink,
   };
 }
