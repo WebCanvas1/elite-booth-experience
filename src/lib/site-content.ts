@@ -85,6 +85,7 @@ export type SiteContent = {
   terms: PolicyContent;
   privacy: PolicyContent;
   googleReviewLink: string;
+  googleReviewsEmbedCode: string;
 };
 
 export const DEFAULT_GALLERY: string[] = [
@@ -217,7 +218,11 @@ export const DEFAULT_FAQS: FAQItem[] = [
 
 const ad = (title: string, description: string, price: string, image: string, popular = false): AddOnItem => ({
   id: title.toLowerCase().replace(/\s+/g, "-"),
-  title, description, price, image, popular,
+  title,
+  description,
+  price,
+  image,
+  popular,
 });
 
 export const DEFAULT_ADDONS: AddOnItem[] = [
@@ -235,7 +240,8 @@ export const DEFAULT_ADDONS: AddOnItem[] = [
 
 const sec = (heading: string, body: string): PolicySection => ({
   id: heading.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
-  heading, body,
+  heading,
+  body,
 });
 
 export const DEFAULT_TERMS: PolicyContent = {
@@ -286,27 +292,86 @@ export const DEFAULT_CONTENT: SiteContent = {
   terms: DEFAULT_TERMS,
   privacy: DEFAULT_PRIVACY,
   googleReviewLink: "",
+  googleReviewsEmbedCode: "",
 };
 
-export function mergeContent(partial: Partial<SiteContent> | null | undefined): SiteContent {
+export function mergeContent(
+  partial: Partial<SiteContent> | null | undefined
+): SiteContent {
   if (!partial) return DEFAULT_CONTENT;
 
   return {
-    packages: Array.isArray(partial.packages) && partial.packages.length ? partial.packages : DEFAULT_PACKAGES,
-    gallery: Array.isArray(partial.gallery) && partial.gallery.length ? partial.gallery : DEFAULT_GALLERY,
+    packages:
+      Array.isArray(partial.packages) && partial.packages.length
+        ? partial.packages
+        : DEFAULT_PACKAGES,
+
+    gallery:
+      Array.isArray(partial.gallery) && partial.gallery.length
+        ? partial.gallery
+        : DEFAULT_GALLERY,
+
     about: { ...DEFAULT_ABOUT, ...(partial.about || {}) },
+
     contact: { ...DEFAULT_CONTACT, ...(partial.contact || {}) },
-    events: Array.isArray(partial.events) && partial.events.length ? partial.events : DEFAULT_EVENTS,
-    pastEvents: Array.isArray(partial.pastEvents) && partial.pastEvents.length ? partial.pastEvents : DEFAULT_PAST_EVENTS,
-    eventVideos: Array.isArray(partial.eventVideos) && partial.eventVideos.length ? partial.eventVideos : DEFAULT_EVENT_VIDEOS,
-    addOns: Array.isArray(partial.addOns) && partial.addOns.length ? partial.addOns : DEFAULT_ADDONS,
-    faqs: Array.isArray(partial.faqs) && partial.faqs.length ? partial.faqs : DEFAULT_FAQS,
+
+    events:
+      Array.isArray(partial.events) && partial.events.length
+        ? partial.events
+        : DEFAULT_EVENTS,
+
+    pastEvents:
+      Array.isArray(partial.pastEvents) && partial.pastEvents.length
+        ? partial.pastEvents
+        : DEFAULT_PAST_EVENTS,
+
+    eventVideos:
+      Array.isArray(partial.eventVideos) && partial.eventVideos.length
+        ? partial.eventVideos
+        : DEFAULT_EVENT_VIDEOS,
+
+    addOns:
+      Array.isArray(partial.addOns) && partial.addOns.length
+        ? partial.addOns
+        : DEFAULT_ADDONS,
+
+    faqs:
+      Array.isArray(partial.faqs) && partial.faqs.length
+        ? partial.faqs
+        : DEFAULT_FAQS,
+
     terms: partial.terms
-      ? { ...DEFAULT_TERMS, ...partial.terms, sections: Array.isArray(partial.terms.sections) && partial.terms.sections.length ? partial.terms.sections : DEFAULT_TERMS.sections }
+      ? {
+          ...DEFAULT_TERMS,
+          ...partial.terms,
+          sections:
+            Array.isArray(partial.terms.sections) &&
+            partial.terms.sections.length
+              ? partial.terms.sections
+              : DEFAULT_TERMS.sections,
+        }
       : DEFAULT_TERMS,
+
     privacy: partial.privacy
-      ? { ...DEFAULT_PRIVACY, ...partial.privacy, sections: Array.isArray(partial.privacy.sections) && partial.privacy.sections.length ? partial.privacy.sections : DEFAULT_PRIVACY.sections }
+      ? {
+          ...DEFAULT_PRIVACY,
+          ...partial.privacy,
+          sections:
+            Array.isArray(partial.privacy.sections) &&
+            partial.privacy.sections.length
+              ? partial.privacy.sections
+              : DEFAULT_PRIVACY.sections,
+        }
       : DEFAULT_PRIVACY,
-    googleReviewLink: typeof partial.googleReviewLink === "string" ? partial.googleReviewLink : DEFAULT_CONTENT.googleReviewLink,
+
+    googleReviewLink:
+      typeof partial.googleReviewLink === "string"
+        ? partial.googleReviewLink
+        : DEFAULT_CONTENT.googleReviewLink,
+
+    googleReviewsEmbedCode:
+      typeof partial.googleReviewsEmbedCode === "string"
+        ? partial.googleReviewsEmbedCode
+        : DEFAULT_CONTENT.googleReviewsEmbedCode,
   };
 }
