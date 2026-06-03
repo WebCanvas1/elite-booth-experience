@@ -38,11 +38,9 @@ const NO_CACHE_HEADERS = {
 
 async function getKV(): Promise<KVLike | null> {
   try {
-    const env = globalThis as unknown as {
-      PHOTOBOOTH_KV?: KVLike;
-    };
+    const { env } = await import("cloudflare:workers");
 
-    return env.PHOTOBOOTH_KV ?? null;
+    return (env.PHOTOBOOTH_KV as KVLike | undefined) ?? null;
   } catch {
     return null;
   }
