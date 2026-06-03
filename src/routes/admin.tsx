@@ -466,7 +466,12 @@ function Dashboard({ creds, onLogout }: { creds: AdminCreds; onLogout: () => voi
         )}
 
         {tab === "contact" && (
-          <ContactTab contact={content.contact} onChange={(contact) => setContent((c) => ({ ...c, contact }))} />
+          <ContactTab
+            contact={content.contact}
+            googleReviewLink={content.googleReviewLink}
+            onChange={(contact) => setContent((c) => ({ ...c, contact }))}
+            onReviewLinkChange={(googleReviewLink) => setContent((c) => ({ ...c, googleReviewLink }))}
+          />
         )}
 
         {tab === "addons" && (
@@ -853,7 +858,7 @@ function AboutTab({ about, onChange }: { about: AboutContent; onChange: (a: Abou
 
 /* ======================== CONTACT TAB ======================== */
 
-function ContactTab({ contact, onChange }: { contact: ContactContent; onChange: (c: ContactContent) => void }) {
+function ContactTab({ contact, googleReviewLink, onChange, onReviewLinkChange }: { contact: ContactContent; googleReviewLink: string; onChange: (c: ContactContent) => void; onReviewLinkChange: (v: string) => void }) {
   const u = (patch: Partial<ContactContent>) => onChange({ ...contact, ...patch });
 
   return (
@@ -876,6 +881,7 @@ function ContactTab({ contact, onChange }: { contact: ContactContent; onChange: 
           <AdminField label="Service area / Location" value={contact.location} onChange={(v) => u({ location: v })} />
           <AdminField label="Instagram URL" value={contact.instagram} placeholder="https://instagram.com/..." onChange={(v) => u({ instagram: v })} />
           <AdminField label="Facebook URL" value={contact.facebook} placeholder="https://facebook.com/..." onChange={(v) => u({ facebook: v })} />
+          <AdminField label="Google Review Link" value={googleReviewLink} placeholder="https://g.page/..." onChange={(v) => onReviewLinkChange(v)} />
         </div>
       </div>
     </div>

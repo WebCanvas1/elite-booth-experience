@@ -335,6 +335,11 @@ export const Route = createFileRoute("/api/content")({
             body!.privacy !== undefined
               ? sanitizePolicy(body!.privacy, DEFAULT_CONTENT.privacy)
               : current.privacy,
+
+          googleReviewLink:
+            body!.googleReviewLink !== undefined
+              ? String(body!.googleReviewLink || "").slice(0, 500)
+              : current.googleReviewLink,
         };
 
         await writeContent(clean);

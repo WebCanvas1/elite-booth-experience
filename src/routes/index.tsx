@@ -256,11 +256,6 @@ function Home() {
               loading="lazy"
               className="rounded-3xl shadow-luxe w-full aspect-[4/5] object-cover"
             />
-
-            <div className="absolute -bottom-6 -right-6 hidden md:block bg-card rounded-2xl p-6 shadow-luxe border border-border max-w-[220px]">
-              <p className="text-3xl font-serif text-gradient-gold">500+</p>
-              <p className="text-sm text-muted-foreground">events styled across {contact.location || "Melbourne"}</p>
-            </div>
           </div>
 
           <div>
@@ -362,6 +357,21 @@ function Home() {
               </details>
             ))}
           </div>
+
+          {content.googleReviewLink && (
+            <div className="mt-12 text-center">
+              <p className="text-sm text-muted-foreground mb-4">Loved your experience with us?</p>
+              <a
+                href={content.googleReviewLink}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-2 rounded-full gradient-gold px-7 py-3.5 font-semibold text-ink shadow-luxe hover:scale-105 transition"
+              >
+                <Star className="h-4 w-4 fill-ink" />
+                Leave a Google Review
+              </a>
+            </div>
+          )}
         </div>
       </section>
 
@@ -453,7 +463,7 @@ function Home() {
         </div>
       )}
 
-      <ContactSection packages={packages} contact={contact} />
+      <ContactSection packages={packages} contact={contact} googleReviewLink={content.googleReviewLink} />
 
       <ScrollToTopButton />
 
@@ -607,8 +617,6 @@ function Hero() {
               ))}
               <span className="ml-1 font-medium text-white">5.0</span>
             </div>
-            <span className="h-4 w-px bg-white/30" />
-            <span><strong className="text-white">500+</strong> events styled</span>
             <span className="h-4 w-px bg-white/30 hidden sm:inline-block" />
             <span className="hidden sm:inline">Unlimited prints · QR sharing</span>
           </div>
@@ -626,15 +634,6 @@ function Hero() {
 
           <div className="absolute -top-6 -left-6 glass-card rounded-2xl p-3 shadow-luxe animate-float">
             <img src={logo} alt="Elite MagicBooth" className="h-14 w-14 rounded-full" />
-          </div>
-
-          <div
-            className="absolute -bottom-6 -right-6 glass-card rounded-2xl px-5 py-4 shadow-luxe animate-float"
-            style={{ animationDelay: "1.5s" }}
-          >
-            <p className="text-xs uppercase tracking-widest text-gold mb-1">Loved by</p>
-            <p className="font-serif text-2xl text-foreground">500+ Events</p>
-            <p className="text-xs text-muted-foreground">across Melbourne</p>
           </div>
         </div>
       </div>
@@ -654,7 +653,7 @@ function Hero() {
   );
 }
 
-function ContactSection({ packages, contact }: { packages: Package[]; contact: ContactContent }) {
+function ContactSection({ packages, contact, googleReviewLink }: { packages: Package[]; contact: ContactContent; googleReviewLink: string }) {
   const [submitting, setSubmitting] = useState(false);
 
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -704,8 +703,8 @@ function ContactSection({ packages, contact }: { packages: Package[]; contact: C
             )}
           </ul>
 
-          {(contact.instagram || contact.facebook) && (
-            <div className="flex gap-3 mt-6">
+          {(contact.instagram || contact.facebook || googleReviewLink) && (
+            <div className="flex flex-wrap gap-3 mt-6">
               {contact.instagram && (
                 <a href={contact.instagram} target="_blank" rel="noreferrer" aria-label="Instagram" className="h-11 w-11 inline-flex items-center justify-center rounded-full border border-border bg-card hover:text-gold hover:border-gold transition">
                   <Instagram className="h-4 w-4" />
@@ -715,6 +714,19 @@ function ContactSection({ packages, contact }: { packages: Package[]; contact: C
               {contact.facebook && (
                 <a href={contact.facebook} target="_blank" rel="noreferrer" aria-label="Facebook" className="h-11 w-11 inline-flex items-center justify-center rounded-full border border-border bg-card hover:text-gold hover:border-gold transition">
                   <Facebook className="h-4 w-4" />
+                </a>
+              )}
+
+              {googleReviewLink && (
+                <a
+                  href={googleReviewLink}
+                  target="_blank"
+                  rel="noreferrer"
+                  aria-label="Leave a Google Review"
+                  className="inline-flex items-center gap-2 rounded-full gradient-gold px-5 py-2.5 text-sm font-semibold text-ink shadow-luxe hover:scale-105 transition"
+                >
+                  <Star className="h-4 w-4 fill-ink" />
+                  Leave a Google Review
                 </a>
               )}
             </div>
