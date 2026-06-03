@@ -653,7 +653,7 @@ function Hero() {
   );
 }
 
-function ContactSection({ packages, contact }: { packages: Package[]; contact: ContactContent }) {
+function ContactSection({ packages, contact, googleReviewLink }: { packages: Package[]; contact: ContactContent; googleReviewLink: string }) {
   const [submitting, setSubmitting] = useState(false);
 
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
