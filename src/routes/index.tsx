@@ -30,7 +30,18 @@ export const Route = createFileRoute("/")({
 
 function Home() {
   const content = useSiteContent();
-  const { packages, gallery, about, contact, events, addOns, pastEvents, faqs, eventVideos } = content;
+  const {
+    packages,
+    gallery,
+    about,
+    contact,
+    events,
+    addOns,
+    pastEvents,
+    faqs,
+    eventVideos,
+    googleReviewsEmbedCode,
+  } = content;
 
   const [selectedGallery, setSelectedGallery] = useState<PastEventItem | null>(null);
   const [galleryPasscode, setGalleryPasscode] = useState("");
@@ -309,6 +320,34 @@ function Home() {
           ))}
         </div>
       </section>
+
+      {/* Google Reviews */}
+      {googleReviewsEmbedCode && (
+        <section id="reviews" className="bg-beige py-16 md:py-24">
+          <div className="max-w-6xl mx-auto px-5 sm:px-6">
+            <div className="text-center max-w-2xl mx-auto mb-12">
+              <p className="text-xs uppercase tracking-[0.3em] text-gold mb-3">
+                Reviews
+              </p>
+
+              <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl mb-4">
+                What Our Clients Say
+              </h2>
+
+              <p className="text-muted-foreground">
+                Real reviews from happy customers.
+              </p>
+            </div>
+
+            <div
+              className="bg-card rounded-3xl border border-border shadow-luxe p-4 overflow-hidden"
+              dangerouslySetInnerHTML={{
+                __html: googleReviewsEmbedCode,
+              }}
+            />
+          </div>
+        </section>
+      )}
 
       {/* Highlights */}
       <section className="max-w-7xl mx-auto px-5 sm:px-6 py-16 md:py-20 grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
