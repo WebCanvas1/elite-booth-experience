@@ -466,7 +466,12 @@ function Dashboard({ creds, onLogout }: { creds: AdminCreds; onLogout: () => voi
         )}
 
         {tab === "contact" && (
-          <ContactTab contact={content.contact} onChange={(contact) => setContent((c) => ({ ...c, contact }))} />
+          <ContactTab
+            contact={content.contact}
+            googleReviewLink={content.googleReviewLink}
+            onChange={(contact) => setContent((c) => ({ ...c, contact }))}
+            onReviewLinkChange={(googleReviewLink) => setContent((c) => ({ ...c, googleReviewLink }))}
+          />
         )}
 
         {tab === "addons" && (
