@@ -38,12 +38,11 @@ const NO_CACHE_HEADERS = {
 
 async function getKV(): Promise<KVLike | null> {
   try {
-    // @ts-expect-error - cloudflare:workers is provided at runtime by @cloudflare/vite-plugin
-    const mod = (await import(/* @vite-ignore */ "cloudflare:workers").catch(() => null)) as
-      | { env?: Record<string, unknown> }
-      | null;
-    const binding = mod?.env?.PHOTOBOOTH_KV as KVLike | undefined;
-    return binding ?? null;
+    const env = globalThis as unknown as {
+      PHOTOBOOTH_KV?: KVLike;
+    };
+
+    return env.PHOTOBOOTH_KV ?? null;
   } catch {
     return null;
   }
@@ -169,14 +168,14 @@ function sanitizePastEvents(input: unknown): PastEventItem[] {
     const x = e as Partial<PastEventItem>;
 
     return {
-  id: String(x.id || crypto.randomUUID()).slice(0, 80),
-  title: String(x.title || "").slice(0, 120),
-  date: String(x.date || "").slice(0, 80),
-  coverImage: String(x.coverImage || "").slice(0, MAX_IMG),
-  galleryUrl: String(x.galleryUrl || "").slice(0, 500),
-  passcode: String(x.passcode || "").slice(0, 80),
-  note: String(x.note || "").slice(0, 500),
-};
+      id: String(x.id || crypto.randomUUID()).slice(0, 80),
+      title: String(x.title || "").slice(0, 120),
+      date: String(x.date || "").slice(0, 80),
+      coverImage: String(x.coverImage || "").slice(0, MAX_IMG),
+      galleryUrl: String(x.galleryUrl || "").slice(0, 500),
+      passcode: String(x.passcode || "").slice(0, 80),
+      note: String(x.note || "").slice(0, 500),
+    };
   });
 }
 
@@ -269,7 +268,9 @@ export const Route = createFileRoute("/api/content")({
 
         const email = (body?.email || "").trim().toLowerCase();
         const password = body?.password || "";
-        const authed = body ? await verifyAdminCredentials(email, password) : false;
+        const authed = body
+          ? await verifyAdminCredentials(email, password)
+          : false;
 
         if (!authed) {
           return new Response(JSON.stringify({ error: "Unauthorized" }), {
