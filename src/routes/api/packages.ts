@@ -20,11 +20,9 @@ type KVLike = {
 
 async function getKV(): Promise<KVLike | null> {
   try {
-    const env = globalThis as unknown as {
-      PHOTOBOOTH_KV?: KVLike;
-    };
+    const { env } = await import("cloudflare:workers");
 
-    return env.PHOTOBOOTH_KV ?? null;
+    return (env.PHOTOBOOTH_KV as KVLike | undefined) ?? null;
   } catch {
     return null;
   }
@@ -118,27 +116,21 @@ export const Route = createFileRoute("/api/packages")({
           : false;
 
         if (!authed) {
-          return new Response(
-            JSON.stringify({ error: "Unauthorized" }),
-            {
-              status: 401,
-              headers: {
-                "content-type": "application/json",
-              },
-            }
-          );
+          return new Response(JSON.stringify({ error: "Unauthorized" }), {
+            status: 401,
+            headers: {
+              "content-type": "application/json",
+            },
+          });
         }
 
         if (!Array.isArray(body!.packages)) {
-          return new Response(
-            JSON.stringify({ error: "Invalid payload" }),
-            {
-              status: 400,
-              headers: {
-                "content-type": "application/json",
-              },
-            }
-          );
+          return new Response(JSON.stringify({ error: "Invalid payload" }), {
+            status: 400,
+            headers: {
+              "content-type": "application/json",
+            },
+          });
         }
 
         const clean: Package[] = body!.packages.map((p) => ({
@@ -147,9 +139,7 @@ export const Route = createFileRoute("/api/packages")({
           price: Number(p.price) || 0,
           image: String(p.image || "").slice(0, 2_500_000),
           features: Array.isArray(p.features)
-            ? p.features
-                .map((f) => String(f).slice(0, 300))
-                .slice(0, 50)
+            ? p.features.map((f) => String(f).slice(0, 300)).slice(0, 50)
             : [],
         }));
 
