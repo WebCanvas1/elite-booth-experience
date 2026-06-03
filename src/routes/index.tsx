@@ -719,7 +719,7 @@ function ContactSection({ packages, contact, googleReviewLink }: { packages: Pac
 
               {googleReviewLink && (
                 <a
-                  href={content.googleReviewLink}
+                  href={googleReviewLink}
                   target="_blank"
                   rel="noreferrer"
                   aria-label="Leave a Google Review"
