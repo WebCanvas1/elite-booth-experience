@@ -469,8 +469,12 @@ function Dashboard({ creds, onLogout }: { creds: AdminCreds; onLogout: () => voi
           <ContactTab
             contact={content.contact}
             googleReviewLink={content.googleReviewLink}
+            googleReviewsEmbedCode={content.googleReviewsEmbedCode}
             onChange={(contact) => setContent((c) => ({ ...c, contact }))}
             onReviewLinkChange={(googleReviewLink) => setContent((c) => ({ ...c, googleReviewLink }))}
+            onReviewsEmbedCodeChange={(googleReviewsEmbedCode) =>
+              setContent((c) => ({ ...c, googleReviewsEmbedCode }))
+            }
           />
         )}
 
@@ -858,12 +862,29 @@ function AboutTab({ about, onChange }: { about: AboutContent; onChange: (a: Abou
 
 /* ======================== CONTACT TAB ======================== */
 
-function ContactTab({ contact, googleReviewLink, onChange, onReviewLinkChange }: { contact: ContactContent; googleReviewLink: string; onChange: (c: ContactContent) => void; onReviewLinkChange: (v: string) => void }) {
+function ContactTab({
+  contact,
+  googleReviewLink,
+  googleReviewsEmbedCode,
+  onChange,
+  onReviewLinkChange,
+  onReviewsEmbedCodeChange,
+}: {
+  contact: ContactContent;
+  googleReviewLink: string;
+  googleReviewsEmbedCode: string;
+  onChange: (c: ContactContent) => void;
+  onReviewLinkChange: (v: string) => void;
+  onReviewsEmbedCodeChange: (v: string) => void;
+}) {
   const u = (patch: Partial<ContactContent>) => onChange({ ...contact, ...patch });
 
   return (
     <div>
-      <SectionHeader title="Contact Details" subtitle="Update contact info shown on the website and footer." />
+      <SectionHeader
+        title="Contact Details"
+        subtitle="Update contact info, Google review link, and Google reviews embed shown on the website."
+      />
       <div className="bg-card border border-border rounded-3xl p-5 sm:p-6 shadow-luxe/30 space-y-4">
         <AdminField label="Section heading" value={contact.heading} onChange={(v) => u({ heading: v })} />
         <div>
@@ -882,6 +903,22 @@ function ContactTab({ contact, googleReviewLink, onChange, onReviewLinkChange }:
           <AdminField label="Instagram URL" value={contact.instagram} placeholder="https://instagram.com/..." onChange={(v) => u({ instagram: v })} />
           <AdminField label="Facebook URL" value={contact.facebook} placeholder="https://facebook.com/..." onChange={(v) => u({ facebook: v })} />
           <AdminField label="Google Review Link" value={googleReviewLink} placeholder="https://g.page/..." onChange={(v) => onReviewLinkChange(v)} />
+        </div>
+
+        <div>
+          <label className="block text-xs uppercase tracking-widest text-muted-foreground mb-2">
+            Google Reviews Embed Code
+          </label>
+          <textarea
+            value={googleReviewsEmbedCode}
+            onChange={(e) => onReviewsEmbedCodeChange(e.target.value)}
+            rows={7}
+            placeholder="Paste Elfsight, Trustindex, SociableKit or other Google Reviews embed code here..."
+            className="w-full rounded-2xl border border-input bg-background px-4 py-3 text-base sm:text-sm font-mono focus:border-gold focus:ring-2 focus:ring-gold/20 outline-none"
+          />
+          <p className="mt-2 text-xs text-muted-foreground">
+            This is for displaying Google reviews on the website. Paste the full widget embed code provided by Elfsight, Trustindex, SociableKit, or a similar service.
+          </p>
         </div>
       </div>
     </div>
