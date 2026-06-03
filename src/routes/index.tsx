@@ -463,7 +463,7 @@ function Home() {
         </div>
       )}
 
-      <ContactSection packages={packages} contact={contact} />
+      <ContactSection packages={packages} contact={contact} googleReviewLink={content.googleReviewLink} />
 
       <ScrollToTopButton />
 
