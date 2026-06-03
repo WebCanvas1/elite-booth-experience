@@ -52,7 +52,7 @@ function Home() {
       <Toaster position="top-center" />
       <SiteHeader />
 
-      <Hero />
+      <Hero googleReviewLink={content.googleReviewLink} />
 
       {/* Packages */}
       <section id="packages" className="max-w-7xl mx-auto px-5 sm:px-6 py-16 md:py-24">
@@ -537,7 +537,11 @@ function ScrollToTopButton() {
   );
 }
 
-function Hero() {
+function Hero({
+  googleReviewLink,
+}: {
+  googleReviewLink: string;
+}) {
   const imgRef = useRef<HTMLImageElement>(null);
 
   useEffect(() => {
@@ -644,6 +648,18 @@ function Hero() {
               Book Now
               <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
             </Link>
+
+            {googleReviewLink && (
+              <a
+                href={googleReviewLink}
+                target="_blank"
+                rel="noreferrer"
+                className="group inline-flex items-center gap-2 rounded-full bg-white/10 backdrop-blur-md ring-1 ring-white/30 px-7 py-4 font-semibold text-white hover:text-ink hover:bg-gold transition"
+              >
+                <Star className="h-4 w-4 fill-current" />
+                Google Review
+              </a>
+            )}
           </div>
 
           <div
