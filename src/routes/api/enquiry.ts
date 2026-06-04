@@ -55,10 +55,7 @@ ${message}
             },
             body: JSON.stringify({
   from: "Elite MagicBooth <onboarding@resend.dev>",
-  to: [
-    "elitemagicbooth@gmail.com",
-    "webstarter17@gmail.com",
-  ],
+  to: ["webstarter17@gmail.com"],
   subject: `🎉 New Elite MagicBooth Enquiry - ${name}`,
   text: emailBody,
 }),
