@@ -711,14 +711,49 @@ function Hero({
 function ContactSection({ packages, contact, googleReviewLink }: { packages: Package[]; contact: ContactContent; googleReviewLink: string }) {
   const [submitting, setSubmitting] = useState(false);
 
-  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    const form = e.currentTarget;
+    const data = new FormData(form);
+
     setSubmitting(true);
-    setTimeout(() => {
+
+    try {
+      const response = await fetch("https://api.web3forms.com/submit", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify({
+          access_key: "dd4c178f-b3ce-4466-aacf-0b7283291071",
+          subject: "🎉 New Elite MagicBooth Homepage Quote Request",
+
+          name: data.get("name"),
+          email: data.get("email"),
+          phone: data.get("phone"),
+          eventDate: data.get("date"),
+          eventType: data.get("eventType"),
+          package: data.get("package"),
+          message: data.get("message"),
+        }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
+        throw new Error("Failed to send quote request");
+      }
+
+      form.reset();
+      toast.success("Thank you! Your quote request has been sent.");
+    } catch (error) {
+      console.error(error);
+      toast.error("Unable to send quote request. Please try again later.");
+    } finally {
       setSubmitting(false);
-      (e.target as HTMLFormElement).reset();
-      toast.success("Thank you! We'll be in touch within 24 hours.");
-    }, 600);
+    }
   };
 
   const telHref = `tel:${contact.phone.replace(/\s+/g, "")}`;
