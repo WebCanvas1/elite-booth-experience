@@ -57,54 +57,55 @@ function EnquirePage() {
       .catch(() => {});
   }, []);
 
-  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  e.preventDefault();
 
-    const form = e.currentTarget;
-    const data = new FormData(form);
+  const form = e.currentTarget;
+  const data = new FormData(form);
 
-    setSubmitting(true);
+  setSubmitting(true);
 
-    try {
-      const response = await fetch("/api/enquiry", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          name: data.get("name"),
-          email: data.get("email"),
-          phone: data.get("phone"),
-          eventType: data.get("eventType"),
-          date: data.get("date"),
-          location: data.get("location"),
-          packageName: data.get("package"),
-          addOn: data.get("addOn"),
-          message: data.get("message"),
-          termsAccepted: data.get("termsAccepted") === "on",
-        }),
-      });
+  try {
+    const response = await fetch("https://api.web3forms.com/submit", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: JSON.stringify({
+        access_key: "dd4c178f-b3ce-4466-aacf-0b7283291071",
+        subject: "🎉 New Elite MagicBooth Enquiry",
 
-      const result = (await response.json().catch(() => ({}))) as {
-        ok?: boolean;
-        error?: string;
-      };
+        name: data.get("name"),
+        email: data.get("email"),
+        phone: data.get("phone"),
+        eventType: data.get("eventType"),
+        eventDate: data.get("date"),
+        eventLocation: data.get("location"),
+        package: data.get("package"),
+        addOn: data.get("addOn"),
+        message: data.get("message"),
+        termsAccepted: data.get("termsAccepted") === "on",
+      }),
+    });
 
-      if (!response.ok || !result.ok) {
-        throw new Error(result.error || "Failed to send enquiry");
-      }
+    const result = await response.json();
 
-      setSubmitted(true);
-      form.reset();
-
-      toast.success("Thank you! Your enquiry has been sent successfully.");
-    } catch (error) {
-      console.error(error);
-      toast.error("Unable to send enquiry. Please try again later.");
-    } finally {
-      setSubmitting(false);
+    if (!response.ok || !result.success) {
+      throw new Error("Failed to send enquiry");
     }
-  };
+
+    setSubmitted(true);
+    form.reset();
+
+    toast.success("Thank you! Your enquiry has been sent successfully.");
+  } catch (error) {
+    console.error(error);
+    toast.error("Unable to send enquiry. Please try again later.");
+  } finally {
+    setSubmitting(false);
+  }
+};
 
   return (
     <div className="min-h-screen bg-background">
