@@ -31,7 +31,7 @@ export function SiteHeader() {
           </span>
         </Link>
 
-       <nav className="hidden md:flex items-center gap-6 lg:gap-7 text-sm font-medium">
+       <nav className="hidden lg:flex items-center gap-4 xl:gap-6 text-sm font-medium">
   <a href="/#packages" className={linkClass}>Packages</a>
   <a href="/#addons" className={linkClass}>Add-Ons</a>
   <a href="/#events" className={linkClass}>Events</a>
