@@ -205,14 +205,14 @@ function Home() {
                   )}
                 </div>
 
-                <div className="p-5 sm:p-6 flex flex-col flex-1">
-                  <h3 className="font-serif text-xl sm:text-2xl font-bold text-foreground mb-2">{a.title}</h3>
+                <div className="p-4 sm:p-5 flex flex-col flex-1">
+                  <h3 className="font-serif text-lg sm:text-xl font-bold text-foreground mb-2">{a.title}</h3>
                   <p className="text-sm text-muted-foreground leading-relaxed flex-1">{a.description}</p>
 
                   <Link
                     to="/enquire"
                     search={{ package: a.title }}
-                    className="mt-5 inline-flex items-center justify-center rounded-full gradient-gold px-5 py-3 text-sm font-bold text-ink shadow-luxe hover:scale-105 transition-transform"
+                    className="mt-4 inline-flex items-center justify-center rounded-full gradient-gold px-4 py-2.5 text-sm font-bold text-ink shadow-luxe hover:scale-105 transition-transform"
                   >
                     Enquire Now
                   </Link>
