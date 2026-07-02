@@ -40,7 +40,7 @@ function Home() {
     pastEvents,
     faqs,
     eventVideos,
-    googleReviewsEmbedCode,
+    reviews,
   } = content;
 
   const [selectedGallery, setSelectedGallery] = useState<PastEventItem | null>(null);
@@ -321,8 +321,8 @@ function Home() {
         </div>
       </section>
 
-      {/* Google Reviews */}
-      {googleReviewsEmbedCode && (
+      {/* Customer Reviews */}
+      {reviews.length > 0 && (
         <section id="reviews" className="bg-beige py-16 md:py-24">
           <div className="max-w-6xl mx-auto px-5 sm:px-6">
             <div className="text-center max-w-2xl mx-auto mb-12">
@@ -335,16 +335,54 @@ function Home() {
               </h2>
 
               <p className="text-muted-foreground">
-                Real reviews from happy customers.
+                Real feedback from happy customers who booked Elite MagicBooth.
               </p>
             </div>
 
-            <div
-              className="bg-card rounded-3xl border border-border shadow-luxe p-4 overflow-hidden"
-              dangerouslySetInnerHTML={{
-                __html: googleReviewsEmbedCode,
-              }}
-            />
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-6">
+              {reviews.map((review) => (
+                <div
+                  key={review.id}
+                  className="bg-card rounded-3xl border border-border shadow-luxe p-6 hover:-translate-y-1.5 transition-transform duration-500"
+                >
+                  <div className="flex items-center gap-1 mb-4">
+                    {Array.from({ length: Math.max(1, Math.min(5, review.rating)) }).map((_, i) => (
+                      <Star key={i} className="h-5 w-5 fill-gold text-gold" />
+                    ))}
+                  </div>
+
+                  <p className="text-muted-foreground leading-relaxed mb-6">
+                    “{review.review}”
+                  </p>
+
+                  <div className="border-t border-border pt-4">
+                    <p className="font-serif text-xl text-foreground">
+                      {review.name}
+                    </p>
+
+                    {review.eventType && (
+                      <p className="text-sm text-gold mt-1">
+                        {review.eventType}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {content.googleReviewLink && (
+              <div className="text-center mt-10">
+                <a
+                  href={content.googleReviewLink}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-2 rounded-full gradient-gold px-7 py-3.5 font-semibold text-ink shadow-luxe hover:scale-105 transition"
+                >
+                  <Star className="h-4 w-4 fill-ink" />
+                  Leave a Google Review
+                </a>
+              </div>
+            )}
           </div>
         </section>
       )}
