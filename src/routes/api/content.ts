@@ -97,14 +97,15 @@ function sanitizePackages(input: unknown): Package[] {
     const pkg = p as Partial<Package>;
 
     return {
-      id: String(pkg.id || crypto.randomUUID()),
-      name: String(pkg.name || "").slice(0, 100),
-      price: Number(pkg.price) || 0,
-      image: String(pkg.image || "").slice(0, MAX_IMG),
-      features: Array.isArray(pkg.features)
-        ? pkg.features.map((f) => String(f).slice(0, 300)).slice(0, 50)
-        : [],
-    };
+  id: String(pkg.id || crypto.randomUUID()),
+  name: String(pkg.name || "").slice(0, 100),
+  price: Number(pkg.price) || 0,
+  image: String(pkg.image || "").slice(0, MAX_IMG),
+  features: Array.isArray(pkg.features)
+    ? pkg.features.map((f) => String(f).slice(0, 300)).slice(0, 50)
+    : [],
+  popular: Boolean(pkg.popular),
+};
   });
 }
 
