@@ -69,10 +69,10 @@ function Home() {
             <div
               key={pkg.id}
               className={`group relative flex flex-col rounded-3xl bg-card border border-border overflow-hidden shadow-luxe hover:-translate-y-2 transition-transform duration-500 ${
-                i === 3 ? "ring-2 ring-gold" : ""
+                pkg.popular ? "ring-2 ring-gold" : ""
               }`}
             >
-              {i === 3 && (
+              {pkg.popular && (
                 <span className="absolute top-4 left-4 z-10 rounded-full gradient-gold px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-ink shadow-luxe">
                   Most Popular
                 </span>
