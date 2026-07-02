@@ -196,7 +196,7 @@ function Home() {
                   </span>
                 )}
 
-                <div className="relative aspect-[4/3] overflow-hidden">
+                <div className="relative aspect-[3/2] overflow-hidden">
                   <img src={a.image} alt={a.title} loading="lazy" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
                   {a.price && (
                     <div className="absolute bottom-3 right-3 rounded-full bg-card/95 backdrop-blur px-3 py-1.5 text-sm font-semibold text-foreground shadow-luxe border border-border">
