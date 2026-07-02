@@ -68,6 +68,7 @@ export const DEFAULT_PACKAGES: Package[] = [
   },
   {
     id: "elite",
+   popular: true,
     name: "Elite",
     price: 800,
     image:
