@@ -19,6 +19,7 @@ import {
   FileText,
   ShieldCheck,
   Video,
+  Star,
 } from "lucide-react";
 import { DEFAULT_PACKAGES, type Package } from "@/lib/packages";
 import {
@@ -34,6 +35,7 @@ import {
   type AddOnItem,
   type PolicyContent,
   type PolicySection,
+  type ReviewItem,
 } from "@/lib/site-content";
 import { Toaster } from "@/components/ui/sonner";
 import logo from "@/assets/logo.png";
@@ -351,6 +353,7 @@ type TabId =
   | "about"
   | "contact"
   | "faqs"
+  | "reviews"
   | "terms"
   | "privacy";
 
@@ -396,6 +399,7 @@ function Dashboard({ creds, onLogout }: { creds: AdminCreds; onLogout: () => voi
     { id: "about", label: "About", icon: Info },
     { id: "contact", label: "Contact", icon: Phone },
     { id: "faqs", label: "FAQ", icon: Info },
+    { id: "reviews", label: "Reviews", icon: Star },
     { id: "terms", label: "Terms", icon: FileText },
     { id: "privacy", label: "Privacy", icon: ShieldCheck },
   ];
@@ -504,6 +508,13 @@ function Dashboard({ creds, onLogout }: { creds: AdminCreds; onLogout: () => voi
           <FaqTab
             faqs={content.faqs}
             onChange={(faqs) => setContent((c) => ({ ...c, faqs }))}
+          />
+        )}
+
+        {tab === "reviews" && (
+          <ReviewsTab
+            reviews={content.reviews || []}
+            onChange={(reviews) => setContent((c) => ({ ...c, reviews }))}
           />
         )}
 
@@ -1614,6 +1625,168 @@ function FaqTab({
           ))}
         </div>
       )}
+    </div>
+  );
+}
+
+
+/* ======================== REVIEWS TAB ======================== */
+
+function ReviewsTab({
+  reviews,
+  onChange,
+}: {
+  reviews: ReviewItem[];
+  onChange: (r: ReviewItem[]) => void;
+}) {
+  const add = () =>
+    onChange([
+      ...reviews,
+      {
+        id: crypto.randomUUID(),
+        name: "New Customer",
+        rating: 5,
+        eventType: "Event",
+        review: "Write the customer review here.",
+      },
+    ]);
+
+  const remove = (idx: number) => onChange(reviews.filter((_, i) => i !== idx));
+
+  const update = (idx: number, patch: Partial<ReviewItem>) =>
+    onChange(reviews.map((r, i) => (i === idx ? { ...r, ...patch } : r)));
+
+  const move = (idx: number, dir: -1 | 1) => {
+    const j = idx + dir;
+    if (j < 0 || j >= reviews.length) return;
+    const next = [...reviews];
+    [next[idx], next[j]] = [next[j], next[idx]];
+    onChange(next);
+  };
+
+  return (
+    <div>
+      <SectionHeader
+        title="Customer Reviews"
+        subtitle="Add, edit, reorder, or remove customer reviews shown on the homepage. Click Save Changes to publish."
+        action={
+          <button onClick={add} className="inline-flex items-center justify-center gap-2 rounded-full border border-gold text-gold px-4 py-2.5 text-sm font-semibold hover:bg-gold hover:text-ink transition">
+            <Plus className="h-4 w-4" /> Add Review
+          </button>
+        }
+      />
+
+      {reviews.length === 0 ? (
+        <div className="text-center py-16 text-muted-foreground bg-card rounded-3xl border border-border border-dashed">
+          No reviews yet. Add one to show customer feedback on the homepage.
+        </div>
+      ) : (
+        <div className="space-y-5">
+          {reviews.map((review, idx) => (
+            <ReviewEditor
+              key={review.id}
+              item={review}
+              onChange={(patch) => update(idx, patch)}
+              onRemove={() => remove(idx)}
+              onMoveUp={() => move(idx, -1)}
+              onMoveDown={() => move(idx, 1)}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function ReviewEditor({
+  item,
+  onChange,
+  onRemove,
+  onMoveUp,
+  onMoveDown,
+}: {
+  item: ReviewItem;
+  onChange: (patch: Partial<ReviewItem>) => void;
+  onRemove: () => void;
+  onMoveUp: () => void;
+  onMoveDown: () => void;
+}) {
+  const safeRating = Math.max(1, Math.min(5, Number(item.rating) || 5));
+
+  return (
+    <div className="bg-card border border-border rounded-3xl p-5 sm:p-6 shadow-luxe/30 space-y-4">
+      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+        <div>
+          <h3 className="font-serif text-xl text-foreground">
+            {item.name || "Customer Review"}
+          </h3>
+          <div className="flex items-center gap-1 mt-2 text-gold">
+            {[1, 2, 3, 4, 5].map((star) => (
+              <button
+                key={star}
+                type="button"
+                onClick={() => onChange({ rating: star })}
+                className="hover:scale-110 transition"
+                aria-label={`Set rating to ${star} star${star === 1 ? "" : "s"}`}
+              >
+                <Star
+                  className={`h-5 w-5 ${star <= safeRating ? "fill-gold text-gold" : "text-muted-foreground"}`}
+                />
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="flex gap-2">
+          <button onClick={onMoveUp} className="inline-flex items-center justify-center rounded-full border border-border px-3 py-2 text-xs hover:text-gold">
+            <ArrowUp className="h-3.5 w-3.5" />
+          </button>
+          <button onClick={onMoveDown} className="inline-flex items-center justify-center rounded-full border border-border px-3 py-2 text-xs hover:text-gold">
+            <ArrowDown className="h-3.5 w-3.5" />
+          </button>
+          <button onClick={onRemove} className="inline-flex items-center justify-center gap-1 rounded-full border border-destructive/40 text-destructive px-3 py-2 text-xs hover:bg-destructive hover:text-destructive-foreground transition">
+            <Trash2 className="h-3.5 w-3.5" /> Delete
+          </button>
+        </div>
+      </div>
+
+      <div className="grid sm:grid-cols-3 gap-4">
+        <AdminField
+          label="Customer Name"
+          value={item.name}
+          placeholder="e.g. Sarah M."
+          onChange={(v) => onChange({ name: v })}
+        />
+
+        <AdminField
+          label="Event Type"
+          value={item.eventType}
+          placeholder="e.g. Wedding"
+          onChange={(v) => onChange({ eventType: v })}
+        />
+
+        <AdminField
+          label="Rating"
+          type="number"
+          value={String(safeRating)}
+          onChange={(v) =>
+            onChange({ rating: Math.max(1, Math.min(5, Number(v) || 5)) })
+          }
+        />
+      </div>
+
+      <div>
+        <label className="block text-xs uppercase tracking-widest text-muted-foreground mb-2">
+          Review Text
+        </label>
+        <textarea
+          value={item.review}
+          onChange={(e) => onChange({ review: e.target.value })}
+          rows={4}
+          placeholder="Write the customer review here..."
+          className="w-full rounded-2xl border border-input bg-background px-4 py-3 text-base sm:text-sm focus:border-gold focus:ring-2 focus:ring-gold/20 outline-none"
+        />
+      </div>
     </div>
   );
 }
