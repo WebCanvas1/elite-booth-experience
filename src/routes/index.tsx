@@ -30,8 +30,7 @@ export const Route = createFileRoute("/")({
 
 function Home() {
   const content = useSiteContent();
- 
-}
+
   const {
     packages,
     gallery,
