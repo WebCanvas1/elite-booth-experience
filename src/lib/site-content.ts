@@ -60,6 +60,14 @@ export type AddOnItem = {
   popular: boolean;
 };
 
+export type ReviewItem = {
+  id: string;
+  name: string;
+  rating: number;
+  eventType: string;
+  review: string;
+};
+
 export type PolicySection = {
   id: string;
   heading: string;
@@ -82,6 +90,7 @@ export type SiteContent = {
   eventVideos: EventVideoItem[];
   addOns: AddOnItem[];
   faqs: FAQItem[];
+  reviews: ReviewItem[];
   terms: PolicyContent;
   privacy: PolicyContent;
   googleReviewLink: string;
@@ -244,6 +253,33 @@ const sec = (heading: string, body: string): PolicySection => ({
   body,
 });
 
+export const DEFAULT_REVIEWS: ReviewItem[] = [
+  {
+    id: "1",
+    name: "Sarah M.",
+    rating: 5,
+    eventType: "Wedding",
+    review:
+      "Elite MagicBooth made our wedding unforgettable. The booth looked amazing and our guests absolutely loved it.",
+  },
+  {
+    id: "2",
+    name: "Daniel R.",
+    rating: 5,
+    eventType: "Birthday Party",
+    review:
+      "Professional service, great communication and fantastic quality prints. Highly recommend!",
+  },
+  {
+    id: "3",
+    name: "Emily T.",
+    rating: 5,
+    eventType: "Corporate Event",
+    review:
+      "A huge hit at our corporate event. The custom branding was perfect.",
+  },
+];
+
 export const DEFAULT_TERMS: PolicyContent = {
   heading: "Terms & Conditions",
   intro:
@@ -289,6 +325,7 @@ export const DEFAULT_CONTENT: SiteContent = {
   eventVideos: DEFAULT_EVENT_VIDEOS,
   addOns: DEFAULT_ADDONS,
   faqs: DEFAULT_FAQS,
+  reviews: DEFAULT_REVIEWS,
   terms: DEFAULT_TERMS,
   privacy: DEFAULT_PRIVACY,
   googleReviewLink: "",
@@ -339,6 +376,11 @@ export function mergeContent(
       Array.isArray(partial.faqs) && partial.faqs.length
         ? partial.faqs
         : DEFAULT_FAQS,
+
+    reviews:
+      Array.isArray(partial.reviews) && partial.reviews.length
+        ? partial.reviews
+        : DEFAULT_REVIEWS,
 
     terms: partial.terms
       ? {
