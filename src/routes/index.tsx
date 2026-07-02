@@ -187,7 +187,7 @@ function Home() {
             <p className="text-muted-foreground">Elevate your event with elegant optional extras, hand-picked to add extra magic.</p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
             {addOns.map((a) => (
               <div key={a.id} className="group relative flex flex-col rounded-3xl bg-card border border-border overflow-hidden shadow-luxe hover:-translate-y-1.5 transition-transform duration-500">
                 {a.popular && (
@@ -196,7 +196,7 @@ function Home() {
                   </span>
                 )}
 
-                <div className="relative aspect-[3/2] overflow-hidden">
+                <div className="relative aspect-[16/10] overflow-hidden">
                   <img src={a.image} alt={a.title} loading="lazy" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
                   {a.price && (
                     <div className="absolute bottom-3 right-3 rounded-full bg-card/95 backdrop-blur px-3 py-1.5 text-sm font-semibold text-foreground shadow-luxe border border-border">
@@ -205,14 +205,14 @@ function Home() {
                   )}
                 </div>
 
-                <div className="p-4 sm:p-5 flex flex-col flex-1">
-                  <h3 className="font-serif text-lg sm:text-xl font-bold text-foreground mb-2">{a.title}</h3>
+                <div className="p-3.5 sm:p-4 flex flex-col flex-1">
+                  <h3 className="font-serif text-base sm:text-lg font-bold text-foreground mb-2">{a.title}</h3>
                   <p className="text-sm text-muted-foreground leading-relaxed flex-1">{a.description}</p>
 
                   <Link
                     to="/enquire"
                     search={{ package: a.title }}
-                    className="mt-4 inline-flex items-center justify-center rounded-full gradient-gold px-4 py-2.5 text-sm font-bold text-ink shadow-luxe hover:scale-105 transition-transform"
+                    className="mt-3 inline-flex items-center justify-center rounded-full gradient-gold px-3 py-2 text-xs font-bold text-ink shadow-luxe hover:scale-105 transition-transform"
                   >
                     Enquire Now
                   </Link>
