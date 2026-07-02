@@ -14,6 +14,7 @@ import {
   type FAQItem,
   type PolicyContent,
   type PolicySection,
+  type ReviewItem,
 } from "@/lib/site-content";
 
 const KV_KEY = "site:v1";
@@ -226,6 +227,23 @@ function sanitizeFaqs(input: unknown): FAQItem[] {
   });
 }
 
+
+function sanitizeReviews(input: unknown): ReviewItem[] {
+  if (!Array.isArray(input)) return DEFAULT_CONTENT.reviews;
+
+  return input.slice(0, 30).map((r) => {
+    const x = r as Partial<ReviewItem>;
+
+    return {
+      id: String(x.id || crypto.randomUUID()).slice(0, 80),
+      name: String(x.name || "").slice(0, 100),
+      rating: Math.max(1, Math.min(5, Number(x.rating) || 5)),
+      eventType: String(x.eventType || "").slice(0, 100),
+      review: String(x.review || "").slice(0, 1000),
+    };
+  });
+}
+
 function sanitizePolicy(input: unknown, fallback: PolicyContent): PolicyContent {
   const p = (input || {}) as Partial<PolicyContent>;
 
@@ -324,6 +342,11 @@ export const Route = createFileRoute("/api/content")({
             body!.faqs !== undefined
               ? sanitizeFaqs(body!.faqs)
               : current.faqs,
+
+          reviews:
+            body!.reviews !== undefined
+              ? sanitizeReviews(body!.reviews)
+              : current.reviews,
 
           terms:
             body!.terms !== undefined
