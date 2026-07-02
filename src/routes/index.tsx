@@ -30,12 +30,7 @@ export const Route = createFileRoute("/")({
 
 function Home() {
   const content = useSiteContent();
-  if (!content) {
-  return (
-    <div className="min-h-screen bg-background flex items-center justify-center">
-      <p className="text-muted-foreground">Loading...</p>
-    </div>
-  );
+ 
 }
   const {
     packages,
