@@ -31,14 +31,15 @@ export function SiteHeader() {
           </span>
         </Link>
 
-        <nav className="hidden md:flex items-center gap-6 lg:gap-7 text-sm font-medium">
-          <a href="/#packages" className={linkClass}>Packages</a>
-          <a href="/#addons" className={linkClass}>Add-Ons</a>
-          <a href="/#events" className={linkClass}>Events</a>
-          <a href="/#about" className={linkClass}>About</a>
-          <a href="/#gallery" className={linkClass}>Capturing Moments</a>
-          <Link to="/enquire" className={linkClass}>Contact</Link>
-        </nav>
+       <nav className="hidden md:flex items-center gap-6 lg:gap-7 text-sm font-medium">
+  <a href="/#packages" className={linkClass}>Packages</a>
+  <a href="/#addons" className={linkClass}>Add-Ons</a>
+  <a href="/#events" className={linkClass}>Events</a>
+  <a href="/#event-galleries" className={linkClass}>Gallery</a>
+  <a href="/#about" className={linkClass}>About</a>
+  <a href="/#gallery" className={linkClass}>Capturing Moments</a>
+  <Link to="/enquire" className={linkClass}>Contact</Link>
+</nav>
 
         <div className="flex items-center gap-2">
           <Link
@@ -64,12 +65,13 @@ export function SiteHeader() {
         <div className="md:hidden border-t border-white/10 bg-[#111111]/95 backdrop-blur">
           <nav className="px-4 py-4 flex flex-col gap-1 text-base">
             {[
-              { href: "/#packages", label: "Packages" },
-              { href: "/#addons", label: "Add-Ons" },
-              { href: "/#events", label: "Events" },
-              { href: "/#about", label: "About" },
-              { href: "/#gallery", label: "Capturing Moments" },
-            ].map((l) => (
+  { href: "/#packages", label: "Packages" },
+  { href: "/#addons", label: "Add-Ons" },
+  { href: "/#events", label: "Events" },
+  { href: "/#event-galleries", label: "Gallery" },
+  { href: "/#about", label: "About" },
+  { href: "/#gallery", label: "Capturing Moments" },
+].map((l) => (
               <a
                 key={l.href}
                 href={l.href}
