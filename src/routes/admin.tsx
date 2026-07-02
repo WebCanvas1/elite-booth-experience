@@ -671,6 +671,19 @@ function PackageEditor({
           <p className="text-xs text-muted-foreground">
             Package image is uploaded from your device. Click <span className="text-gold font-semibold">Upload Image</span> to replace it.
           </p>
+          <label className="inline-flex items-center gap-2 text-sm">
+  <input
+    type="checkbox"
+    checked={Boolean(pkg.popular)}
+    onChange={(e) =>
+      onChange({
+        popular: e.target.checked,
+      })
+    }
+    className="h-4 w-4 accent-[oklch(0.78_0.11_80)]"
+  />
+  Show "Most Popular" badge
+</label>
 
           <div>
             <div className="flex items-center justify-between mb-2">
