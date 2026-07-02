@@ -4,6 +4,7 @@ export type Package = {
   price: number;
   image: string;
   features: string[];
+  popular?: boolean;
 };
 
 export const DEFAULT_PACKAGES: Package[] = [
