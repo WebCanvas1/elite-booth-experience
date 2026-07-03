@@ -21,7 +21,7 @@ export const Route = createFileRoute("/")({
           "Premium photobooth hire in Melbourne for weddings, birthdays, corporate events & more. Unlimited prints, custom templates, props, backdrops & digital sharing.",
       },
       { property: "og:title", content: "Elite MagicBooth — Premium Photobooth Hire" },
-      { property: "og:description", content: "Stylish photobooth experiences for unforgettable events in Melbourne." },
+      { property: "og:description", content: "Stylish photobooth experience for unforgettable events in Melbourne." },
       { property: "og:image", content: heroImg },
     ],
   }),
