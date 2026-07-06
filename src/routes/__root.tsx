@@ -15,25 +15,19 @@ function ScrollToTopOnRefresh() {
   React.useEffect(() => {
     if (typeof window === "undefined") return;
 
-    // Disable browser automatic scroll restoration
     if ("scrollRestoration" in window.history) {
       window.history.scrollRestoration = "manual";
     }
 
     const forceScrollTop = () => {
       window.scrollTo(0, 0);
-
       document.documentElement.scrollTop = 0;
       document.body.scrollTop = 0;
     };
 
-    // Scroll immediately
     forceScrollTop();
-
-    // Scroll again after render/hydration
     setTimeout(forceScrollTop, 50);
 
-    // Scroll before refresh/unload
     window.addEventListener("beforeunload", forceScrollTop);
 
     return () => {
@@ -49,7 +43,9 @@ function NotFoundComponent() {
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
         <h1 className="text-7xl font-bold text-foreground">404</h1>
-        <h2 className="mt-4 text-xl font-semibold text-foreground">Page not found</h2>
+        <h2 className="mt-4 text-xl font-semibold text-foreground">
+          Page not found
+        </h2>
         <p className="mt-2 text-sm text-muted-foreground">
           The page you're looking for doesn't exist or has been moved.
         </p>
@@ -66,7 +62,13 @@ function NotFoundComponent() {
   );
 }
 
-function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
+function ErrorComponent({
+  error,
+  reset,
+}: {
+  error: Error;
+  reset: () => void;
+}) {
   console.error(error);
   const router = useRouter();
 
@@ -77,7 +79,8 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
           This page didn't load
         </h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          Something went wrong on our end. You can try refreshing or head back home.
+          Something went wrong on our end. You can try refreshing or head back
+          home.
         </p>
         <div className="mt-6 flex flex-wrap justify-center gap-2">
           <button
@@ -101,20 +104,50 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   );
 }
 
-export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
+export const Route = createRootRouteWithContext<{
+  queryClient: QueryClient;
+}>()({
   head: () => ({
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Elite MagicBooth — Premium Photobooth Hire Melbourne" },
-      { name: "description", content: "Premium photobooth hire in Melbourne for weddings, birthdays, corporate events & more." },
-      { property: "og:title", content: "Elite MagicBooth — Premium Photobooth Hire Melbourne" },
+      {
+        title: "Elite MagicBooth — Premium Photobooth Hire Melbourne",
+      },
+      {
+        name: "description",
+        content:
+          "Premium photobooth hire in Melbourne for weddings, birthdays, corporate events & more.",
+      },
+      {
+        property: "og:title",
+        content: "Elite MagicBooth — Premium Photobooth Hire Melbourne",
+      },
       { property: "og:type", content: "website" },
-      { name: "twitter:title", content: "Elite MagicBooth — Premium Photobooth Hire Melbourne" },
-      { property: "og:description", content: "Premium photobooth hire in Melbourne for weddings, birthdays, corporate events & more." },
-      { name: "twitter:description", content: "Premium photobooth hire in Melbourne for weddings, birthdays, corporate events & more." },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/5c25a6b4-7945-4fb6-95f7-f6d08da3cc0e/id-preview-a60b3a0e--dd27fb5c-b90e-4f8e-a3a9-3a13a9d74be8.lovable.app-1779198622603.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/5c25a6b4-7945-4fb6-95f7-f6d08da3cc0e/id-preview-a60b3a0e--dd27fb5c-b90e-4f8e-a3a9-3a13a9d74be8.lovable.app-1779198622603.png" },
+      {
+        name: "twitter:title",
+        content: "Elite MagicBooth — Premium Photobooth Hire Melbourne",
+      },
+      {
+        property: "og:description",
+        content:
+          "Premium photobooth hire in Melbourne for weddings, birthdays, corporate events & more.",
+      },
+      {
+        name: "twitter:description",
+        content:
+          "Premium photobooth hire in Melbourne for weddings, birthdays, corporate events & more.",
+      },
+      {
+        property: "og:image",
+        content:
+          "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/5c25a6b4-7945-4fb6-95f7-f6d08da3cc0e/id-preview-a60b3a0e--dd27fb5c-b90e-4f8e-a3a9-3a13a9d74be8.lovable.app-1779198622603.png",
+      },
+      {
+        name: "twitter:image",
+        content:
+          "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/5c25a6b4-7945-4fb6-95f7-f6d08da3cc0e/id-preview-a60b3a0e--dd27fb5c-b90e-4f8e-a3a9-3a13a9d74be8.lovable.app-1779198622603.png",
+      },
       { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [
@@ -122,8 +155,15 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "icon", type: "image/png", href: "/favicon.png" },
       { rel: "apple-touch-icon", href: "/favicon.png" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
-      { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
-      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Inter:wght@300;400;500;600;700&display=swap" },
+      {
+        rel: "preconnect",
+        href: "https://fonts.gstatic.com",
+        crossOrigin: "anonymous",
+      },
+      {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Inter:wght@300;400;500;600;700&display=swap",
+      },
     ],
   }),
   shellComponent: RootShell,
@@ -137,7 +177,25 @@ function RootShell({ children }: { children: React.ReactNode }) {
     <html lang="en">
       <head>
         <HeadContent />
+
+        {/* Google Analytics */}
+        <script
+          async
+          src="https://www.googletagmanager.com/gtag/js?id=G-ZJMWZWR2XG"
+        ></script>
+
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', 'G-ZJMWZWR2XG');
+            `,
+          }}
+        />
       </head>
+
       <body className="overflow-x-hidden">
         {children}
         <Scripts />
