@@ -48,6 +48,34 @@ function Home() {
   const [galleryPasscode, setGalleryPasscode] = useState("");
   const [galleryError, setGalleryError] = useState("");
 
+  useEffect(() => {
+    const scrollToHashSection = () => {
+      const hash = window.location.hash;
+
+      if (!hash) return;
+
+      const sectionId = decodeURIComponent(hash.slice(1));
+      const section = document.getElementById(sectionId);
+
+      if (!section) return;
+
+      window.setTimeout(() => {
+        section.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+      }, 300);
+    };
+
+    scrollToHashSection();
+
+    window.addEventListener("hashchange", scrollToHashSection);
+
+    return () => {
+      window.removeEventListener("hashchange", scrollToHashSection);
+    };
+  }, [pastEvents.length]);
+
   return (
     <div className="min-h-screen bg-background">
       <Toaster position="top-center" />
@@ -254,7 +282,10 @@ function Home() {
       </section>
 
       {/* Event Galleries */}
-      <section id="event-galleries" className="bg-beige py-16 md:py-24">
+      <section
+        id="event-galleries"
+        className="bg-beige py-16 md:py-24 scroll-mt-24"
+      >
         <div className="max-w-7xl mx-auto px-5 sm:px-6">
           <div className="text-center max-w-2xl mx-auto mb-12">
             <p className="text-xs uppercase tracking-[0.3em] text-gold mb-3">
