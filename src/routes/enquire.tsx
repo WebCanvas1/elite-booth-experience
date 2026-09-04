@@ -5,10 +5,12 @@ import { toast } from "sonner";
 import { SiteHeader, SiteFooter } from "@/components/SiteChrome";
 import { Toaster } from "@/components/ui/sonner";
 import { DEFAULT_PACKAGES, type Package } from "@/lib/packages";
+import type { BackdropItem } from "@/lib/site-content";
 
 export const Route = createFileRoute("/enquire")({
   validateSearch: (search: Record<string, unknown>) => ({
     package: typeof search.package === "string" ? search.package : "",
+    backdrop: typeof search.backdrop === "string" ? search.backdrop : "",
   }),
   head: () => ({
     meta: [
@@ -32,8 +34,6 @@ const ADD_ONS = [
   "Red Carpet & Bollards",
   "Designer Scrapbook Album",
   "Extra Prints",
-  "Flower Walls",
-  "Premium Backdrops",
   "Neon Signs",
   "Custom Props",
   "Instant Sharing",
@@ -43,17 +43,30 @@ const ADD_ONS = [
 function EnquirePage() {
   const search = Route.useSearch();
   const selectedPackage = search.package || "";
+  const selectedBackdrop = search.backdrop || "";
 
   const [packages, setPackages] = useState<Package[]>(DEFAULT_PACKAGES);
+  const [backdrops, setBackdrops] = useState<BackdropItem[]>([]);
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
   useEffect(() => {
-    fetch("/api/packages")
+    fetch("/api/content")
       .then((r) => r.json())
-      .then((d: { packages?: Package[] }) => {
-        if (d.packages?.length) setPackages(d.packages);
-      })
+      .then(
+        (d: {
+          packages?: Package[];
+          backdrops?: BackdropItem[];
+        }) => {
+          if (d.packages?.length) {
+            setPackages(d.packages);
+          }
+
+          if (Array.isArray(d.backdrops)) {
+            setBackdrops(d.backdrops);
+          }
+        },
+      )
       .catch(() => {});
   }, []);
 
@@ -83,6 +96,7 @@ const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         eventDate: data.get("date"),
         eventLocation: data.get("location"),
         package: data.get("package"),
+        backdrop: data.get("backdrop"),
         addOn: data.get("addOn"),
         message: data.get("message"),
         termsAccepted: data.get("termsAccepted") === "on",
@@ -245,6 +259,15 @@ const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
                 name="package"
                 options={packages.map((p) => p.name)}
                 defaultValue={selectedPackage}
+              />
+            </div>
+
+            <div className="md:col-span-2">
+              <SelectField
+                label="Backdrop Interested In"
+                name="backdrop"
+                options={backdrops.map((b) => b.title)}
+                defaultValue={selectedBackdrop}
               />
             </div>
 
