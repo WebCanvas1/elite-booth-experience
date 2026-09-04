@@ -34,6 +34,7 @@ import {
   type FAQItem,
   type AddOnItem,
   type BackdropItem,
+  type VideoGuestbookItem,
   type PolicyContent,
   type PolicySection,
   type ReviewItem,
@@ -386,6 +387,7 @@ async function fileToCompressedDataUrl(file: File, maxDim = 1200, quality = 0.72
 type TabId =
   | "packages"
   | "backdrops"
+  | "videoGuestbooks"
   | "addons"
   | "events"
   | "pastEvents"
@@ -417,6 +419,8 @@ function Dashboard({ onLogout }: { onLogout: () => void }) {
         return { packages: content.packages };
       case "backdrops":
         return { backdrops: content.backdrops };
+      case "videoGuestbooks":
+        return { videoGuestbooks: content.videoGuestbooks };
       case "addons":
         return { addOns: content.addOns };
       case "events":
@@ -482,6 +486,7 @@ function Dashboard({ onLogout }: { onLogout: () => void }) {
   const tabs: { id: TabId; label: string; icon: typeof PackageIcon }[] = [
     { id: "packages", label: "Photobooths", icon: PackageIcon },
     { id: "backdrops", label: "Backdrops", icon: ImageIcon },
+    { id: "videoGuestbooks", label: "Video Guestbook", icon: Video },
     { id: "addons", label: "Add-Ons", icon: Sparkles },
     { id: "events", label: "Events", icon: CalendarHeart },
     { id: "pastEvents", label: "Event Galleries", icon: ImageIcon },
@@ -553,6 +558,15 @@ function Dashboard({ onLogout }: { onLogout: () => void }) {
           <BackdropsTab
             backdrops={content.backdrops}
             onChange={(backdrops) => setContent((c) => ({ ...c, backdrops }))}
+          />
+        )}
+
+        {tab === "videoGuestbooks" && (
+          <VideoGuestbooksTab
+            items={content.videoGuestbooks}
+            onChange={(videoGuestbooks) =>
+              setContent((c) => ({ ...c, videoGuestbooks }))
+            }
           />
         )}
 
@@ -1477,6 +1491,231 @@ function BackdropEditor({
 
           <p className="text-xs text-muted-foreground">
             Upload the backdrop image, enter its details, then click Save Changes to publish it.
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+
+/* ======================== VIDEO GUESTBOOK TAB ======================== */
+
+function VideoGuestbooksTab({
+  items,
+  onChange,
+}: {
+  items: VideoGuestbookItem[];
+  onChange: (items: VideoGuestbookItem[]) => void;
+}) {
+  const add = () =>
+    onChange([
+      ...items,
+      {
+        id: crypto.randomUUID(),
+        title: "New Video Guestbook",
+        description: "",
+        price: "",
+        image: "",
+        popular: false,
+      },
+    ]);
+
+  const remove = (idx: number) =>
+    onChange(items.filter((_, i) => i !== idx));
+
+  const update = (idx: number, patch: Partial<VideoGuestbookItem>) =>
+    onChange(items.map((item, i) => (i === idx ? { ...item, ...patch } : item)));
+
+  const move = (idx: number, dir: -1 | 1) => {
+    const j = idx + dir;
+    if (j < 0 || j >= items.length) return;
+
+    const next = [...items];
+    [next[idx], next[j]] = [next[j], next[idx]];
+    onChange(next);
+  };
+
+  return (
+    <div>
+      <SectionHeader
+        title="Video Guestbook"
+        subtitle="Add and manage Video Guestbook options available to customers. Click Save Changes to publish."
+        action={
+          <button
+            onClick={add}
+            className="inline-flex items-center justify-center gap-2 rounded-full border border-gold text-gold px-4 py-2.5 text-sm font-semibold hover:bg-gold hover:text-ink transition"
+          >
+            <Plus className="h-4 w-4" /> Add Video Guestbook
+          </button>
+        }
+      />
+
+      {items.length === 0 ? (
+        <div className="text-center py-16 text-muted-foreground bg-card rounded-3xl border border-border border-dashed">
+          No Video Guestbook options added yet. Click Add Video Guestbook to get started.
+        </div>
+      ) : (
+        <div className="space-y-5">
+          {items.map((item, idx) => (
+            <VideoGuestbookEditor
+              key={item.id}
+              item={item}
+              onChange={(patch) => update(idx, patch)}
+              onRemove={() => remove(idx)}
+              onMoveUp={() => move(idx, -1)}
+              onMoveDown={() => move(idx, 1)}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function VideoGuestbookEditor({
+  item,
+  onChange,
+  onRemove,
+  onMoveUp,
+  onMoveDown,
+}: {
+  item: VideoGuestbookItem;
+  onChange: (patch: Partial<VideoGuestbookItem>) => void;
+  onRemove: () => void;
+  onMoveUp: () => void;
+  onMoveDown: () => void;
+}) {
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false);
+
+  const pickFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      toast.error("Please select an image file");
+      return;
+    }
+
+    setUploading(true);
+
+    try {
+      const url = await fileToCompressedDataUrl(file);
+      onChange({ image: url });
+      toast.success("Video Guestbook image ready — click Save Changes to publish");
+    } catch {
+      toast.error("Could not process image");
+    } finally {
+      setUploading(false);
+      if (fileRef.current) fileRef.current.value = "";
+    }
+  };
+
+  return (
+    <div className="bg-card rounded-3xl border border-border p-5 sm:p-6 shadow-luxe/30">
+      <div className="grid sm:grid-cols-[200px_1fr] md:grid-cols-[220px_1fr] gap-5 md:gap-6">
+        <div>
+          <div className="aspect-[4/5] rounded-2xl overflow-hidden bg-muted mb-3 border border-border">
+            {item.image ? (
+              <img
+                src={item.image}
+                alt={item.title}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center text-xs text-muted-foreground">
+                No image
+              </div>
+            )}
+          </div>
+
+          <input
+            ref={fileRef}
+            type="file"
+            accept="image/*"
+            onChange={pickFile}
+            className="hidden"
+          />
+
+          <button
+            type="button"
+            onClick={() => fileRef.current?.click()}
+            disabled={uploading}
+            className="w-full inline-flex items-center justify-center gap-2 rounded-full border border-gold text-gold text-xs font-semibold py-2.5 hover:bg-gold hover:text-ink transition disabled:opacity-60 mb-2"
+          >
+            <Upload className="h-3.5 w-3.5" />
+            {uploading ? "Processing..." : "Upload Image"}
+          </button>
+
+          <div className="grid grid-cols-2 gap-2">
+            <button
+              type="button"
+              onClick={onMoveUp}
+              className="inline-flex items-center justify-center rounded-full border border-border text-xs py-2 hover:text-gold"
+            >
+              <ArrowUp className="h-3 w-3" />
+            </button>
+
+            <button
+              type="button"
+              onClick={onMoveDown}
+              className="inline-flex items-center justify-center rounded-full border border-border text-xs py-2 hover:text-gold"
+            >
+              <ArrowDown className="h-3 w-3" />
+            </button>
+          </div>
+
+          <button
+            type="button"
+            onClick={onRemove}
+            className="mt-2 w-full inline-flex items-center justify-center gap-1 rounded-full border border-destructive/40 text-destructive text-xs py-2 hover:bg-destructive hover:text-destructive-foreground transition"
+          >
+            <Trash2 className="h-3 w-3" /> Delete Video Guestbook
+          </button>
+        </div>
+
+        <div className="space-y-4">
+          <div className="grid sm:grid-cols-2 gap-4">
+            <AdminField
+              label="Video Guestbook Name"
+              value={item.title}
+              onChange={(v) => onChange({ title: v })}
+            />
+
+            <AdminField
+              label="Price / Price Text"
+              value={item.price}
+              placeholder="$350, From $350 or POA"
+              onChange={(v) => onChange({ price: v })}
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs uppercase tracking-widest text-muted-foreground mb-2">
+              Description
+            </label>
+            <textarea
+              value={item.description}
+              onChange={(e) => onChange({ description: e.target.value })}
+              rows={4}
+              placeholder="Describe this Video Guestbook option..."
+              className="w-full rounded-2xl border border-input bg-background px-4 py-3 text-base sm:text-sm focus:border-gold focus:ring-2 focus:ring-gold/20 outline-none"
+            />
+          </div>
+
+          <label className="inline-flex items-center gap-2 text-sm">
+            <input
+              type="checkbox"
+              checked={item.popular}
+              onChange={(e) => onChange({ popular: e.target.checked })}
+              className="h-4 w-4 accent-[oklch(0.78_0.11_80)]"
+            />
+            Show "Popular" badge
+          </label>
+
+          <p className="text-xs text-muted-foreground">
+            Upload the product image, enter its details, then click Save Changes to publish it.
           </p>
         </div>
       </div>
