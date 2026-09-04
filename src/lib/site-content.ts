@@ -69,6 +69,15 @@ export type BackdropItem = {
   popular: boolean;
 };
 
+export type VideoGuestbookItem = {
+  id: string;
+  title: string;
+  description: string;
+  price: string;
+  image: string;
+  popular: boolean;
+};
+
 export type ReviewItem = {
   id: string;
   name: string;
@@ -99,6 +108,7 @@ export type SiteContent = {
   eventVideos: EventVideoItem[];
   addOns: AddOnItem[];
   backdrops: BackdropItem[];
+  videoGuestbooks: VideoGuestbookItem[];
   faqs: FAQItem[];
   reviews: ReviewItem[];
   terms: PolicyContent;
@@ -256,6 +266,7 @@ export const DEFAULT_ADDONS: AddOnItem[] = [
 ];
 
 export const DEFAULT_BACKDROPS: BackdropItem[] = [];
+export const DEFAULT_VIDEO_GUESTBOOKS: VideoGuestbookItem[] = [];
 
 const sec = (heading: string, body: string): PolicySection => ({
   id: heading.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
@@ -335,6 +346,7 @@ export const DEFAULT_CONTENT: SiteContent = {
   eventVideos: DEFAULT_EVENT_VIDEOS,
   addOns: DEFAULT_ADDONS,
   backdrops: DEFAULT_BACKDROPS,
+  videoGuestbooks: DEFAULT_VIDEO_GUESTBOOKS,
   faqs: DEFAULT_FAQS,
   reviews: DEFAULT_REVIEWS,
   terms: DEFAULT_TERMS,
@@ -387,6 +399,11 @@ export function mergeContent(
       Array.isArray(partial.backdrops)
         ? partial.backdrops
         : DEFAULT_BACKDROPS,
+
+    videoGuestbooks:
+      Array.isArray(partial.videoGuestbooks)
+        ? partial.videoGuestbooks
+        : DEFAULT_VIDEO_GUESTBOOKS,
 
     faqs:
       Array.isArray(partial.faqs) && partial.faqs.length
