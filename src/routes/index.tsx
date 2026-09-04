@@ -39,6 +39,7 @@ function Home() {
     events,
     addOns,
     backdrops,
+    videoGuestbooks,
     pastEvents,
     faqs,
     eventVideos,
@@ -213,6 +214,85 @@ function Home() {
                     >
                       Enquire About This Backdrop
                     </Link>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Video Guestbook */}
+      {videoGuestbooks.length > 0 && (
+        <section
+          id="video-guestbook"
+          className="py-16 md:py-24 scroll-mt-24"
+        >
+          <div className="max-w-7xl mx-auto px-5 sm:px-6">
+            <div className="text-center max-w-2xl mx-auto mb-12">
+              <p className="text-xs uppercase tracking-[0.3em] text-gold mb-3">
+                Messages To Treasure
+              </p>
+
+              <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl mb-4">
+                Video Guestbook
+              </h2>
+
+              <p className="text-muted-foreground">
+                Capture heartfelt video messages, laughs and unforgettable moments from your guests to revisit long after the celebration.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6">
+              {videoGuestbooks.map((item) => (
+                <div
+                  key={item.id}
+                  className="group relative flex flex-col rounded-3xl bg-card border border-border overflow-hidden shadow-luxe hover:-translate-y-2 transition-transform duration-500"
+                >
+                  {item.popular && (
+                    <span className="absolute top-4 left-4 z-10 rounded-full gradient-gold px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-ink shadow-luxe">
+                      Popular
+                    </span>
+                  )}
+
+                  <div className="relative aspect-[4/5] overflow-hidden">
+                    {item.image ? (
+                      <img
+                        src={item.image}
+                        alt={item.title}
+                        loading="lazy"
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center bg-muted text-muted-foreground text-sm">
+                        Image coming soon
+                      </div>
+                    )}
+
+                    {item.price && (
+                      <div className="absolute bottom-3 right-3 rounded-full bg-card/95 backdrop-blur px-3 py-1.5 text-sm font-semibold text-foreground shadow-luxe border border-border">
+                        {item.price}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="p-4 sm:p-5 flex flex-col flex-1">
+                    <h3 className="font-serif text-lg sm:text-xl font-bold text-foreground mb-2">
+                      {item.title}
+                    </h3>
+
+                    {item.description && (
+                      <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed flex-1">
+                        {item.description}
+                      </p>
+                    )}
+
+                    <a
+                      href={`/enquire?videoGuestbook=${encodeURIComponent(item.title)}`}
+                      className="mt-4 inline-flex items-center justify-center rounded-full gradient-gold px-4 py-2.5 text-xs font-bold text-ink shadow-luxe hover:scale-105 transition-transform"
+                    >
+                      Enquire About Video Guestbook
+                    </a>
                   </div>
                 </div>
               ))}
