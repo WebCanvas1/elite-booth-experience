@@ -33,6 +33,7 @@ import {
   type EventVideoItem,
   type FAQItem,
   type AddOnItem,
+  type BackdropItem,
   type PolicyContent,
   type PolicySection,
   type ReviewItem,
@@ -345,6 +346,7 @@ async function fileToCompressedDataUrl(file: File, maxDim = 1400, quality = 0.8)
 
 type TabId =
   | "packages"
+  | "backdrops"
   | "addons"
   | "events"
   | "pastEvents"
@@ -390,7 +392,8 @@ function Dashboard({ creds, onLogout }: { creds: AdminCreds; onLogout: () => voi
   if (loading) return <div className="p-10 text-center text-muted-foreground">Loading...</div>;
 
   const tabs: { id: TabId; label: string; icon: typeof PackageIcon }[] = [
-    { id: "packages", label: "Packages", icon: PackageIcon },
+    { id: "packages", label: "Photobooths", icon: PackageIcon },
+    { id: "backdrops", label: "Backdrops", icon: ImageIcon },
     { id: "addons", label: "Add-Ons", icon: Sparkles },
     { id: "events", label: "Events", icon: CalendarHeart },
     { id: "pastEvents", label: "Event Galleries", icon: ImageIcon },
@@ -455,6 +458,13 @@ function Dashboard({ creds, onLogout }: { creds: AdminCreds; onLogout: () => voi
           <PackagesTab
             packages={content.packages}
             onChange={(packages) => setContent((c) => ({ ...c, packages }))}
+          />
+        )}
+
+        {tab === "backdrops" && (
+          <BackdropsTab
+            backdrops={content.backdrops}
+            onChange={(backdrops) => setContent((c) => ({ ...c, backdrops }))}
           />
         )}
 
@@ -1158,6 +1168,230 @@ function AdminField({
         onChange={(e) => onChange(e.target.value)}
         className="w-full rounded-xl border border-input bg-background px-3 py-2.5 text-base sm:text-sm focus:border-gold focus:ring-2 focus:ring-gold/20 outline-none"
       />
+    </div>
+  );
+}
+
+/* ======================== BACKDROPS TAB ======================== */
+
+function BackdropsTab({
+  backdrops,
+  onChange,
+}: {
+  backdrops: BackdropItem[];
+  onChange: (b: BackdropItem[]) => void;
+}) {
+  const add = () =>
+    onChange([
+      ...backdrops,
+      {
+        id: crypto.randomUUID(),
+        title: "New Backdrop",
+        description: "",
+        price: "",
+        image: "",
+        popular: false,
+      },
+    ]);
+
+  const remove = (idx: number) =>
+    onChange(backdrops.filter((_, i) => i !== idx));
+
+  const update = (idx: number, patch: Partial<BackdropItem>) =>
+    onChange(backdrops.map((b, i) => (i === idx ? { ...b, ...patch } : b)));
+
+  const move = (idx: number, dir: -1 | 1) => {
+    const j = idx + dir;
+    if (j < 0 || j >= backdrops.length) return;
+
+    const next = [...backdrops];
+    [next[idx], next[j]] = [next[j], next[idx]];
+    onChange(next);
+  };
+
+  return (
+    <div>
+      <SectionHeader
+        title="Backdrops"
+        subtitle="Add and manage the backdrop options available to customers. Click Save Changes to publish."
+        action={
+          <button
+            onClick={add}
+            className="inline-flex items-center justify-center gap-2 rounded-full border border-gold text-gold px-4 py-2.5 text-sm font-semibold hover:bg-gold hover:text-ink transition"
+          >
+            <Plus className="h-4 w-4" /> Add Backdrop
+          </button>
+        }
+      />
+
+      {backdrops.length === 0 ? (
+        <div className="text-center py-16 text-muted-foreground bg-card rounded-3xl border border-border border-dashed">
+          No backdrops added yet. Click Add Backdrop to get started.
+        </div>
+      ) : (
+        <div className="space-y-5">
+          {backdrops.map((backdrop, idx) => (
+            <BackdropEditor
+              key={backdrop.id}
+              item={backdrop}
+              onChange={(patch) => update(idx, patch)}
+              onRemove={() => remove(idx)}
+              onMoveUp={() => move(idx, -1)}
+              onMoveDown={() => move(idx, 1)}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function BackdropEditor({
+  item,
+  onChange,
+  onRemove,
+  onMoveUp,
+  onMoveDown,
+}: {
+  item: BackdropItem;
+  onChange: (patch: Partial<BackdropItem>) => void;
+  onRemove: () => void;
+  onMoveUp: () => void;
+  onMoveDown: () => void;
+}) {
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false);
+
+  const pickFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      toast.error("Please select an image file");
+      return;
+    }
+
+    setUploading(true);
+
+    try {
+      const url = await fileToCompressedDataUrl(file);
+      onChange({ image: url });
+      toast.success("Backdrop image ready — click Save Changes to publish");
+    } catch {
+      toast.error("Could not process image");
+    } finally {
+      setUploading(false);
+      if (fileRef.current) fileRef.current.value = "";
+    }
+  };
+
+  return (
+    <div className="bg-card rounded-3xl border border-border p-5 sm:p-6 shadow-luxe/30">
+      <div className="grid sm:grid-cols-[200px_1fr] md:grid-cols-[220px_1fr] gap-5 md:gap-6">
+        <div>
+          <div className="aspect-[4/5] rounded-2xl overflow-hidden bg-muted mb-3 border border-border">
+            {item.image ? (
+              <img
+                src={item.image}
+                alt={item.title}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center text-xs text-muted-foreground">
+                No image
+              </div>
+            )}
+          </div>
+
+          <input
+            ref={fileRef}
+            type="file"
+            accept="image/*"
+            onChange={pickFile}
+            className="hidden"
+          />
+
+          <button
+            type="button"
+            onClick={() => fileRef.current?.click()}
+            disabled={uploading}
+            className="w-full inline-flex items-center justify-center gap-2 rounded-full border border-gold text-gold text-xs font-semibold py-2.5 hover:bg-gold hover:text-ink transition disabled:opacity-60 mb-2"
+          >
+            <Upload className="h-3.5 w-3.5" />
+            {uploading ? "Processing..." : "Upload Image"}
+          </button>
+
+          <div className="grid grid-cols-2 gap-2">
+            <button
+              type="button"
+              onClick={onMoveUp}
+              className="inline-flex items-center justify-center rounded-full border border-border text-xs py-2 hover:text-gold"
+            >
+              <ArrowUp className="h-3 w-3" />
+            </button>
+
+            <button
+              type="button"
+              onClick={onMoveDown}
+              className="inline-flex items-center justify-center rounded-full border border-border text-xs py-2 hover:text-gold"
+            >
+              <ArrowDown className="h-3 w-3" />
+            </button>
+          </div>
+
+          <button
+            type="button"
+            onClick={onRemove}
+            className="mt-2 w-full inline-flex items-center justify-center gap-1 rounded-full border border-destructive/40 text-destructive text-xs py-2 hover:bg-destructive hover:text-destructive-foreground transition"
+          >
+            <Trash2 className="h-3 w-3" /> Delete Backdrop
+          </button>
+        </div>
+
+        <div className="space-y-4">
+          <div className="grid sm:grid-cols-2 gap-4">
+            <AdminField
+              label="Backdrop Name"
+              value={item.title}
+              onChange={(v) => onChange({ title: v })}
+            />
+
+            <AdminField
+              label="Price / Price Text"
+              value={item.price}
+              placeholder="$250, From $250 or POA"
+              onChange={(v) => onChange({ price: v })}
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs uppercase tracking-widest text-muted-foreground mb-2">
+              Description
+            </label>
+            <textarea
+              value={item.description}
+              onChange={(e) => onChange({ description: e.target.value })}
+              rows={4}
+              placeholder="Describe this backdrop..."
+              className="w-full rounded-2xl border border-input bg-background px-4 py-3 text-base sm:text-sm focus:border-gold focus:ring-2 focus:ring-gold/20 outline-none"
+            />
+          </div>
+
+          <label className="inline-flex items-center gap-2 text-sm">
+            <input
+              type="checkbox"
+              checked={item.popular}
+              onChange={(e) => onChange({ popular: e.target.checked })}
+              className="h-4 w-4 accent-[oklch(0.78_0.11_80)]"
+            />
+            Show "Popular" badge
+          </label>
+
+          <p className="text-xs text-muted-foreground">
+            Upload the backdrop image, enter its details, then click Save Changes to publish it.
+          </p>
+        </div>
+      </div>
     </div>
   );
 }
