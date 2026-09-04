@@ -55,20 +55,40 @@ type AdminCreds = { email: string };
 
 function AdminPage() {
   const [creds, setCreds] = useState<AdminCreds | null>(null);
+  const [checkingSession, setCheckingSession] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
-    const clearAdminSession = () => {
-      setCreds(null);
-    };
+    let cancelled = false;
 
-    window.addEventListener("pagehide", clearAdminSession);
-    window.addEventListener("beforeunload", clearAdminSession);
+    fetch("/api/admin/session", {
+      method: "GET",
+      credentials: "same-origin",
+      cache: "no-store",
+    })
+      .then(async (res) => {
+        if (!res.ok) return null;
+
+        return (await res.json().catch(() => null)) as
+          | { ok?: boolean; email?: string }
+          | null;
+      })
+      .then((data) => {
+        if (
+          !cancelled &&
+          data?.ok &&
+          typeof data.email === "string" &&
+          data.email.length > 0
+        ) {
+          setCreds({ email: data.email });
+        }
+      })
+      .finally(() => {
+        if (!cancelled) setCheckingSession(false);
+      });
 
     return () => {
-      clearAdminSession();
-      window.removeEventListener("pagehide", clearAdminSession);
-      window.removeEventListener("beforeunload", clearAdminSession);
+      cancelled = true;
     };
   }, []);
 
@@ -76,11 +96,29 @@ function AdminPage() {
     setCreds(c);
   };
 
-  const handleLogout = () => {
-    setCreds(null);
-    toast.success("Logged out");
-    navigate({ to: "/" });
+  const handleLogout = async () => {
+    try {
+      await fetch("/api/admin/logout", {
+        method: "POST",
+        credentials: "same-origin",
+      });
+    } catch {
+      // Clear local UI state even if the network request fails.
+    } finally {
+      setCreds(null);
+      toast.success("Logged out");
+      navigate({ to: "/" });
+    }
   };
+
+  if (checkingSession) {
+    return (
+      <div className="min-h-screen bg-beige flex items-center justify-center">
+        <Toaster position="top-center" />
+        <div className="text-sm text-muted-foreground">Checking admin session...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-beige">
