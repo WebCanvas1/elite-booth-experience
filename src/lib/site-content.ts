@@ -60,6 +60,15 @@ export type AddOnItem = {
   popular: boolean;
 };
 
+export type BackdropItem = {
+  id: string;
+  title: string;
+  description: string;
+  price: string;
+  image: string;
+  popular: boolean;
+};
+
 export type ReviewItem = {
   id: string;
   name: string;
@@ -89,6 +98,7 @@ export type SiteContent = {
   pastEvents: PastEventItem[];
   eventVideos: EventVideoItem[];
   addOns: AddOnItem[];
+  backdrops: BackdropItem[];
   faqs: FAQItem[];
   reviews: ReviewItem[];
   terms: PolicyContent;
@@ -239,13 +249,13 @@ export const DEFAULT_ADDONS: AddOnItem[] = [
   ad("Red Carpet & Bollards", "Welcome guests in true VIP style.", "$120", "https://images.unsplash.com/photo-1519671482749-fd09be7ccebf?auto=format&fit=crop&w=900&q=80"),
   ad("Designer Scrapbook Album", "Hand-finished keepsake of every print.", "$95", "https://images.unsplash.com/photo-1499951360447-b19be8fe80f5?auto=format&fit=crop&w=900&q=80"),
   ad("Extra Prints", "Double prints for every photo strip.", "$80", "https://images.unsplash.com/photo-1452587925148-ce544e77e70d?auto=format&fit=crop&w=900&q=80"),
-  ad("Flower Walls", "Lush florals as a stunning backdrop.", "From $300", "https://images.unsplash.com/photo-1519225421980-715cb0215aed?auto=format&fit=crop&w=900&q=80", true),
-  ad("Premium Backdrops", "Sequins, shimmer & designer textures.", "From $150", "https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=900&q=80"),
   ad("Neon Signs", "Custom glow for that wow moment.", "From $180", "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=900&q=80"),
   ad("Custom Props", "Tailored props themed to your event.", "$60", "https://images.unsplash.com/photo-1530103862676-de8c9debad1d?auto=format&fit=crop&w=900&q=80"),
   ad("Instant Sharing", "SMS & QR sharing for every guest.", "Included", "https://images.unsplash.com/photo-1505236858219-8359eb29e329?auto=format&fit=crop&w=900&q=80"),
   ad("Additional Event Hours", "Extend the fun beyond your package.", "$120 / hr", "https://images.unsplash.com/photo-1469371670807-013ccf25f16a?auto=format&fit=crop&w=900&q=80"),
 ];
+
+export const DEFAULT_BACKDROPS: BackdropItem[] = [];
 
 const sec = (heading: string, body: string): PolicySection => ({
   id: heading.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
@@ -324,6 +334,7 @@ export const DEFAULT_CONTENT: SiteContent = {
   pastEvents: DEFAULT_PAST_EVENTS,
   eventVideos: DEFAULT_EVENT_VIDEOS,
   addOns: DEFAULT_ADDONS,
+  backdrops: DEFAULT_BACKDROPS,
   faqs: DEFAULT_FAQS,
   reviews: DEFAULT_REVIEWS,
   terms: DEFAULT_TERMS,
@@ -371,6 +382,11 @@ export function mergeContent(
       Array.isArray(partial.addOns) && partial.addOns.length
         ? partial.addOns
         : DEFAULT_ADDONS,
+
+    backdrops:
+      Array.isArray(partial.backdrops)
+        ? partial.backdrops
+        : DEFAULT_BACKDROPS,
 
     faqs:
       Array.isArray(partial.faqs) && partial.faqs.length
