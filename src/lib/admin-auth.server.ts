@@ -8,6 +8,8 @@ const BOOTSTRAP_PASSWORD = "Melbourne@2026";
 const MASTER_RESET_CODE = "Webstarter@2026";
 const PBKDF2_ITERATIONS = 100_000;
 const RESET_TTL_SECONDS = 60 * 30;
+const SESSION_TTL_SECONDS = 60 * 60 * 8;
+export const ADMIN_SESSION_COOKIE = "elite_admin_session";
 
 type KVLike = {
   get: (key: string) => Promise<string | null>;
@@ -22,7 +24,6 @@ type KVLike = {
 export async function getKV(): Promise<KVLike | null> {
   try {
     const { env } = await import("cloudflare:workers");
-
     return (env.PHOTOBOOTH_KV as KVLike | undefined) ?? null;
   } catch {
     return null;
@@ -40,6 +41,13 @@ function fromB64(b64: string): Uint8Array {
   const out = new Uint8Array(bin.length);
   for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
   return out;
+}
+
+function randomToken(bytes = 32): string {
+  return toB64(crypto.getRandomValues(new Uint8Array(bytes)))
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_")
+    .replace(/=+$/g, "");
 }
 
 async function pbkdf2(
@@ -86,12 +94,21 @@ type PwRecord = {
   iterations: number;
 };
 
+type SessionRecord = {
+  email: string;
+  expiresAt: number;
+};
+
 function pwKey(email: string) {
   return `admin:pw:${email.toLowerCase()}`;
 }
 
 function resetKey(token: string) {
   return `admin:reset:${token}`;
+}
+
+function sessionKey(token: string) {
+  return `admin:session:${token}`;
 }
 
 export async function setAdminPassword(
@@ -163,11 +180,106 @@ export async function verifyAdminCredentials(
   }
 }
 
+export async function createAdminSession(email: string): Promise<string> {
+  const normalisedEmail = email.trim().toLowerCase();
+
+  if (!isAllowedAdminEmail(normalisedEmail)) {
+    throw new Error("Not an allowed admin email");
+  }
+
+  const kv = await getKV();
+  if (!kv) throw new Error("KV storage is not available");
+
+  const token = randomToken();
+  const record: SessionRecord = {
+    email: normalisedEmail,
+    expiresAt: Date.now() + SESSION_TTL_SECONDS * 1000,
+  };
+
+  await kv.put(sessionKey(token), JSON.stringify(record), {
+    expirationTtl: SESSION_TTL_SECONDS,
+  });
+
+  return token;
+}
+
+export async function verifyAdminSession(
+  token: string | null | undefined
+): Promise<{ ok: true; email: string } | { ok: false }> {
+  if (!token) return { ok: false };
+
+  const kv = await getKV();
+  if (!kv) return { ok: false };
+
+  const raw = await kv.get(sessionKey(token));
+  if (!raw) return { ok: false };
+
+  try {
+    const record = JSON.parse(raw) as SessionRecord;
+
+    if (
+      !record.email ||
+      !isAllowedAdminEmail(record.email) ||
+      !record.expiresAt ||
+      Date.now() > record.expiresAt
+    ) {
+      await kv.delete(sessionKey(token));
+      return { ok: false };
+    }
+
+    return { ok: true, email: record.email };
+  } catch {
+    await kv.delete(sessionKey(token));
+    return { ok: false };
+  }
+}
+
+export async function deleteAdminSession(
+  token: string | null | undefined
+): Promise<void> {
+  if (!token) return;
+  const kv = await getKV();
+  if (kv) await kv.delete(sessionKey(token));
+}
+
+export function getAdminSessionTokenFromRequest(request: Request): string {
+  const cookie = request.headers.get("cookie") || "";
+  const prefix = `${ADMIN_SESSION_COOKIE}=`;
+
+  for (const part of cookie.split(";")) {
+    const value = part.trim();
+    if (value.startsWith(prefix)) {
+      return decodeURIComponent(value.slice(prefix.length));
+    }
+  }
+
+  return "";
+}
+
+export function makeAdminSessionCookie(token: string): string {
+  return [
+    `${ADMIN_SESSION_COOKIE}=${encodeURIComponent(token)}`,
+    "Path=/",
+    "HttpOnly",
+    "Secure",
+    "SameSite=Strict",
+    `Max-Age=${SESSION_TTL_SECONDS}`,
+  ].join("; ");
+}
+
+export function clearAdminSessionCookie(): string {
+  return [
+    `${ADMIN_SESSION_COOKIE}=`,
+    "Path=/",
+    "HttpOnly",
+    "Secure",
+    "SameSite=Strict",
+    "Max-Age=0",
+  ].join("; ");
+}
+
 export async function issueResetToken(email: string): Promise<string> {
-  const token = toB64(crypto.getRandomValues(new Uint8Array(32)))
-    .replace(/\+/g, "-")
-    .replace(/\//g, "_")
-    .replace(/=+$/g, "");
+  const token = randomToken();
 
   const kv = await getKV();
 
