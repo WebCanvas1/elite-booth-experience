@@ -11,6 +11,7 @@ import {
   type PastEventItem,
   type EventVideoItem,
   type AddOnItem,
+  type BackdropItem,
   type FAQItem,
   type PolicyContent,
   type PolicySection,
@@ -214,6 +215,23 @@ function sanitizeAddOns(input: unknown): AddOnItem[] {
   });
 }
 
+function sanitizeBackdrops(input: unknown): BackdropItem[] {
+  if (!Array.isArray(input)) return DEFAULT_CONTENT.backdrops;
+
+  return input.slice(0, 60).map((b) => {
+    const x = b as Partial<BackdropItem>;
+
+    return {
+      id: String(x.id || crypto.randomUUID()).slice(0, 80),
+      title: String(x.title || "").slice(0, 100),
+      description: String(x.description || "").slice(0, 600),
+      price: String(x.price || "").slice(0, 40),
+      image: String(x.image || "").slice(0, MAX_IMG),
+      popular: Boolean(x.popular),
+    };
+  });
+}
+
 function sanitizeFaqs(input: unknown): FAQItem[] {
   if (!Array.isArray(input)) return DEFAULT_CONTENT.faqs;
 
@@ -338,6 +356,11 @@ export const Route = createFileRoute("/api/content")({
             body!.addOns !== undefined
               ? sanitizeAddOns(body!.addOns)
               : current.addOns,
+
+          backdrops:
+            body!.backdrops !== undefined
+              ? sanitizeBackdrops(body!.backdrops)
+              : current.backdrops,
 
           faqs:
             body!.faqs !== undefined
