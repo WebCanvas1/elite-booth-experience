@@ -1,6 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { type Package } from "@/lib/packages";
-import { verifyAdminCredentials } from "@/lib/admin-auth.server";
+import {
+  getAdminSessionTokenFromRequest,
+  verifyAdminSession,
+} from "@/lib/admin-auth.server";
 import {
   DEFAULT_CONTENT,
   mergeContent,
@@ -12,6 +15,7 @@ import {
   type EventVideoItem,
   type AddOnItem,
   type BackdropItem,
+  type VideoGuestbookItem,
   type FAQItem,
   type PolicyContent,
   type PolicySection,
@@ -41,7 +45,6 @@ const NO_CACHE_HEADERS = {
 async function getKV(): Promise<KVLike | null> {
   try {
     const { env } = await import("cloudflare:workers");
-
     return (env.PHOTOBOOTH_KV as KVLike | undefined) ?? null;
   } catch {
     return null;
@@ -98,15 +101,15 @@ function sanitizePackages(input: unknown): Package[] {
     const pkg = p as Partial<Package>;
 
     return {
-  id: String(pkg.id || crypto.randomUUID()),
-  name: String(pkg.name || "").slice(0, 100),
-  price: Number(pkg.price) || 0,
-  image: String(pkg.image || "").slice(0, MAX_IMG),
-  features: Array.isArray(pkg.features)
-    ? pkg.features.map((f) => String(f).slice(0, 300)).slice(0, 50)
-    : [],
-  popular: Boolean(pkg.popular),
-};
+      id: String(pkg.id || crypto.randomUUID()),
+      name: String(pkg.name || "").slice(0, 100),
+      price: Number(pkg.price) || 0,
+      image: String(pkg.image || "").slice(0, MAX_IMG),
+      features: Array.isArray(pkg.features)
+        ? pkg.features.map((f) => String(f).slice(0, 300)).slice(0, 50)
+        : [],
+      popular: Boolean(pkg.popular),
+    };
   });
 }
 
@@ -232,6 +235,23 @@ function sanitizeBackdrops(input: unknown): BackdropItem[] {
   });
 }
 
+function sanitizeVideoGuestbooks(input: unknown): VideoGuestbookItem[] {
+  if (!Array.isArray(input)) return DEFAULT_CONTENT.videoGuestbooks;
+
+  return input.slice(0, 60).map((v) => {
+    const x = v as Partial<VideoGuestbookItem>;
+
+    return {
+      id: String(x.id || crypto.randomUUID()).slice(0, 80),
+      title: String(x.title || "").slice(0, 100),
+      description: String(x.description || "").slice(0, 600),
+      price: String(x.price || "").slice(0, 40),
+      image: String(x.image || "").slice(0, MAX_IMG),
+      popular: Boolean(x.popular),
+    };
+  });
+}
+
 function sanitizeFaqs(input: unknown): FAQItem[] {
   if (!Array.isArray(input)) return DEFAULT_CONTENT.faqs;
 
@@ -245,7 +265,6 @@ function sanitizeFaqs(input: unknown): FAQItem[] {
     };
   });
 }
-
 
 function sanitizeReviews(input: unknown): ReviewItem[] {
   if (!Array.isArray(input)) return DEFAULT_CONTENT.reviews;
@@ -297,19 +316,23 @@ export const Route = createFileRoute("/api/content")({
       },
 
       POST: async ({ request }) => {
-        const body = (await request.json().catch(() => null)) as
-          | (Partial<SiteContent> & { email?: string; password?: string })
-          | null;
+        const sessionToken = getAdminSessionTokenFromRequest(request);
+        const session = await verifyAdminSession(sessionToken);
 
-        const email = (body?.email || "").trim().toLowerCase();
-        const password = body?.password || "";
-        const authed = body
-          ? await verifyAdminCredentials(email, password)
-          : false;
-
-        if (!authed) {
+        if (!session.ok) {
           return new Response(JSON.stringify({ error: "Unauthorized" }), {
             status: 401,
+            headers: NO_CACHE_HEADERS,
+          });
+        }
+
+        const body = (await request.json().catch(() => null)) as
+          | Partial<SiteContent>
+          | null;
+
+        if (!body) {
+          return new Response(JSON.stringify({ error: "Invalid request" }), {
+            status: 400,
             headers: NO_CACHE_HEADERS,
           });
         }
@@ -318,84 +341,90 @@ export const Route = createFileRoute("/api/content")({
 
         const clean: SiteContent = {
           packages:
-            body!.packages !== undefined
-              ? sanitizePackages(body!.packages)
+            body.packages !== undefined
+              ? sanitizePackages(body.packages)
               : current.packages,
 
           gallery:
-            body!.gallery !== undefined
-              ? sanitizeGallery(body!.gallery)
+            body.gallery !== undefined
+              ? sanitizeGallery(body.gallery)
               : current.gallery,
 
           about:
-            body!.about !== undefined
-              ? sanitizeAbout(body!.about)
+            body.about !== undefined
+              ? sanitizeAbout(body.about)
               : current.about,
 
           contact:
-            body!.contact !== undefined
-              ? sanitizeContact(body!.contact)
+            body.contact !== undefined
+              ? sanitizeContact(body.contact)
               : current.contact,
 
           events:
-            body!.events !== undefined
-              ? sanitizeEvents(body!.events)
+            body.events !== undefined
+              ? sanitizeEvents(body.events)
               : current.events,
 
           pastEvents:
-            body!.pastEvents !== undefined
-              ? sanitizePastEvents(body!.pastEvents)
+            body.pastEvents !== undefined
+              ? sanitizePastEvents(body.pastEvents)
               : current.pastEvents,
 
           eventVideos:
-            body!.eventVideos !== undefined
-              ? sanitizeEventVideos(body!.eventVideos)
+            body.eventVideos !== undefined
+              ? sanitizeEventVideos(body.eventVideos)
               : current.eventVideos,
 
           addOns:
-            body!.addOns !== undefined
-              ? sanitizeAddOns(body!.addOns)
+            body.addOns !== undefined
+              ? sanitizeAddOns(body.addOns)
               : current.addOns,
 
           backdrops:
-            body!.backdrops !== undefined
-              ? sanitizeBackdrops(body!.backdrops)
+            body.backdrops !== undefined
+              ? sanitizeBackdrops(body.backdrops)
               : current.backdrops,
 
+          videoGuestbooks:
+            body.videoGuestbooks !== undefined
+              ? sanitizeVideoGuestbooks(body.videoGuestbooks)
+              : current.videoGuestbooks,
+
           faqs:
-            body!.faqs !== undefined
-              ? sanitizeFaqs(body!.faqs)
+            body.faqs !== undefined
+              ? sanitizeFaqs(body.faqs)
               : current.faqs,
 
           reviews:
-            body!.reviews !== undefined
-              ? sanitizeReviews(body!.reviews)
+            body.reviews !== undefined
+              ? sanitizeReviews(body.reviews)
               : current.reviews,
 
           terms:
-            body!.terms !== undefined
-              ? sanitizePolicy(body!.terms, DEFAULT_CONTENT.terms)
+            body.terms !== undefined
+              ? sanitizePolicy(body.terms, DEFAULT_CONTENT.terms)
               : current.terms,
 
           privacy:
-            body!.privacy !== undefined
-              ? sanitizePolicy(body!.privacy, DEFAULT_CONTENT.privacy)
+            body.privacy !== undefined
+              ? sanitizePolicy(body.privacy, DEFAULT_CONTENT.privacy)
               : current.privacy,
 
           googleReviewLink:
-            body!.googleReviewLink !== undefined
-              ? String(body!.googleReviewLink || "").slice(0, 500)
+            body.googleReviewLink !== undefined
+              ? String(body.googleReviewLink || "").slice(0, 500)
               : current.googleReviewLink,
 
           googleReviewsEmbedCode:
-            body!.googleReviewsEmbedCode !== undefined
-              ? String(body!.googleReviewsEmbedCode || "").slice(0, 10000)
+            body.googleReviewsEmbedCode !== undefined
+              ? String(body.googleReviewsEmbedCode || "").slice(0, 10000)
               : current.googleReviewsEmbedCode,
         };
 
         await writeContent(clean);
 
-        return new Response(JSON.stringify({ ok: true, content: clean }), {
+        // Keep the response tiny. The admin already has the edited content locally.
+        return new Response(JSON.stringify({ ok: true }), {
           headers: NO_CACHE_HEADERS,
         });
       },
