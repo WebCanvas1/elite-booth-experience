@@ -51,7 +51,7 @@ export const Route = createFileRoute("/admin")({
   component: AdminPage,
 });
 
-type AdminCreds = { email: string; password: string };
+type AdminCreds = { email: string };
 
 function AdminPage() {
   const [creds, setCreds] = useState<AdminCreds | null>(null);
@@ -89,7 +89,7 @@ function AdminPage() {
       {!creds ? (
         <LoginCard onLogin={handleLogin} />
       ) : (
-        <Dashboard creds={creds} onLogout={handleLogout} />
+        <Dashboard onLogout={handleLogout} />
       )}
     </div>
   );
@@ -117,6 +117,7 @@ function LoginCard({ onLogin }: { onLogin: (c: AdminCreds) => void }) {
     try {
       const res = await fetch("/api/admin/login", {
         method: "POST",
+        credentials: "same-origin",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
           email: email.trim().toLowerCase(),
@@ -132,7 +133,7 @@ function LoginCard({ onLogin }: { onLogin: (c: AdminCreds) => void }) {
       if (!res.ok || !data.ok) {
         setErr("Invalid email or password.");
       } else {
-        onLogin({ email: email.trim().toLowerCase(), password });
+        onLogin({ email: email.trim().toLowerCase() });
       }
     } catch {
       setErr("Network error. Please try again.");
@@ -329,7 +330,7 @@ function LoginCard({ onLogin }: { onLogin: (c: AdminCreds) => void }) {
   );
 }
 
-async function fileToCompressedDataUrl(file: File, maxDim = 1400, quality = 0.8): Promise<string> {
+async function fileToCompressedDataUrl(file: File, maxDim = 1200, quality = 0.72): Promise<string> {
   const buf = await file.arrayBuffer();
   const blob = new Blob([buf], { type: file.type || "image/jpeg" });
   const bitmap = await createImageBitmap(blob);
@@ -359,28 +360,77 @@ type TabId =
   | "terms"
   | "privacy";
 
-function Dashboard({ creds, onLogout }: { creds: AdminCreds; onLogout: () => void }) {
+function Dashboard({ onLogout }: { onLogout: () => void }) {
   const [content, setContent] = useState<SiteContent>(DEFAULT_CONTENT);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [tab, setTab] = useState<TabId>("packages");
 
   useEffect(() => {
-    fetch("/api/content")
+    fetch("/api/content", { credentials: "same-origin" })
       .then((r) => r.json())
       .then((d) => setContent(mergeContent(d as Partial<SiteContent>)))
       .finally(() => setLoading(false));
   }, []);
 
+  const getActiveTabPayload = (): Partial<SiteContent> => {
+    switch (tab) {
+      case "packages":
+        return { packages: content.packages };
+      case "backdrops":
+        return { backdrops: content.backdrops };
+      case "addons":
+        return { addOns: content.addOns };
+      case "events":
+        return { events: content.events };
+      case "pastEvents":
+        return { pastEvents: content.pastEvents };
+      case "eventVideos":
+        return { eventVideos: content.eventVideos };
+      case "gallery":
+        return { gallery: content.gallery };
+      case "about":
+        return { about: content.about };
+      case "contact":
+        return {
+          contact: content.contact,
+          googleReviewLink: content.googleReviewLink,
+          googleReviewsEmbedCode: content.googleReviewsEmbedCode,
+        };
+      case "faqs":
+        return { faqs: content.faqs };
+      case "reviews":
+        return { reviews: content.reviews };
+      case "terms":
+        return { terms: content.terms };
+      case "privacy":
+        return { privacy: content.privacy };
+      default:
+        return {};
+    }
+  };
+
   const save = async () => {
     setSaving(true);
+
     try {
+      const payload = getActiveTabPayload();
+
       const res = await fetch("/api/content", {
         method: "POST",
+        credentials: "same-origin",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ email: creds.email, password: creds.password, ...content }),
+        body: JSON.stringify(payload),
       });
+
+      if (res.status === 401) {
+        toast.error("Your admin session has expired. Please sign in again.");
+        window.location.reload();
+        return;
+      }
+
       if (!res.ok) throw new Error("Save failed");
+
       toast.success("Changes saved successfully");
     } catch {
       toast.error("Failed to save changes");
