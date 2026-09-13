@@ -5,12 +5,11 @@ import { toast } from "sonner";
 import { SiteHeader, SiteFooter } from "@/components/SiteChrome";
 import { Toaster } from "@/components/ui/sonner";
 import { DEFAULT_PACKAGES, type Package } from "@/lib/packages";
-import type { BackdropItem, VideoGuestbookItem } from "@/lib/site-content";
+import type { VideoGuestbookItem } from "@/lib/site-content";
 
 export const Route = createFileRoute("/enquire")({
   validateSearch: (search: Record<string, unknown>) => ({
     package: typeof search.package === "string" ? search.package : "",
-    backdrop: typeof search.backdrop === "string" ? search.backdrop : "",
     videoGuestbook:
       typeof search.videoGuestbook === "string" ? search.videoGuestbook : "",
   }),
@@ -31,25 +30,12 @@ export const Route = createFileRoute("/enquire")({
 
 const EVENT_TYPES = ["Wedding", "Birthday", "Corporate", "Baby Shower", "Engagement", "Party", "Other"];
 
-const ADD_ONS = [
-  "Audio Guest Book",
-  "Red Carpet & Bollards",
-  "Designer Scrapbook Album",
-  "Extra Prints",
-  "Neon Signs",
-  "Custom Props",
-  "Instant Sharing",
-  "Additional Event Hours",
-];
-
 function EnquirePage() {
   const search = Route.useSearch();
   const selectedPackage = search.package || "";
-  const selectedBackdrop = search.backdrop || "";
   const selectedVideoGuestbook = search.videoGuestbook || "";
 
   const [packages, setPackages] = useState<Package[]>(DEFAULT_PACKAGES);
-  const [backdrops, setBackdrops] = useState<BackdropItem[]>([]);
   const [videoGuestbooks, setVideoGuestbooks] = useState<VideoGuestbookItem[]>([]);
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -60,15 +46,10 @@ function EnquirePage() {
       .then(
         (d: {
           packages?: Package[];
-          backdrops?: BackdropItem[];
           videoGuestbooks?: VideoGuestbookItem[];
         }) => {
           if (d.packages?.length) {
             setPackages(d.packages);
-          }
-
-          if (Array.isArray(d.backdrops)) {
-            setBackdrops(d.backdrops);
           }
 
           if (Array.isArray(d.videoGuestbooks)) {
@@ -105,9 +86,7 @@ const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         eventDate: data.get("date"),
         eventLocation: data.get("location"),
         package: data.get("package"),
-        backdrop: data.get("backdrop"),
         videoGuestbook: data.get("videoGuestbook"),
-        addOn: data.get("addOn"),
         message: data.get("message"),
         termsAccepted: data.get("termsAccepted") === "on",
       }),
@@ -272,15 +251,6 @@ const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
               />
             </div>
 
-            <div className="md:col-span-2">
-              <SelectField
-                label="Backdrop Interested In"
-                name="backdrop"
-                options={backdrops.map((b) => b.title)}
-                defaultValue={selectedBackdrop}
-              />
-            </div>
-
             {videoGuestbooks.length > 0 && (
               <div className="md:col-span-2">
                 <SelectField
@@ -291,14 +261,6 @@ const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
                 />
               </div>
             )}
-
-            <div className="md:col-span-2">
-              <SelectField
-                label="Add-On Interested In"
-                name="addOn"
-                options={ADD_ONS}
-              />
-            </div>
           </div>
 
           <div>
