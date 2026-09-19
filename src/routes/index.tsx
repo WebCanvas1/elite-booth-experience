@@ -319,11 +319,11 @@ function Home() {
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-6 items-stretch auto-rows-fr">
+            <div className="flex gap-5 sm:gap-6 overflow-x-auto snap-x snap-mandatory pb-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
               {reviews.map((review) => (
                 <div
                   key={review.id}
-                  className="bg-card rounded-3xl border border-border shadow-luxe p-6 hover:-translate-y-1.5 transition-transform duration-500 h-full min-h-[400px] flex flex-col"
+                  className="bg-card rounded-3xl border border-border shadow-luxe p-6 hover:-translate-y-1.5 transition-transform duration-500 min-h-[400px] flex flex-col shrink-0 snap-start w-[88%] sm:w-[70%] md:w-[calc((100%-3rem)/3)]"
                 >
                   <div className="flex items-center gap-1 mb-4">
                     {Array.from({ length: Math.max(1, Math.min(5, review.rating)) }).map((_, i) => (
