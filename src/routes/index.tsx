@@ -319,7 +319,7 @@ function Home() {
               </p>
             </div>
 
-            <div className="flex gap-5 sm:gap-6 overflow-x-auto snap-x snap-mandatory pb-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            <div className="reviews-marquee overflow-hidden pb-4"><div className="reviews-track flex gap-5 sm:gap-6 w-max">
               {reviews.map((review) => (
                 <div
                   key={review.id}
@@ -348,7 +348,25 @@ function Home() {
                   </div>
                 </div>
               ))}
-            </div>
+              {reviews.map((review) => (
+                <div
+                  key={`duplicate-${review.id}`}
+                  aria-hidden="true"
+                  className="bg-card rounded-3xl border border-border shadow-luxe p-6 min-h-[400px] flex flex-col shrink-0 w-[88vw] sm:w-[70vw] md:w-[calc((100vw-3rem)/3)] max-w-[360px]"
+                >
+                  <div className="flex items-center gap-1 mb-4">
+                    {Array.from({ length: Math.max(1, Math.min(5, review.rating)) }).map((_, i) => (
+                      <Star key={i} className="h-5 w-5 fill-gold text-gold" />
+                    ))}
+                  </div>
+                  <p className="text-muted-foreground leading-relaxed mb-6 flex-1">“{review.review}”</p>
+                  <div className="border-t border-border pt-4 mt-auto">
+                    <p className="font-serif text-xl text-foreground">{review.name}</p>
+                    {review.eventType && <p className="text-sm text-gold mt-1">{review.eventType}</p>}
+                  </div>
+                </div>
+              ))}
+            </div></div>
 
             {content.googleReviewLink && (
               <div className="text-center mt-10">
