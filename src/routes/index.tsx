@@ -319,11 +319,11 @@ function Home() {
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-6 items-stretch">
               {reviews.map((review) => (
                 <div
                   key={review.id}
-                  className="bg-card rounded-3xl border border-border shadow-luxe p-6 hover:-translate-y-1.5 transition-transform duration-500"
+                  className="bg-card rounded-3xl border border-border shadow-luxe p-6 hover:-translate-y-1.5 transition-transform duration-500 h-full flex flex-col"
                 >
                   <div className="flex items-center gap-1 mb-4">
                     {Array.from({ length: Math.max(1, Math.min(5, review.rating)) }).map((_, i) => (
@@ -331,11 +331,11 @@ function Home() {
                     ))}
                   </div>
 
-                  <p className="text-muted-foreground leading-relaxed mb-6">
+                  <p className="text-muted-foreground leading-relaxed mb-6 flex-1">
                     “{review.review}”
                   </p>
 
-                  <div className="border-t border-border pt-4">
+                  <div className="border-t border-border pt-4 mt-auto">
                     <p className="font-serif text-xl text-foreground">
                       {review.name}
                     </p>
