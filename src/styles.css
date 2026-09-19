@@ -171,3 +171,20 @@
     animation: shimmer 6s linear infinite;
   }
 }
+
+
+/* Continuous single-row reviews carousel */
+.reviews-track {
+  animation: reviews-marquee 45s linear infinite;
+}
+.reviews-marquee:hover .reviews-track {
+  animation-play-state: paused;
+}
+@keyframes reviews-marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .reviews-track { animation: none; }
+  .reviews-marquee { overflow-x: auto; }
+}
