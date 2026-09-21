@@ -176,6 +176,15 @@
 /* Continuous single-row reviews carousel */
 .reviews-track {
   animation: reviews-marquee 45s linear infinite;
+  will-change: transform;
+}
+.review-card {
+  width: min(360px, calc(100vw - 72px));
+}
+@media (min-width: 768px) {
+  .review-card {
+    width: 360px;
+  }
 }
 .reviews-marquee:hover .reviews-track {
   animation-play-state: paused;
