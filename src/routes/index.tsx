@@ -323,7 +323,7 @@ function Home() {
               {reviews.map((review) => (
                 <div
                   key={review.id}
-                  className="bg-card rounded-3xl border border-border shadow-luxe p-6 hover:-translate-y-1.5 transition-transform duration-500 min-h-[400px] flex flex-col shrink-0 snap-start w-[88%] sm:w-[70%] md:w-[calc((100%-3rem)/3)]"
+                  className="review-card bg-card rounded-3xl border border-border shadow-luxe p-6 hover:-translate-y-1.5 transition-transform duration-500 min-h-[400px] flex flex-col shrink-0"
                 >
                   <div className="flex items-center gap-1 mb-4">
                     {Array.from({ length: Math.max(1, Math.min(5, review.rating)) }).map((_, i) => (
@@ -352,7 +352,7 @@ function Home() {
                 <div
                   key={`duplicate-${review.id}`}
                   aria-hidden="true"
-                  className="bg-card rounded-3xl border border-border shadow-luxe p-6 min-h-[400px] flex flex-col shrink-0 w-[88vw] sm:w-[70vw] md:w-[calc((100vw-3rem)/3)] max-w-[360px]"
+                  className="review-card bg-card rounded-3xl border border-border shadow-luxe p-6 min-h-[400px] flex flex-col shrink-0"
                 >
                   <div className="flex items-center gap-1 mb-4">
                     {Array.from({ length: Math.max(1, Math.min(5, review.rating)) }).map((_, i) => (
