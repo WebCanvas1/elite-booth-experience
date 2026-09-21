@@ -181,6 +181,25 @@
 .review-card {
   width: min(360px, calc(100vw - 72px));
 }
+@media (max-width: 767px) {
+  .reviews-marquee {
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .reviews-marquee::-webkit-scrollbar {
+    display: none;
+  }
+  .reviews-track {
+    animation: none;
+    transform: none;
+    will-change: auto;
+  }
+  .review-card {
+    scroll-snap-align: center;
+  }
+}
 @media (min-width: 768px) {
   .review-card {
     width: 360px;
