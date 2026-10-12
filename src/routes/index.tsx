@@ -78,6 +78,31 @@ function Home() {
     };
   }, [pastEvents.length]);
 
+  // The bundled defaults contain outdated prices. Do not render them while
+  // the current CMS data is loading, or if the content API is unavailable.
+  if (content.isContentLoading || content.contentLoadError) {
+    return (
+      <div className="min-h-screen bg-background">
+        <SiteHeader />
+        <main className="mx-auto flex min-h-[60vh] max-w-xl flex-col items-center justify-center px-6 text-center">
+          {content.isContentLoading ? (
+            <>
+              <div className="h-8 w-8 animate-spin rounded-full border-2 border-gold border-t-transparent" aria-hidden="true" />
+              <p className="mt-5 text-muted-foreground" role="status">Loading the latest packages and pricing…</p>
+            </>
+          ) : (
+            <>
+              <h1 className="font-serif text-3xl">Pricing temporarily unavailable</h1>
+              <p className="mt-4 text-muted-foreground">We couldn't load the latest packages. Please refresh the page to try again.</p>
+              <button type="button" onClick={() => window.location.reload()} className="mt-6 rounded-full gradient-gold px-6 py-3 font-semibold text-ink">Try again</button>
+            </>
+          )}
+        </main>
+        <SiteFooter />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <Toaster position="top-center" />
