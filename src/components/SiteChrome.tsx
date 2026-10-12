@@ -35,7 +35,7 @@ export function SiteHeader() {
   <a href="/#packages" className={linkClass}>Packages</a>
   <a href="/#addons" className={linkClass}>Add-Ons</a>
   <a href="/#events" className={linkClass}>Events</a>
-  <a href="/#event-galleries" className={linkClass}>Gallery</a>
+  <a href="/gallery" className={linkClass}>Gallery</a>
   <a href="/#about" className={linkClass}>About</a>
   <a href="/#gallery" className={linkClass}>Capturing Moments</a>
   <Link to="/enquire" className={linkClass}>Contact</Link>
@@ -217,6 +217,7 @@ export function SiteFooter() {
             <li><a href="/#packages" className="hover:text-gold">Packages</a></li>
             <li><a href="/#addons" className="hover:text-gold">Add-Ons</a></li>
             <li><a href="/#events" className="hover:text-gold">Events We Cover</a></li>
+            <li><Link to="/gallery" className="hover:text-gold">Gallery</Link></li>
             <li><a href="/#about" className="hover:text-gold">About</a></li>
             <li><a href="/#gallery" className="hover:text-gold">Capturing Moments</a></li>
             <li><Link to="/enquire" className="hover:text-gold">Get a Quote</Link></li>
