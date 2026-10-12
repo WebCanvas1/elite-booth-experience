@@ -5,35 +5,41 @@ import {
   type SiteContent,
 } from "@/lib/site-content";
 
-export function useSiteContent(): SiteContent {
+// Never display bundled demo prices while waiting for the client's live CMS data.
+export function useSiteContent(): SiteContent & {
+  isContentLoading: boolean;
+  contentLoadError: boolean;
+} {
   const [content, setContent] = useState<SiteContent>(DEFAULT_CONTENT);
+  const [isContentLoading, setIsContentLoading] = useState(true);
+  const [contentLoadError, setContentLoadError] = useState(false);
 
   useEffect(() => {
-    let cancelled = false;
+    const controller = new AbortController();
 
-    fetch(`/api/content?ts=${Date.now()}`, {
+    fetch("/api/content", {
       cache: "no-store",
+      signal: controller.signal,
     })
-      .then((r) => {
-        if (!r.ok) throw new Error("Failed to load content");
-        return r.json();
+      .then((response) => {
+        if (!response.ok) throw new Error("Failed to load content");
+        return response.json();
       })
       .then((data) => {
-        if (!cancelled) {
-          setContent(mergeContent(data as Partial<SiteContent>));
-        }
+        if (controller.signal.aborted) return;
+        setContent(mergeContent(data as Partial<SiteContent>));
+        setContentLoadError(false);
+        setIsContentLoading(false);
       })
-      .catch((err) => {
-        console.error("Failed to load site content:", err);
-        if (!cancelled) {
-          setContent(DEFAULT_CONTENT);
-        }
+      .catch((error) => {
+        if (controller.signal.aborted) return;
+        console.error("Failed to load site content:", error);
+        setContentLoadError(true);
+        setIsContentLoading(false);
       });
 
-    return () => {
-      cancelled = true;
-    };
+    return () => controller.abort();
   }, []);
 
-  return content;
+  return { ...content, isContentLoading, contentLoadError };
 }
